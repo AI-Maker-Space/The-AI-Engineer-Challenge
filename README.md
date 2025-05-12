@@ -8,7 +8,9 @@
 
 ## 🤖 Your First Vibe Coding LLM Application
 
-> If you need an introduction to `git`, or information on how to set up API keys for the tools we'll be using in this repository - check out our [Interactive Dev Environment for LLM Development](https://github.com/AI-Maker-Space/Interactive-Dev-Environment-for-AI-Engineers) which has everything you'd need to get started in this repository!
+> If you are a novice, and need more hand-holding to get your dev environment off the ground,  check out this [Setup Guide](docs/GIT_SETUP.md). This guide will walk you through the 'git' setup you need to get started.
+
+> For additional context on LLM development environments and API key setup, you can also check out our [Interactive Dev Environment for LLM Development](https://github.com/AI-Maker-Space/Interactive-Dev-Environment-for-AI-Engineers).
 
 In this repository, we'll walk you through the steps to create a LLM (Large Language Model) powered application with a vibe-coded frontend!
 
@@ -29,6 +31,16 @@ That's it! Head to the next step and start building your application!
 <details>
   <summary>🏗️ Forking & Cloning This Repository</summary>
 
+Before you begin, make sure you have:
+
+1. 👤 A GitHub account (you'll need to replace `YOUR_GITHUB_USERNAME` with your actual username)
+2. 🔧 Git installed on your local machine
+3. 💻 A code editor (like Cursor, VS Code, etc.)
+4. ⌨️ Terminal access (Mac/Linux) or Command Prompt/PowerShell (Windows)
+5. 🔑 A GitHub Personal Access Token (for authentication)
+
+Got everything in place? Let's move on!
+
 1. Fork [this](https://github.com/AI-Maker-Space/The-AI-Engineer-Challenge) repo!
 
      ![image](https://i.imgur.com/bhjySNh.png)
@@ -36,17 +48,38 @@ That's it! Head to the next step and start building your application!
 1. Clone your newly created repo.
 
      ``` bash
+     # First, navigate to where you want the project folder to be created
+     cd PATH_TO_DESIRED_PARENT_DIRECTORY
+
+     # Then clone (this will create a new folder called The-AI-Engineer-Challenge)
      git clone git@github.com:<YOUR GITHUB USERNAME>/The-AI-Engineer-Challenge.git
      ```
 
-2. Open the freshly cloned repository inside Cursor!
+     > Note: This command uses SSH. If you haven't set up SSH with GitHub, the command will fail. In that case, use HTTPS by replacing `git@github.com:` with `https://github.com/` - you'll then be prompted for your GitHub username and personal access token.
+
+2. Verify your git setup:
+
+     ```bash
+     # Check that your remote is set up correctly
+     git remote -v
+
+     # Check the status of your repository
+     git status
+
+     # See which branch you're on
+     git branch
+     ```
+
+     <!-- > Need more help with git? Check out our [Detailed Git Setup Guide](docs/GIT_SETUP.md) for a comprehensive walkthrough of git configuration and best practices. -->
+
+3. Open the freshly cloned repository inside Cursor!
 
      ```bash
      cd The-AI-Engineering-Challenge
      cursor .
      ```
 
-3. Check out the existing backend code found in `/api/app.py`
+4. Check out the existing backend code found in `/api/app.py`
 
 </details>
 
