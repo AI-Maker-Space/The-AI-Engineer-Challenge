@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 import os
 from typing import Optional
+import traceback
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -27,39 +28,46 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
-    model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
+    model: Optional[str] = "gpt-3.5-turbo"  # Optional model selection with default
     api_key: str          # OpenAI API key for authentication
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        # Initialize OpenAI client with the provided API key
+        # Initialize OpenAI client with the API key
         client = OpenAI(api_key=request.api_key)
         
         # Create an async generator function for streaming responses
         async def generate():
-            # Create a streaming chat completion request
-            stream = client.chat.completions.create(
-                model=request.model,
-                messages=[
-                    {"role": "developer", "content": request.developer_message},
-                    {"role": "user", "content": request.user_message}
-                ],
-                stream=True  # Enable streaming response
-            )
-            
-            # Yield each chunk of the response as it becomes available
-            for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    yield chunk.choices[0].delta.content
+            try:
+                # Create a streaming chat completion request
+                stream = client.chat.completions.create(
+                    model=request.model,
+                    messages=[
+                        {"role": "system", "content": request.developer_message},
+                        {"role": "user", "content": request.user_message}
+                    ],
+                    stream=True
+                )
+                
+                # Yield each chunk of the response as it becomes available
+                for chunk in stream:
+                    if chunk.choices[0].delta.content is not None:
+                        yield chunk.choices[0].delta.content
+            except Exception as e:
+                error_msg = f"Error in stream generation: {str(e)}\n{traceback.format_exc()}"
+                print(error_msg)  # Print to server logs
+                yield error_msg
 
         # Return a streaming response to the client
         return StreamingResponse(generate(), media_type="text/plain")
     
     except Exception as e:
         # Handle any errors that occur during processing
-        raise HTTPException(status_code=500, detail=str(e))
+        error_msg = f"Error in chat endpoint: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)  # Print to server logs
+        raise HTTPException(status_code=500, detail=error_msg)
 
 # Define a health check endpoint to verify API status
 @app.get("/api/health")
