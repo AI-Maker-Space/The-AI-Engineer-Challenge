@@ -1,0 +1,64 @@
+{
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "defaultBranch": "main",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "node_modules",
+      ".next",
+      "dist",
+      "build",
+      "out",
+      "coverage"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "correctness": {
+        "noChildrenProp": "error",
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error",
+        "noUnusedImports": "error",
+        "useJsxKeyInIterable": "error",
+        "noUnusedFunctionParameters": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtmlWithChildren": "error"
+      },
+      "suspicious": {
+        "noCommentText": "error",
+        "noExplicitAny": "error",
+        "noArrayIndexKey": "error",
+        "noDuplicateJsxProps": "error"
+      }
+    }
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": false
+    }
+  }, 
+  "css": {
+  "formatter": {
+    "enabled": false
+  },
+  "linter": {
+    "enabled": false
+  }
+}
+}
