@@ -1,0 +1,13 @@
+{
+  "name": "ai-engineer-challenge",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7"
+  },
+  "scripts": {
+    "prepare": "husky"
+  }
+}

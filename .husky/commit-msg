@@ -1,0 +1,6 @@
+#!/bin/sh
+if command -v pnpm >/dev/null 2>&1 && pnpm exec --which commitlint >/dev/null 2>&1; then
+  pnpm exec commitlint --edit "$1" || echo "Warning: Commit message doesn't follow conventions, but proceeding anyway."
+else
+  echo "Warning: commitlint not available. Skipping check."
+fi
