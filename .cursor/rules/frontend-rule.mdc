@@ -1,4 +1,9 @@
 ---
+description: 
+globs: 
+alwaysApply: true
+---
+---
 description: When designing a frontend or frontend components.
 globs: 
 alwaysApply: false

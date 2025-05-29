@@ -3,6 +3,11 @@ description:
 globs: 
 alwaysApply: true
 ---
+---
+description: 
+globs: 
+alwaysApply: true
+---
 ## Rules to Follow
 
 - You must always commit your changes whenever you update code. 
