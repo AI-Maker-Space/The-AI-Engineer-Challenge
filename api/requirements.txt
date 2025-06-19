@@ -3,3 +3,4 @@ uvicorn==0.34.2
 openai==1.77.0
 pydantic==2.11.4
 python-multipart==0.0.18
+python-dotenv==1.0.0

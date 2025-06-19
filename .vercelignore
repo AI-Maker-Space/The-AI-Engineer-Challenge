@@ -1,0 +1,3 @@
+# Ignore authentication files
+.vercel/project.json
+.vercel/project.json.bak 
