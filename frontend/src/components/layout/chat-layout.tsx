@@ -10,9 +10,12 @@ interface ChatLayoutProps {
 }
 
 /**
- * Enhanced chat layout with proper centering and expansion animation.
- * Integrates with the existing secure chat store and animation state.
- * Maintains mobile responsiveness and animation control from old project.
+ * Provides a responsive chat interface layout with animated expansion and contraction based on chat state.
+ *
+ * Renders an optional header and main content area, automatically centering content when collapsed and expanding to fill the viewport when a valid API key is present. Animations are triggered on state changes for smooth transitions. The layout is accessible and adapts to mobile and desktop screens.
+ *
+ * @param children - The main chat content to display within the animated area.
+ * @param header - Optional header content rendered above the chat area.
  */
 export function ChatLayout({ children, header }: ChatLayoutProps) {
   const { isExpanded, hasValidApiKey, setIsExpanded } = useChatStore();

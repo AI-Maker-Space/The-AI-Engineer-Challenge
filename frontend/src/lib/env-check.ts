@@ -5,6 +5,11 @@
 
 import { logger } from './logger';
 
+/**
+ * Checks for the presence of required environment variables and provides suggestions for missing ones.
+ *
+ * @returns An object containing a boolean indicating if all required variables are present (`isValid`), an array of missing variable names (`missing`), and suggestions for adding any missing variables (`suggestions`).
+ */
 export function checkEnvironmentVariables(): {
   isValid: boolean;
   missing: string[];
@@ -29,7 +34,9 @@ export function checkEnvironmentVariables(): {
 }
 
 /**
- * Log environment status (development only)
+ * Logs the status of required environment variables when running in development mode.
+ *
+ * Checks for the presence of required environment variables and logs a success message if all are set. If any are missing, logs an error with details and suggestions, and provides additional guidance for Doppler users. No action is taken outside of development mode.
  */
 export function logEnvironmentStatus(): void {
   if (process.env.NODE_ENV !== 'development') {

@@ -1,6 +1,13 @@
 import type * as React from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Renders a customizable multi-line text input element.
+ *
+ * Accepts all standard `<textarea>` props and supports additional styling via the `className` prop. The component is accessible, supports disabled and invalid states, and applies enhanced focus and text formatting styles for improved usability.
+ *
+ * @param className - Additional CSS classes to apply to the textarea element
+ */
 function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
   return (
     <textarea

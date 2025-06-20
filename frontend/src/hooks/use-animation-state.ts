@@ -5,12 +5,11 @@ import { useEffect, useState } from 'react';
 import { useChatStore } from '@/store';
 
 /**
- * Simplified animation state hook for background animations and welcome states.
+ * Provides animation state and control flags for background and welcome animations, ensuring hydration safety.
  *
- * Focuses on:
- * - Background animation states (valid/invalid API key)
- * - Welcome animation control
- * - Hydration safety
+ * This hook derives animation-related state from the global chat store, including API key validity, user setup progress, and whether the welcome animation has been seen. It tracks hydration status to ensure client-side safety and determines if the user is first-time or returning. The returned object includes flags for which background animation to show, whether to play or skip the welcome animation, and readiness indicators for hydration and animation.
+ *
+ * @returns An object containing animation state flags, user experience indicators, and hydration readiness.
  */
 export function useAnimationState() {
   const {

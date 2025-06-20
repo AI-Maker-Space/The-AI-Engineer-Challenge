@@ -39,9 +39,10 @@ export async function validateApiKeyAction(apiKey: string): Promise<ActionResult
 }
 
 /**
- * Test API key with a simple request
+ * Validates the format of an API key and returns the result.
  *
  * @deprecated Not implemented. Use the route handler pattern instead.
+ * @returns An ActionResult indicating whether the API key format is valid.
  */
 export async function testApiKeyAction(apiKey: string): Promise<ActionResult<boolean>> {
   console.warn('testApiKeyAction is deprecated and not implemented.');

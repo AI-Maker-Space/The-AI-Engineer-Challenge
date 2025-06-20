@@ -9,16 +9,9 @@ import { useFormStatus } from 'react-dom';
 import { ModelSelector } from './model-selector';
 
 /**
- * Renders a secure section for entering, validating, and managing an OpenAI API key and selecting an AI model.
+ * React component for securely entering, validating, and managing an OpenAI API key with integrated AI model selection.
  *
- * Provides a password-masked input for API key entry, client- and server-side validation, real-time status indicators, and accessible controls for key visibility, validation, and deletion. Integrates a model selector and displays contextual error messages and help text. Ensures accessibility with keyboard navigation, ARIA attributes, and focus management.
- *
- * Key props and accessibility features:
- * - Password-masked input with toggle for visibility
- * - Validation status indicator with color-coded feedback
- * - Accessible error messages and help text with ARIA support
- * - Keyboard navigation for input and action buttons
- * - Model selector integrated alongside API key controls
+ * Provides a password-masked input field with visibility toggle, real-time client and server validation, and contextual feedback for API key status. Includes accessible error messages, help text, and ARIA attributes for screen readers. Supports keyboard navigation and focus management. Allows users to select an AI model and delete or reset the API key session.
  */
 export function ApiKeySection() {
   // Local state for API key input (not persisted)

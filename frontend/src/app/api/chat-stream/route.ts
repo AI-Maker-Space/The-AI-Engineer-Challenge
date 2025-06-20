@@ -3,6 +3,13 @@ import type { NextRequest } from 'next/server';
 import { getApiKeySession, getDecryptedApiKey } from '@/app/actions/api-key-actions';
 import { logger } from '@/lib';
 
+/**
+ * Handles chat streaming POST requests by validating the API key session, parsing and validating the user message and model, and forwarding the request to a backend FastAPI service. Returns a streaming response with the AI-generated reply or an appropriate error message.
+ *
+ * Expects a JSON body with a `message` (required), an optional `model`, and an optional `developerMessage`. Enforces authentication, input validation, and model selection, and streams the backend response to the client.
+ *
+ * @returns A streaming response with the AI-generated reply, or a JSON error response with appropriate HTTP status codes.
+ */
 export async function POST(request: NextRequest) {
   try {
     // 1. Verify session exists (SECURE)

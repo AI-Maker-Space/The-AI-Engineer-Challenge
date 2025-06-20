@@ -3,21 +3,11 @@
 import { useAnimationState } from '@/hooks/use-animation-state';
 
 /**
- * Animated background with enhanced animation control and stability.
+ * Renders a full-screen animated background with smooth transitions and overlays, displaying children content above.
  *
- * Key improvements:
- * - Enhanced animation state integration
- * - Stable transitions without flickering
- * - Consistent animation behavior for all users
- * - No hydration delays or loading states
+ * The background features animated logo patterns and a dynamic glassmorphism effect, with animation states controlled by user session and API key validity. Renders immediately without hydration delays for a stable visual experience.
  *
- * Features:
- * - No hydration waiting - renders immediately
- * - Uses localStorage-based flags for instant state
- * - Clean animation transitions without loading states
- * - Maintains visual stability across page reloads
- *
- * @param children - The content to render above the animated background
+ * @param children - React nodes to display above the animated background
  */
 export function AnimatedBackground({ children }: { children: React.ReactNode }) {
   const {

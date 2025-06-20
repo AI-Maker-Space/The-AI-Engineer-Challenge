@@ -15,9 +15,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * Root layout component that wraps all pages with global styles and font variables.
- * Renders the application's children within an HTML structure set to English, applying Geist Sans and Geist Mono fonts and antialiasing to the body.
- * @param children - The page content to be rendered inside the layout.
+ * Root layout for all application pages, applying global styles, fonts, and initializing the store.
+ *
+ * Wraps every page in a consistent HTML structure with Geist Sans and Geist Mono fonts, antialiasing, and global state initialization.
+ *
+ * @param children - The page content to render within the layout.
  */
 export default function RootLayout({
   children,

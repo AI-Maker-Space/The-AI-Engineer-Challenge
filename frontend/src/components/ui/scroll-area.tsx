@@ -27,6 +27,13 @@ function ScrollArea({
   );
 }
 
+/**
+ * Renders a styled scrollbar for the scroll area, supporting vertical or horizontal orientation.
+ *
+ * Applies custom sizing, padding, and interactive thumb styling for improved appearance and accessibility.
+ *
+ * @param orientation - The scrollbar orientation, either 'vertical' or 'horizontal'. Defaults to 'vertical'.
+ */
 function ScrollBar({
   className,
   orientation = 'vertical',

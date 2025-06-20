@@ -7,21 +7,14 @@ import { cn } from '@/lib/utils';
 import { AVAILABLE_MODELS, type ModelSelectorProps } from '../chat.types';
 
 /**
- * Renders a dropdown selector for choosing a model from a predefined list.
+ * Displays a dropdown menu for selecting a model from a predefined list.
  *
- * Displays the currently selected model or a placeholder if none is selected.
- * Supports disabling interaction and custom styling via props. The dropdown is
- * accessible and keyboard-navigable.
+ * Shows the current selection or a placeholder if none is chosen. The selector can be disabled and styled via props, and is fully accessible and keyboard-navigable.
  *
- * STABILITY FIXES:
- * - Memoized model list to prevent unnecessary re-renders
- * - Stable visibility during API key state changes
- * - Consistent styling that doesn't cause layout shifts
- *
- * @param selectedModel - The ID of the currently selected model
- * @param onModelChange - Callback invoked with the new model ID when selection changes
- * @param disabled - If true, disables the selector
- * @param className - Additional CSS classes for custom styling
+ * @param selectedModel - The ID of the currently selected model, or undefined to show the default.
+ * @param onModelChange - Callback triggered with the new model ID when the selection changes.
+ * @param disabled - If true, disables user interaction with the selector.
+ * @param className - Additional CSS classes for custom styling.
  */
 export function ModelSelector({
   selectedModel,

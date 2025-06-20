@@ -6,8 +6,11 @@ import { useChatStore } from '@/store';
 import type { Message } from '@/types';
 
 /**
- * Enhanced useChat hook that integrates with the streaming route handler
- * and provides secure message sending with proper error handling.
+ * React hook for sending chat messages with streaming assistant responses and robust error handling.
+ *
+ * Integrates with a streaming API endpoint to send user messages and receive assistant replies in real time. Manages chat state, including message updates, loading and typing indicators, and animated content for a typewriter effect. On error, adds an assistant message with the error details and re-throws the error for external handling.
+ *
+ * @returns An object containing the `sendMessage` function for sending messages and the `isStreaming` boolean indicating if a response is currently streaming.
  */
 export function useChat() {
   const [isStreaming, setIsStreaming] = useState(false);

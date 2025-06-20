@@ -227,7 +227,12 @@ export const logger = new ConsoleLogger();
 export const perf = new PerformanceTracker();
 
 /**
- * Development-only assertion utility
+ * Throws an error with the provided message if the condition is false in development mode.
+ *
+ * In development environments, this function enforces assertions by throwing an error and logging it when the condition is not met. In production, it has no effect.
+ *
+ * @param condition - The boolean expression to assert
+ * @param message - The error message to display if the assertion fails
  */
 export function devAssert(condition: boolean, message: string): asserts condition {
   if (process.env.NODE_ENV === 'development' && !condition) {
@@ -237,7 +242,10 @@ export function devAssert(condition: boolean, message: string): asserts conditio
 }
 
 /**
- * Component-specific logger factory
+ * Creates a logger instance scoped to a specific component, automatically including the component name in all log entries.
+ *
+ * @param componentName - The name of the component to associate with all log messages
+ * @returns An object with logging methods (`debug`, `info`, `warn`, `error`, `success`) that prepend the component context to each log entry
  */
 export function createComponentLogger(componentName: string) {
   return {
@@ -255,7 +263,10 @@ export function createComponentLogger(componentName: string) {
 }
 
 /**
- * Feature-specific logger factory
+ * Creates a logger instance scoped to a specific feature, automatically including the feature name in all log contexts.
+ *
+ * @param featureName - The name of the feature to associate with all log entries
+ * @returns An object with logging methods (`debug`, `info`, `warn`, `error`, `success`) that prepend the feature context to each log
  */
 export function createFeatureLogger(featureName: string) {
   return {

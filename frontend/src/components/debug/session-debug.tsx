@@ -34,8 +34,9 @@ interface ZustandPersistedData {
 }
 
 /**
- * Debug component to help diagnose persistence and session issues
- * Only renders in development mode
+ * Displays a fixed debug panel in development mode with session and persistence state details.
+ *
+ * Shows key session flags, Zustand store values, parsed localStorage data, and visible cookies to assist in diagnosing session or persistence issues during development. The panel is visually distinct, fixed to the viewport, and uses semantic markup for accessibility. It does not render in production environments.
  */
 export function SessionDebug() {
   const {

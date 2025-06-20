@@ -9,7 +9,11 @@ import { Send } from 'lucide-react';
 import { ApiKeySection } from './api-key-section';
 
 /**
- * Submit button with proper loading and validation states
+ * Renders a chat submit button that displays a loading spinner while submitting and disables itself if submission is in progress or the API key is invalid.
+ *
+ * The button is accessible via keyboard and screen readers, and its appearance updates to reflect loading and disabled states.
+ *
+ * @param isSubmitting - Indicates whether a message is currently being submitted
  */
 function SubmitButton({ isSubmitting }: { isSubmitting: boolean }) {
   const { hasValidApiKey } = useChatStore();
@@ -34,7 +38,9 @@ function SubmitButton({ isSubmitting }: { isSubmitting: boolean }) {
 }
 
 /**
- * Enhanced chat input with streaming support via route handler
+ * Renders a chat input interface with streaming message support and API key validation.
+ *
+ * Provides a textarea for composing messages, auto-resizes input, and manages submission state and errors. Disables input and submission when the API key is missing or a message is being sent. Includes accessible status messages and keyboard shortcuts (Enter to send, Shift+Enter for new line).
  */
 export function ChatInput() {
   const [input, setInput] = useState('');

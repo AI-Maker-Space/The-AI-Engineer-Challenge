@@ -20,13 +20,9 @@ import { useChatStore } from '@/store';
 import { Bot, Clock, Sparkles } from 'lucide-react';
 
 /**
- * Main chat page with streaming support and proper state management.
+ * Renders the main chat page with streaming support, state management, and dynamic UI based on user session and animation state.
  *
- * Updated for streaming architecture:
- * - Removed server action dependencies
- * - Uses route handler for streaming
- * - Improved error handling and loading states
- * - Better integration with store initialization
+ * Initializes chat store after hydration, performs background session validation, and displays a chat interface with message list, input, and timestamp toggling. The header adapts to user return status and animation state.
  */
 export default function HomePage() {
   const {

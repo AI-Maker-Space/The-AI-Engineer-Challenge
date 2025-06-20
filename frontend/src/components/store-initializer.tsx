@@ -6,8 +6,9 @@ import { logger } from '@/lib';
 import { useChatStore } from '@/store';
 
 /**
- * Component to initialize the store on app startup.
- * This ensures proper hydration and session checking.
+ * Initializes the application store and checks user session on app startup.
+ *
+ * Ensures the store is hydrated and any existing user session is validated before the app renders. This component does not render any UI and should be included at the root of the application.
  */
 export function StoreInitializer() {
   const { initializeStore, checkSession, isInitialized } = useChatStore();

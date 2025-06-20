@@ -13,14 +13,11 @@ interface EmptyStateProps {
 }
 
 /**
- * EmptyState - Client Component for welcome message display
+ * Displays a welcome UI for the AI chat assistant, showing an animated introduction for first-time users and a static message for returning users.
  *
- * Features:
- * - Beautiful welcome UI with animated elements for first-time users
- * - Static "ready to help" message for returning users (no animation)
- * - Glassmorphism styling matching project design
- * - FIXED: Animation only plays once per user, persisted in localStorage
- * - Single Responsibility: Only handles empty state welcome UI
+ * Determines whether to show the animated welcome based on a persisted flag in localStorage, ensuring the animation only plays once per user. Includes accessible headings, descriptive text, and a tip about API key security. The `className` prop allows for custom styling.
+ *
+ * @param className - Optional custom class names for styling the root container
  */
 export function EmptyState({ className }: EmptyStateProps) {
   const { setHasSeenWelcomeAnimation } = useChatStore();
