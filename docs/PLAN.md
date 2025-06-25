@@ -15,7 +15,7 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 
 ## 2. Branding & Design
 
-- [ ] Design and add a cute cartoon cat logo (SVG/PNG) for the header and web icon.
+- [ ] Generate and add a simple SVG cartoon cat logo for the header and web icon.
 - [ ] Create a modern, responsive layout with TailwindCSS.
 - [ ] Implement a light/dark theme toggle (accessible via button or switch).
 - [ ] Ensure all UI components meet WCAG 2.2 accessibility standards (color contrast, keyboard navigation, ARIA labels, etc.).
@@ -26,11 +26,13 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 - [ ] Implement a tabbed interface with two tabs:
   - **Configuration**
   - **Chat**
+- [ ] Always default to the **Chat** tab on load.
 
 ## 4. Configuration Tab
 
 - [ ] Add a password input for the user to paste their OpenAI API key (masked input, not stored persistently).
 - [ ] Add a textarea for the user to update the system prompt (developer message).
+- [ ] Pre-populate the system prompt with a good generic prompt by default.
 - [ ] Validate inputs and provide accessible error messages if needed.
 
 ## 5. Chat Tab
@@ -38,20 +40,21 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 - [ ] Add a textarea for the user to type their question/message.
 - [ ] Add a "Send" button to submit the input.
 - [ ] Display chat history in a conversational format (user and assistant messages, styled with avatars or icons).
-- [ ] Show loading indicators and handle streaming responses from the backend.
+- [ ] Store chat history in local/session storage (never the API key).
+- [ ] Show loading indicators and update the chat UI as streaming responses are received from the backend.
 - [ ] Ensure keyboard accessibility for all controls.
 
 ## 6. API Integration
 
 - [ ] Connect the frontend to the backend FastAPI service in the `api` directory.
-- [ ] Use the `/api/chat` endpoint for chat functionality (POST requests with API key, system prompt, and user message).
-- [ ] Handle streaming responses and errors gracefully.
+- [ ] Use the `/api/chat` endpoint directly for chat functionality (POST requests with API key, system prompt, and user message).
+- [ ] Handle streaming responses and errors gracefully, updating the chat UI in real time.
 
 ## 7. Accessibility & Testing
 
 - [ ] Audit the UI for WCAG 2.2 compliance (color contrast, focus states, ARIA roles, etc.).
 - [ ] Test keyboard navigation and screen reader compatibility.
-- [ ] Add unit and integration tests for key components and API calls.
+- [ ] Add unit and integration tests for key components and API calls using React Testing Library.
 
 ## 8. Documentation
 
