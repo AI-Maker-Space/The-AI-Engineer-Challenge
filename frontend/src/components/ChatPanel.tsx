@@ -54,7 +54,7 @@ export default function ChatPanel({
                 }`}
               >
                 {msg.role === "assistant" && (
-                  <span className="inline-block w-7 h-7 rounded-full bg-yellow-200 border border-gray-300 dark:border-gray-700 flex items-center justify-center">
+                  <span className="w-7 h-7 rounded-full bg-yellow-200 border border-gray-300 dark:border-gray-700 flex items-center justify-center">
                     <span role="img" aria-label="cat">🐱</span>
                   </span>
                 )}
@@ -68,7 +68,7 @@ export default function ChatPanel({
                   {msg.content}
                 </span>
                 {msg.role === "user" && (
-                  <span className="inline-block w-7 h-7 rounded-full bg-blue-200 border border-gray-300 dark:border-gray-700 flex items-center justify-center">
+                  <span className="w-7 h-7 rounded-full bg-blue-200 border border-gray-300 dark:border-gray-700 flex items-center justify-center">
                     <span role="img" aria-label="user">🧑</span>
                   </span>
                 )}

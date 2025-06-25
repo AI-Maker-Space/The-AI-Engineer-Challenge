@@ -54,7 +54,8 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 
 - [ ] Audit the UI for WCAG 2.2 compliance (color contrast, focus states, ARIA roles, etc.).
 - [ ] Test keyboard navigation and screen reader compatibility.
-- [ ] Add unit and integration tests for key components and API calls using React Testing Library.
+- [ ] Add unit and integration tests for key components and API calls using **Vitest** and **React Testing Library** (`@testing-library/react`).
+- [ ] Use `@testing-library/jest-dom` for custom matchers in assertions.
 
 ## 8. Documentation
 
