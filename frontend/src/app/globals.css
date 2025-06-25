@@ -2,6 +2,8 @@
 
 :root {
   --wenge: hsla(346, 8%, 31%, 1);
+  /* #55494c */
+  --wenge-darker: hsla(346, 8%, 18%, 1);
   --jasper: hsla(6, 65%, 57%, 1);
   --persian-orange: hsla(23, 51%, 60%, 1);
   --isabelline: hsla(50, 21%, 95%, 1);
@@ -12,6 +14,7 @@
   --accent: var(--jasper);
   --secondary: var(--persian-orange);
   --success: var(--mint);
+  --border: var(--wenge);
 }
 
 .dark {
@@ -20,6 +23,7 @@
   --accent: var(--mint);
   --secondary: var(--persian-orange);
   --success: var(--jasper);
+  --border: var(--isabelline);
 }
 
 @theme inline {

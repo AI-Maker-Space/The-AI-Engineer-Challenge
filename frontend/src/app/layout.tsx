@@ -1,5 +1,4 @@
 'use client';
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Image from "next/image";
@@ -51,7 +50,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <header className="w-full flex flex-col items-center justify-center px-4 py-8 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-wenge">
+        <header className="w-full flex flex-col items-center justify-center px-4 py-8 border-b border-gray-200 dark:border-gray-700 bg-isabelline dark:bg-wenge">
           <div className="flex flex-col items-center gap-3">
             <Image src="/chatty-cat.svg" alt="ChattyCat logo" width={150} height={150} priority />
             <span className="text-5xl font-extrabold tracking-tight select-none" aria-label="ChattyCat">ChattyCat</span>

@@ -7,6 +7,16 @@ import { DEFAULT_SYSTEM_PROMPT } from "../constants";
 
 const CHAT_HISTORY_KEY = "chattycat-history";
 
+// Utility to escape HTML for safe rendering
+function escapeHtml(text: string) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export default function Home() {
   // State for configuration
   const [apiKey, setApiKey] = useState("");
@@ -62,7 +72,7 @@ export default function Home() {
         }),
       });
       if (!response.body) throw new Error("No response body");
-      let assistantMsg: ChatMessage = { role: "assistant", content: "" };
+      const assistantMsg: ChatMessage = { role: "assistant", content: "" };
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
@@ -85,10 +95,24 @@ export default function Home() {
           });
         }
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to get response from backend.");
+    } catch (err: unknown) {
+      if (typeof err === "string") {
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to get response from backend.");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handler to clear chat
+  const handleClearChat = () => {
+    setChatHistory([]);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(CHAT_HISTORY_KEY);
     }
   };
 
@@ -100,16 +124,28 @@ export default function Home() {
           label: "Chat",
           id: "chat",
           content: (
-            <div>
+            <div className="relative">
+              {!apiKey && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+                  <div className="bg-jasper text-white text-lg font-semibold px-8 py-6 rounded-xl shadow-lg border-2 border-persian-orange max-w-md mx-auto text-center pointer-events-auto" role="alert" aria-live="assertive">
+                    Please enter your OpenAI API key in the Configuration tab to use ChattyCat.
+                  </div>
+                </div>
+              )}
               {error && (
                 <div className="mb-2 text-red-600 dark:text-red-400 text-sm" role="alert">{error}</div>
               )}
               <ChatPanel
-                chatHistory={chatHistory}
+                chatHistory={chatHistory.map(msg =>
+                  msg.role === "assistant"
+                    ? { ...msg, content: escapeHtml(msg.content) }
+                    : msg
+                )}
                 userInput={userInput}
                 onInputChange={setUserInput}
                 onSend={handleSend}
                 loading={loading}
+                onClearChat={handleClearChat}
               />
             </div>
           ),
