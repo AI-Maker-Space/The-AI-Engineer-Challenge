@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --wenge: hsla(346, 8%, 31%, 1);
+  --jasper: hsla(6, 65%, 57%, 1);
+  --persian-orange: hsla(23, 51%, 60%, 1);
+  --isabelline: hsla(50, 21%, 95%, 1);
+  --mint: hsla(161, 49%, 58%, 1);
+
+  --background: var(--isabelline);
+  --foreground: var(--wenge);
+  --accent: var(--jasper);
+  --secondary: var(--persian-orange);
+  --success: var(--mint);
+}
+
+.dark {
+  --background: var(--wenge);
+  --foreground: var(--isabelline);
+  --accent: var(--mint);
+  --secondary: var(--persian-orange);
+  --success: var(--jasper);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
