@@ -42,6 +42,7 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 - [ ] Ensure keyboard accessibility for all controls.
 
 ## 6. API Integration
+
 - [ ] Connect the frontend to the backend FastAPI service in the `api` directory.
 - [ ] Use the `/api/chat` endpoint for chat functionality (POST requests with API key, system prompt, and user message).
 - [ ] Handle streaming responses and errors gracefully.
@@ -59,7 +60,7 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 
 ## 9. Deployment (Optional)
 
-- [ ] Prepare the frontend for deployment (Vercel or similar platform).
+- [ ] Prepare the frontend for deployment to Vercel.
 - [ ] Ensure environment variables (if any) are handled securely.
 
 ---
