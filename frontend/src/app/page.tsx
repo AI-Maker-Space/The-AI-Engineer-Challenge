@@ -1,14 +1,13 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
-import ConfigurationPanel from "../components/ConfigurationPanel";
-import { DEFAULT_SYSTEM_PROMPT, CHAT_HISTORY_KEY } from "../constants";
+import { DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
+import Sidebar from "../components/Sidebar";
 
 export default function Home() {
   // State for configuration
   const [apiKey, setApiKey] = useState("");
-  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [assistantPrompt, setAssistantPrompt] = useState("");
 
   // State for chat
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -37,13 +36,6 @@ export default function Home() {
     }
   }, [chatHistory]);
 
-  // Open sidebar if no API key is entered
-  useEffect(() => {
-    if (!apiKey) {
-      setSidebarOpen(true);
-    }
-  }, [apiKey]);
-
   // Handler for sending a message with streaming
   const handleSend = async () => {
     setError(null);
@@ -61,7 +53,9 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          developer_message: systemPrompt,
+          // TODO sanitize assistant input
+          ...(assistantPrompt.trim() !== "" ? { assistant_message: assistantPrompt } : {}),
+          developer_message: DEVELOPER_PROMPT,
           user_message: userMsg.content,
           api_key: apiKey,
         }),
@@ -113,56 +107,36 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Collapsible Sidebar for configuration */}
-      <aside
-        className={`transition-all duration-300 ${
-          sidebarOpen ? "w-80" : "w-0"
-        } bg-white border-r border-gray-200 p-4 flex flex-col gap-4 overflow-hidden`}
-        style={{ minWidth: sidebarOpen ? "22rem" : "0", maxWidth: sidebarOpen ? "22rem" : "0" }}
-      >
-        {sidebarOpen && (
-          <ConfigurationPanel
-            apiKey={apiKey}
-            onApiKeyChange={setApiKey}
-            systemPrompt={systemPrompt}
-            onSystemPromptChange={setSystemPrompt}
-          />
-        )}
-      </aside>
-      {/* Sidebar toggle button */}
-      <button
-        className="absolute left-0 top-4 z-20 bg-gray-200 text-black px-2 py-1 rounded-r focus:outline-none border border-gray-300"
-        style={{
-          transform: sidebarOpen ? "translateX(20rem)" : "translateX(0)",
-          transition: "transform 0.3s",
-        }}
-        aria-label={sidebarOpen ? "Close configuration sidebar" : "Open configuration sidebar"}
-        onClick={() => setSidebarOpen((open) => !open)}
-      >
-        {sidebarOpen ? "←" : "→"}
-      </button>
+      <Sidebar
+        apiKey={apiKey}
+        onApiKeyChange={setApiKey}
+        assistantPrompt={assistantPrompt}
+        onAssistantPromptChange={setAssistantPrompt}
+      />
       {/* Main chat area */}
-      <main className="flex-1">
-        <div className="relative p-4">
-          {error && (
-            <div className="mb-2 text-black text-sm" role="alert">{error}</div>
-          )}
-          <ChatPanel
-            chatHistory={chatHistory.map(msg =>
-              msg.role === "assistant"
-                ? { ...msg, content: msg.content }
-                : msg
+      <section>
+        <div className="w-screen flex justify-center items-center">
+          <div className="flex flex-col w-full max-w-screen">
+            {error && (
+              <div className="mb-2 text-black text-sm" role="alert">{error}</div>
             )}
-            userInput={userInput}
-            onInputChange={setUserInput}
-            onSend={handleSend}
-            loading={loading}
-            onClearChat={handleClearChat}
-            clearChatDisabled={chatHistory.length === 0}
-            renderAssistantHtml={true}
-          />
+            <ChatPanel
+              chatHistory={chatHistory.map(msg =>
+                msg.role === "assistant"
+                  ? { ...msg, content: msg.content }
+                  : msg
+              )}
+              userInput={userInput}
+              onInputChange={setUserInput}
+              onSend={handleSend}
+              loading={loading}
+              onClearChat={handleClearChat}
+              clearChatDisabled={chatHistory.length === 0}
+              renderAssistantHtml={true}
+            />
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }
