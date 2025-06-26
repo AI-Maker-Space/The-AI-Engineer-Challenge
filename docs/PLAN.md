@@ -22,20 +22,17 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 
 ## 3. Application Structure
 
-- [ ] Use a single-page layout with a header (logo + theme toggle) and main content area.
-- [ ] Implement a tabbed interface with two tabs:
-  - **Configuration**
-  - **Chat**
-- [ ] Always default to the **Chat** tab on load.
+- [ ] Use a single-page layout with a header, sidebar and main content area.
+- [ ] The sidebar contains configuration input
 
-## 4. Configuration Tab
+## 4. Configuration Sidebar
 
 - [ ] Add a password input for the user to paste their OpenAI API key (masked input, not stored persistently).
 - [ ] Add a textarea for the user to update the system prompt (developer message).
 - [ ] Pre-populate the system prompt with a good generic prompt by default.
 - [ ] Validate inputs and provide accessible error messages if needed.
 
-## 5. Chat Tab
+## 5. Chat Area
 
 - [ ] Add a textarea for the user to type their question/message.
 - [ ] Add a "Send" button to submit the input.
@@ -61,6 +58,7 @@ Build a modern, accessible, single-page chatbot web application called **ChattyC
 
 - [ ] Update `frontend/README.md` with setup, run, and usage instructions.
 - [ ] Document accessibility features and known limitations.
+- [ ] Document changes to requirements in `docs/PLAN.md`
 
 ## 9. Deployment (Optional)
 

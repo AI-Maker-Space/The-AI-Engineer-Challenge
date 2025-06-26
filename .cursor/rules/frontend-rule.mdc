@@ -14,10 +14,6 @@ alwaysApply: false
 
 Use these colors in the theme:
 ```css
-/* CSS HSL */
---wenge: hsla(346, 8%, 31%, 1);
---jasper: hsla(6, 65%, 57%, 1);
---persian-orange: hsla(23, 51%, 60%, 1);
---isabelline: hsla(50, 21%, 95%, 1);
---mint: hsla(161, 49%, 58%, 1);
+  --color-dustyrose-400: oklch(0.7526 0.0752 344.63);
+  --color-olive-400: oklch(0.7068 0.1085 121.31);
 ```
