@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
-import ConfigurationPanel from "../components/ConfigurationPanel";
 import { SYSTEM_PROMPT, DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import Sidebar from "../components/Sidebar";
 
