@@ -122,10 +122,13 @@ export default function Home() {
               <div className="mb-2 text-black text-sm" role="alert">{error}</div>
             )}
             <ChatPanel
-              chatHistory={chatHistory.map(msg =>
-                msg.role === "assistant"
-                  ? { ...msg, content: marked.parse(msg.content as string) }
-                  : msg
+              // For each message in chatHistory, if the message is from the assistant,
+              // convert its content from markdown to HTML using marked.parse, so it can be rendered as HTML.
+              // User messages are left unchanged.
+              chatHistory={chatHistory.map(message =>
+                message.role === "assistant"
+                  ? { ...message, content: marked.parse(message.content as string, { async: false }) }
+                  : message
               )}
               userInput={userInput}
               onInputChange={setUserInput}
