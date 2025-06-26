@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import ChatPanel, { ChatMessage } from "../components/ChatPanel";
+import { marked } from "marked";
 import { DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
+import ChatPanel, { ChatMessage } from "../components/ChatPanel";
 import Sidebar from "../components/Sidebar";
 
 export default function Home() {
@@ -123,7 +124,7 @@ export default function Home() {
             <ChatPanel
               chatHistory={chatHistory.map(msg =>
                 msg.role === "assistant"
-                  ? { ...msg, content: msg.content }
+                  ? { ...msg, content: marked.parse(msg.content as string) }
                   : msg
               )}
               userInput={userInput}

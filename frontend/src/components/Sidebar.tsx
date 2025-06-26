@@ -23,7 +23,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 h-screen z-50 transition-all duration-300 ${
         sidebarOpen ? "w-[20rem]" : "w-0"
       } bg-gray-200 p-4 flex flex-col gap-4`}
     >
