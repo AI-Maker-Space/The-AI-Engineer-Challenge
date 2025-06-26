@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 interface SidebarProps {
   apiKey: string;
   onApiKeyChange: (value: string) => void;
-  developerPrompt: string;
-  onDeveloperPromptChange: (value: string) => void;
+  assistantPrompt: string;
+  onAssistantPromptChange: (value: string) => void;
 }
 
 export default function Sidebar({
   apiKey,
   onApiKeyChange,
-  developerPrompt,
-  onDeveloperPromptChange,
+  assistantPrompt,
+  onAssistantPromptChange,
 }: SidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -23,13 +23,12 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`transition-all duration-300 ${
-        sidebarOpen ? "w-80" : "w-0"
-      } bg-white border-r border-gray-200 p-4 flex flex-col gap-4 overflow-hidden`}
-      style={{ minWidth: sidebarOpen ? "22rem" : "0", maxWidth: sidebarOpen ? "22rem" : "0", marginTop: "0" }}
+      className={`fixed top-0 left-0 h-screen z-40 transition-all duration-300 ${
+        sidebarOpen ? "w-[20rem]" : "w-0"
+      } bg-gray-200 p-4 flex flex-col gap-4`}
     >
       <button
-        className="mb-4 bg-gray-200 text-black px-2 py-1 rounded-r focus:outline-none border border-gray-300 self-end"
+        className="mb-4 -mr-8 bg-gray-300 text-black px-2 py-1 rounded-r focus:outline-none border border-gray-300 self-end"
         aria-label={sidebarOpen ? "Close configuration sidebar" : "Open configuration sidebar"}
         onClick={() => setSidebarOpen((open) => !open)}
       >
@@ -49,12 +48,12 @@ export default function Sidebar({
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="font-semibold">Developer Prompt</span>
+            <span className="font-semibold">Assistant Prompt</span>
             <textarea
               className="border rounded px-3 py-2 bg-gray-100 border-gray-300 focus:outline-none focus:ring focus:ring-gray-200 min-h-[48px]"
-              placeholder="Enter your developer prompt..."
-              value={developerPrompt}
-              onChange={e => onDeveloperPromptChange(e.target.value)}
+              placeholder="Enter your assistant prompt..."
+              value={assistantPrompt}
+              onChange={e => onAssistantPromptChange(e.target.value)}
             />
           </label>
         </form>

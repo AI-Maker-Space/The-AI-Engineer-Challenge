@@ -1,13 +1,13 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
-import { SYSTEM_PROMPT, DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
+import { DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import Sidebar from "../components/Sidebar";
 
 export default function Home() {
   // State for configuration
   const [apiKey, setApiKey] = useState("");
-  const [developerPrompt, setDeveloperPrompt] = useState(DEFAULT_DEVELOPER_PROMPT);
+  const [assistantPrompt, setAssistantPrompt] = useState("");
 
   // State for chat
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -53,7 +53,9 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          developer_message: `${SYSTEM_PROMPT} ${developerPrompt}`,
+          // TODO sanitize assistant input
+          ...(assistantPrompt.trim() !== "" ? { assistant_message: assistantPrompt } : {}),
+          developer_message: DEVELOPER_PROMPT,
           user_message: userMsg.content,
           api_key: apiKey,
         }),
@@ -108,31 +110,33 @@ export default function Home() {
       <Sidebar
         apiKey={apiKey}
         onApiKeyChange={setApiKey}
-        developerPrompt={developerPrompt}
-        onDeveloperPromptChange={setDeveloperPrompt}
+        assistantPrompt={assistantPrompt}
+        onAssistantPromptChange={setAssistantPrompt}
       />
       {/* Main chat area */}
-      <main className="flex-1">
-        <div className="relative p-4">
-          {error && (
-            <div className="mb-2 text-black text-sm" role="alert">{error}</div>
-          )}
-          <ChatPanel
-            chatHistory={chatHistory.map(msg =>
-              msg.role === "assistant"
-                ? { ...msg, content: msg.content }
-                : msg
+      <section>
+        <div className="w-screen flex justify-center items-center">
+          <div className="flex flex-col w-full max-w-screen">
+            {error && (
+              <div className="mb-2 text-black text-sm" role="alert">{error}</div>
             )}
-            userInput={userInput}
-            onInputChange={setUserInput}
-            onSend={handleSend}
-            loading={loading}
-            onClearChat={handleClearChat}
-            clearChatDisabled={chatHistory.length === 0}
-            renderAssistantHtml={true}
-          />
+            <ChatPanel
+              chatHistory={chatHistory.map(msg =>
+                msg.role === "assistant"
+                  ? { ...msg, content: msg.content }
+                  : msg
+              )}
+              userInput={userInput}
+              onInputChange={setUserInput}
+              onSend={handleSend}
+              loading={loading}
+              onClearChat={handleClearChat}
+              clearChatDisabled={chatHistory.length === 0}
+              renderAssistantHtml={true}
+            />
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }

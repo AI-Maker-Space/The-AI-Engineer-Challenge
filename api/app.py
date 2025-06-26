@@ -25,7 +25,7 @@ app.add_middleware(
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
 class ChatRequest(BaseModel):
-    assistant_message: Optional[str] # Message from assistant to tune the prompt
+    assistant_message: Optional[str] = None  # Optional message from assistant to tune the prompt
     developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default

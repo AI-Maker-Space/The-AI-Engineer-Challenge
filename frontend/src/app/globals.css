@@ -3,15 +3,6 @@
 /* Remove all custom color variables except for gray, black, and white */
 @theme {
   --breakpoint-3xl: 120rem;
-  /* Only gray, black, and white colors retained */
-  /* --color-gray-100: #f5f5f5;
-  --color-gray-200: #e5e5e5;
-  --color-gray-300: #d4d4d4;
-  --color-gray-400: #a3a3a3;
-  --color-gray-500: #737373;
-  --color-gray-600: #525252;
-  --color-black: #000000;
-  --color-white: #ffffff; */
   --color-dustyrose-300: oklch(0.8234 0.0752 344.63);
   --color-dustyrose-400: oklch(0.7526 0.0752 344.63);
   --color-olive-300: oklch(0.8116 0.1085 121.31);
