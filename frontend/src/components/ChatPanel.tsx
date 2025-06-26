@@ -68,7 +68,7 @@ function ChatInputForm({
         <button
           type="button"
           onClick={onClearChat}
-          className="px-4 py-2 rounded bg-gray-400 text-white font-semibold shadow focus:outline-none focus-visible:ring disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded bg-gray-200 text-gray-700 font-semibold shadow focus:outline-none focus-visible:ring disabled:opacity-60 disabled:cursor-not-allowed"
           disabled={clearChatDisabled}
         >
           Clear Chat
