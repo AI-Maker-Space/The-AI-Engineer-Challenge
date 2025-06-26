@@ -2,8 +2,8 @@
 
 Advanced Build
 
-1. GitHub URL to Markdown: []()
-2. Vercel URL to Updated Challenge Project: []()
+1. GitHub URL to Markdown: [HW1_VIBE_CHECK.md](https://github.com/julie-berlin/pub-aim-the-ai-engineer-challenge/blob/main/docs/HW1_VIBE_CHECK.md)
+2. Vercel URL to Updated Challenge Project: [ChattyCat](https://pub-aim-the-ai-engineer-challenge.vercel.app/)
 
 ---
 
@@ -12,30 +12,52 @@ Advanced Build
 Please evaluate your system on the following questions:
 
 1. Explain the concept of object-oriented programming in simple terms to a complete beginner.
+    - user prompt:
+    ```
+    Explain the concept of object-oriented programming in simple terms to a complete beginner.
+    ```
     - Expected Good Answer: A short response that uses simple words to explain the main concepts.
     - Aspect Tested: Factual accuracy and style guide adherence
     - Evaluation: The answer is acceptable
 
-2. Read the following paragraph and provide a concise summary of the key points:
-```
-```
-    - Expected Good Answer:
-    - Aspect Tested:
+2. Read the following paragraph and provide a concise summary of the key points…
+    - user prompt:
+    ```
+    Read the following paragraph and provide a concise summary of the key points:
+
+    What If Your New Kitty Doesn't Get Along With Your Other Pets? Don't panic if you have another cat and it isn't getting along with the new kitten just yet. This process can take time, and 30 days may not be enough for your cat to adjust. This is where those synthetic calming pheromones can help all the cats in the household to adjust; they can be used as a diffuser in a room both cats spend time in, or a spray that can be used on their beds or other common areas. It can also help them bond if you make their interactions more positive by playing with both cats together, giving them treats, and/or engaging in other activities your cats enjoy, such as grooming, with the new kitten in tow.
+    ```
+    - Expected Good Answer: Include time frame, calming pheromones, positive reinforcement in answer.
+    - Aspect Tested: Factual accuracy,
     - Evaluation:
 
 3. Write a short, imaginative story (100–150 words) about a robot finding friendship in an unexpected place.
-    - Aspect Tested:
+    - user prompt:
+    ```
+    Write a short, imaginative story (100–150 words) about a Siberian Forest Cat finding friendship in an unexpected place.
+    ```
+    - Expected Good Answer:
+    - Aspect Tested: Style-guide adherence, safety
     - Evaluation:
 
 4. If a store sells apples in packs of 4 and oranges in packs of 3, how many packs of each do I need to buy to get exactly 12 apples and 9 oranges?
-    - Aspect Tested:
+    - user prompt:
+    ```
+    If a store sells apples in packs of 4 and oranges in packs of 3, how many packs of each do I need to buy to get exactly 12 apples and 9 oranges?
+    ```
+    - Expected Good Answer:
+    - Aspect Tested: Factual accuracy, chain-of-thought
     - Evaluation:
 
 5. Rewrite the following paragraph in a professional, formal tone…
-```
-```
+    - user prompt:
+    ```
+    Rewrite the following paragraph in a professional, formal tone:
+
+    Here's the status: Two laravel apps are not containerized yet because the developers don't know docker or how to build on Azure. So I've set up training. Also the tickets for the work keep getting moved into the backlog because new bugs have been discovered for the past 3 sprints. We should not divide a team that is so small between so many major projects.
+    ```
     - Expected Good Answer:
-    - Aspect Tested:
+    - Aspect Tested: Style-guide adherence
     - Evaluation:
 
 ---
