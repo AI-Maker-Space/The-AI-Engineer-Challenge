@@ -25,6 +25,7 @@ app.add_middleware(
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
 class ChatRequest(BaseModel):
+    assistant_message: Optional[str] = None  # Optional message from assistant to tune the prompt
     developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
@@ -36,19 +37,23 @@ async def chat(request: ChatRequest):
     try:
         # Initialize OpenAI client with the provided API key
         client = OpenAI(api_key=request.api_key)
-        
+
         # Create an async generator function for streaming responses
         async def generate():
             # Create a streaming chat completion request
             stream = client.chat.completions.create(
                 model=request.model,
-                messages=[
+                messages=(
+                    [
+                        {"role": "assistant", "content": request.assistant_message}
+                    ] if request.assistant_message else []
+                ) + [
                     {"role": "developer", "content": request.developer_message},
                     {"role": "user", "content": request.user_message}
                 ],
                 stream=True  # Enable streaming response
             )
-            
+
             # Yield each chunk of the response as it becomes available
             for chunk in stream:
                 if chunk.choices[0].delta.content is not None:
@@ -56,7 +61,7 @@ async def chat(request: ChatRequest):
 
         # Return a streaming response to the client
         return StreamingResponse(generate(), media_type="text/plain")
-    
+
     except Exception as e:
         # Handle any errors that occur during processing
         raise HTTPException(status_code=500, detail=str(e))
