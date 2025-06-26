@@ -150,7 +150,7 @@ export default function Home() {
           <ChatPanel
             chatHistory={chatHistory.map(msg =>
               msg.role === "assistant"
-                ? { ...msg, content: marked.parse(msg.content) }
+                ? { ...msg, content: msg.content }
                 : msg
             )}
             userInput={userInput}
