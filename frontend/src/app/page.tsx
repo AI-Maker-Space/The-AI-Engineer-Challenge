@@ -1,20 +1,8 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import Tabs from "../components/Tabs";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
 import ConfigurationPanel from "../components/ConfigurationPanel";
 import { DEFAULT_SYSTEM_PROMPT, CHAT_HISTORY_KEY } from "../constants";
-import { marked } from "marked";
-
-// Utility to escape HTML for safe rendering
-function escapeHtml(text: string) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
 
 export default function Home() {
   // State for configuration
@@ -162,7 +150,7 @@ export default function Home() {
           <ChatPanel
             chatHistory={chatHistory.map(msg =>
               msg.role === "assistant"
-                ? { ...msg, content: marked.parse(msg.content) }
+                ? { ...msg, content: msg.content }
                 : msg
             )}
             userInput={userInput}
