@@ -12,10 +12,14 @@ Advanced Build
 Please evaluate your system on the following questions:
 
 1. Explain the concept of object-oriented programming in simple terms to a complete beginner.
-    - Aspect Tested:
-    - Evaluation:
+    - Expected Good Answer: A short response that uses simple words to explain the main concepts.
+    - Aspect Tested: Factual accuracy and style guide adherence
+    - Evaluation: The answer is acceptable
 
-2. Read the following paragraph and provide a concise summary of the key points…
+2. Read the following paragraph and provide a concise summary of the key points:
+```
+```
+    - Expected Good Answer:
     - Aspect Tested:
     - Evaluation:
 
@@ -28,9 +32,11 @@ Please evaluate your system on the following questions:
     - Evaluation:
 
 5. Rewrite the following paragraph in a professional, formal tone…
+```
+```
+    - Expected Good Answer:
     - Aspect Tested:
     - Evaluation:
-
 
 ---
 
