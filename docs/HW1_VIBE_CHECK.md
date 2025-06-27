@@ -64,7 +64,7 @@ Problems found:
 
 - [x] Model responses are sometimes in Markdown format which was not interpreted on the UI. Updated the app with a function to detect markdown and format it to semantic HTML.
 - [x] Usability issues such as hiding the header and some chat being hidden on scroll.
-- [x] Responses were sometimes longer than necessary. Adding the directive to be "concise" helped.
+- [x] The developer prompt was 100% in control of user. Added a secret "prepended" prompt so app retains some control.
 
 ---
 
