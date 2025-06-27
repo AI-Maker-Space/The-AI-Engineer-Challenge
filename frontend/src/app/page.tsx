@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { marked } from "marked";
+import { apiClient } from "@/utils/apiClient";
 import { SYSTEM_PROMPT, DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
 import Sidebar from "../components/Sidebar";
-import { apiClient } from "@/utils/apiClient";
 
 export default function Home() {
   // State for configuration
@@ -43,7 +43,7 @@ export default function Home() {
     setError(null);
     if (!userInput.trim()) return;
     if (!apiKey) {
-      setError("Please enter your OpenAI API key in the Configuration tab.");
+      setError("Please enter your OpenAI API key in the Sidebar!");
       return;
     }
 
@@ -104,6 +104,13 @@ export default function Home() {
     }
   };
 
+  // Clear error when user types or updates API key
+  useEffect(() => {
+    if (error && (userInput || apiKey)) {
+      setError(null);
+    }
+  }, [userInput, apiKey]);
+
   return (
     <div className="flex min-h-screen">
       <Sidebar
@@ -135,6 +142,7 @@ export default function Home() {
               onClearChat={handleClearChat}
               clearChatDisabled={chatHistory.length === 0}
               renderAssistantHtml={true}
+              error={error}
             />
           </div>
         </div>

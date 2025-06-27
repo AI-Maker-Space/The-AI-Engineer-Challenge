@@ -14,6 +14,7 @@ interface ChatPanelProps {
   onClearChat?: () => void;
   clearChatDisabled?: boolean;
   renderAssistantHtml?: boolean;
+  error?: string | null;
 }
 
 interface ChatInputFormProps {
@@ -91,6 +92,7 @@ export default function ChatPanel({
   onClearChat,
   clearChatDisabled,
   renderAssistantHtml,
+  error,
 }: ChatPanelProps) {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -106,6 +108,11 @@ export default function ChatPanel({
         aria-label="Chat history"
         tabIndex={0}
       >
+        {error && (
+          <div className="fixed top-0 right-0 p-4 text-center bg-red-600 text-white font-semibold" role="alert">
+            {error}
+          </div>
+        )}
         {chatHistory.length === 0 ? (
           <div className="text-gray-500 text-center">No messages yet. Say hi to ChattyCat!</div>
         ) : (
