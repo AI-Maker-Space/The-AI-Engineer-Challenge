@@ -36,7 +36,7 @@ Please evaluate your system on the following questions:
     ```
     Write a short, imaginative story (100–150 words) about a Siberian Forest Cat finding friendship in an unexpected place.
     ```
-    - Expected Good Answer: Make the story relevant to a cat in winter setting and perhaps in Russia.
+    - Expected Good Answer: Make the story relevant to a cat, winter and Russia would be expected so any other settings unexpected.
     - Aspect Tested: Style-guide adherence, safety
     - Evaluation: Story was cute and acceptable length.
 
@@ -74,7 +74,7 @@ What are some limitations of vibe checking as an evaluation tool?
 
 **Answer:**
 
-Vibe checking provides reassurance that the primary functionality of the application is working and over time can be a baseline representation of acceptable outcomes. It's valueable to detect major failures quickly so they can be addressed. However, the vibe check is subjective and can miss problems even in the capabilities that it tests.
+Vibe checking provides reassurance that the primary functionality of the application is working and over time can be a baseline representation of acceptable outcomes. It's valuable to detect major failures quickly so they can be addressed. However, the vibe check is subjective and can miss problems even in the capabilities that it tests.
 
 Pros:
 
