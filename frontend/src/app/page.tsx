@@ -1,14 +1,14 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { marked } from "marked";
-import { DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
+import { DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
 import Sidebar from "../components/Sidebar";
 
 export default function Home() {
   // State for configuration
   const [apiKey, setApiKey] = useState("");
-  const [assistantPrompt, setAssistantPrompt] = useState("");
+  const [developerPrompt, setDeveloperPrompt] = useState(DEFAULT_DEVELOPER_PROMPT);
 
   // State for chat
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -54,9 +54,8 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // TODO sanitize assistant input
-          ...(assistantPrompt.trim() !== "" ? { assistant_message: assistantPrompt } : {}),
-          developer_message: DEVELOPER_PROMPT,
+          // TODO sanitize input
+          developer_message: developerPrompt,
           user_message: userMsg.content,
           api_key: apiKey,
         }),
@@ -111,8 +110,8 @@ export default function Home() {
       <Sidebar
         apiKey={apiKey}
         onApiKeyChange={setApiKey}
-        assistantPrompt={assistantPrompt}
-        onAssistantPromptChange={setAssistantPrompt}
+        developerPrompt={developerPrompt}
+        onDeveloperPromptChange={setDeveloperPrompt}
       />
       {/* Main chat area */}
       <section>

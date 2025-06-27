@@ -124,10 +124,10 @@ export default function ChatPanel({
                   />
                 ) : (
                   <span
-                    className={`px-3 py-2 rounded-lg w-3/4 max-w-full break-words text-sm shadow-sm ${
+                    className={`px-3 py-2 rounded-lg max-w-full break-words text-sm shadow-sm ${
                       msg.role === "user"
-                        ? "bg-dustyrose-300 text-black"
-                        : "bg-olive-300 text-black"
+                        ? "bg-dustyrose-300 text-black w-1/2"
+                        : "bg-olive-300 text-black w-3/4"
                     }`}
                   >
                     {msg.content}

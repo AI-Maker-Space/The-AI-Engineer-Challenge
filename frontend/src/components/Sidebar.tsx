@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 interface SidebarProps {
   apiKey: string;
   onApiKeyChange: (value: string) => void;
-  assistantPrompt: string;
-  onAssistantPromptChange: (value: string) => void;
+  developerPrompt: string;
+  onDeveloperPromptChange: (value: string) => void;
 }
 
 export default function Sidebar({
   apiKey,
   onApiKeyChange,
-  assistantPrompt,
-  onAssistantPromptChange,
+  developerPrompt,
+  onDeveloperPromptChange,
 }: SidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -48,12 +48,12 @@ export default function Sidebar({
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="font-semibold">Assistant Prompt</span>
+            <span className="font-semibold">Developer Prompt</span>
             <textarea
               className="border rounded px-3 py-2 bg-gray-100 border-gray-300 focus:outline-none focus:ring focus:ring-gray-200 min-h-[48px]"
-              placeholder="Enter your assistant prompt..."
-              value={assistantPrompt}
-              onChange={e => onAssistantPromptChange(e.target.value)}
+              placeholder="Enter your developer prompt..."
+              value={developerPrompt}
+              onChange={e => onDeveloperPromptChange(e.target.value)}
             />
           </label>
         </form>
