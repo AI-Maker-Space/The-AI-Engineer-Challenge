@@ -27,7 +27,6 @@ export default function RootLayout({
         <div className="bg-white flex flex-col h-screen">
           <header
             className="fixed top-0 left-0 bg-gray-600 w-screen justify-center flex"
-            // className="flex h-32 items-center justify-center px-4 py-6 bg-gray-600"
           >
             <div className="flex flex-row items-center gap-3">
               <Image

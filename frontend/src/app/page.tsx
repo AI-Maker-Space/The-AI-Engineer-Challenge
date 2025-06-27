@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { marked } from "marked";
-import { DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
+import { SYSTEM_PROMPT, DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
 import Sidebar from "../components/Sidebar";
+import { apiClient } from "@/utils/apiClient";
 
 export default function Home() {
   // State for configuration
@@ -45,26 +46,24 @@ export default function Home() {
       setError("Please enter your OpenAI API key in the Configuration tab.");
       return;
     }
+
     const userMsg = { role: "user" as const, content: userInput.trim() };
     setChatHistory((prev) => [...prev, userMsg]);
     setUserInput("");
     setLoading(true);
+
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // TODO sanitize input
-          developer_message: developerPrompt,
-          user_message: userMsg.content,
-          api_key: apiKey,
-        }),
-      });
-      if (!response.body) throw new Error("No response body");
+      const responseBody = await apiClient(
+        `${SYSTEM_PROMPT} ${developerPrompt}`,
+        userMsg.content,
+        apiKey
+      );
+
       const assistantMsg: ChatMessage = { role: "assistant", content: "" };
-      const reader = response.body.getReader();
+      const reader = responseBody.getReader();
       const decoder = new TextDecoder();
       let done = false;
+
       while (!done) {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
