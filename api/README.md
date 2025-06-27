@@ -73,4 +73,4 @@ The API includes basic error handling for:
 - OpenAI API errors
 - General server errors
 
-All errors will return a 500 status code with an error message. 
+All errors will return a 500 status code with an error message.

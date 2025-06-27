@@ -25,7 +25,6 @@ app.add_middleware(
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
 class ChatRequest(BaseModel):
-    assistant_message: Optional[str] = None  # Optional message from assistant to tune the prompt
     developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
@@ -43,11 +42,7 @@ async def chat(request: ChatRequest):
             # Create a streaming chat completion request
             stream = client.chat.completions.create(
                 model=request.model,
-                messages=(
-                    [
-                        {"role": "assistant", "content": request.assistant_message}
-                    ] if request.assistant_message else []
-                ) + [
+                messages=[
                     {"role": "developer", "content": request.developer_message},
                     {"role": "user", "content": request.user_message}
                 ],

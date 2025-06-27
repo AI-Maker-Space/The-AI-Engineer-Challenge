@@ -1,8 +1,12 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import ChatPanel, { ChatMessage } from "./ChatPanel";
 import React from "react";
-import { describe, it, expect, vi } from "vitest";
 import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeAll } from "vitest";
+import ChatPanel, { ChatMessage } from "./ChatPanel";
+
+beforeAll(() => {
+  window.HTMLElement.prototype.scrollIntoView = function () {};
+});
 
 describe("ChatPanel", () => {
   const baseProps = {
@@ -11,6 +15,9 @@ describe("ChatPanel", () => {
     onInputChange: vi.fn(),
     onSend: vi.fn(),
     loading: false,
+    onClearChat: vi.fn(),
+    clearChatDisabled: false,
+    renderAssistantHtml: false,
   };
 
   it("renders empty chat state", () => {
@@ -20,7 +27,7 @@ describe("ChatPanel", () => {
     expect(screen.getByRole("button", { name: /send/i })).toBeInTheDocument();
   });
 
-  it("renders chat history", () => {
+  it("renders chat history with user and assistant", () => {
     const chatHistory: ChatMessage[] = [
       { role: "user", content: "Hello!" },
       { role: "assistant", content: "Hi there!" },
@@ -31,22 +38,44 @@ describe("ChatPanel", () => {
   });
 
   it("calls onInputChange when typing", () => {
-    const onInputChange = vi.fn();
-    render(<ChatPanel {...baseProps} onInputChange={onInputChange} />);
+    render(<ChatPanel {...baseProps} />);
     fireEvent.change(screen.getByLabelText(/type your message/i), { target: { value: "test" } });
-    expect(onInputChange).toHaveBeenCalledWith("test");
+    expect(baseProps.onInputChange).toHaveBeenCalledWith("test");
   });
 
   it("calls onSend when form is submitted", () => {
-    const onSend = vi.fn();
-    render(<ChatPanel {...baseProps} userInput="hi" onSend={onSend} />);
+    render(<ChatPanel {...baseProps} userInput="hi" />);
     fireEvent.submit(screen.getByRole("form"));
-    expect(onSend).toHaveBeenCalled();
+    expect(baseProps.onSend).toHaveBeenCalled();
   });
 
   it("disables input and button when loading", () => {
     render(<ChatPanel {...baseProps} loading={true} userInput="hi" />);
     expect(screen.getByLabelText(/type your message/i)).toBeDisabled();
     expect(screen.getByRole("button", { name: /send/i })).toBeDisabled();
+  });
+
+  it("calls onClearChat when clear chat button is clicked", () => {
+    render(<ChatPanel {...baseProps} userInput="hi" onClearChat={baseProps.onClearChat} />);
+    const clearButton = screen.getByRole("button", { name: /clear chat/i });
+    fireEvent.click(clearButton);
+    expect(baseProps.onClearChat).toHaveBeenCalled();
+  });
+
+  it("disables clear chat button when clearChatDisabled is true", () => {
+    render(<ChatPanel {...baseProps} clearChatDisabled={true} onClearChat={baseProps.onClearChat} />);
+    expect(screen.getByRole("button", { name: /clear chat/i })).toBeDisabled();
+  });
+
+  it("renders assistant message as HTML when renderAssistantHtml is true", () => {
+    const chatHistory: ChatMessage[] = [
+      { role: "assistant", content: "<b>Bold!</b>" },
+    ];
+    render(<ChatPanel
+      {...baseProps}
+      chatHistory={chatHistory}
+      renderAssistantHtml={true}
+    />);
+    expect(screen.getByText("Bold!")).toBeInTheDocument();
   });
 });

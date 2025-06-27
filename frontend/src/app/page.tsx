@@ -1,13 +1,15 @@
 'use client';
 import React, { useState, useEffect } from "react";
+import { marked } from "marked";
+import { SYSTEM_PROMPT, DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
-import { DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import Sidebar from "../components/Sidebar";
+import { apiClient } from "@/utils/apiClient";
 
 export default function Home() {
   // State for configuration
   const [apiKey, setApiKey] = useState("");
-  const [assistantPrompt, setAssistantPrompt] = useState("");
+  const [developerPrompt, setDeveloperPrompt] = useState(DEFAULT_DEVELOPER_PROMPT);
 
   // State for chat
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -44,27 +46,24 @@ export default function Home() {
       setError("Please enter your OpenAI API key in the Configuration tab.");
       return;
     }
+
     const userMsg = { role: "user" as const, content: userInput.trim() };
     setChatHistory((prev) => [...prev, userMsg]);
     setUserInput("");
     setLoading(true);
+
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // TODO sanitize assistant input
-          ...(assistantPrompt.trim() !== "" ? { assistant_message: assistantPrompt } : {}),
-          developer_message: DEVELOPER_PROMPT,
-          user_message: userMsg.content,
-          api_key: apiKey,
-        }),
-      });
-      if (!response.body) throw new Error("No response body");
+      const responseBody = await apiClient(
+        `${SYSTEM_PROMPT} ${developerPrompt}`,
+        userMsg.content,
+        apiKey
+      );
+
       const assistantMsg: ChatMessage = { role: "assistant", content: "" };
-      const reader = response.body.getReader();
+      const reader = responseBody.getReader();
       const decoder = new TextDecoder();
       let done = false;
+
       while (!done) {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
@@ -110,8 +109,8 @@ export default function Home() {
       <Sidebar
         apiKey={apiKey}
         onApiKeyChange={setApiKey}
-        assistantPrompt={assistantPrompt}
-        onAssistantPromptChange={setAssistantPrompt}
+        developerPrompt={developerPrompt}
+        onDeveloperPromptChange={setDeveloperPrompt}
       />
       {/* Main chat area */}
       <section>
@@ -121,10 +120,13 @@ export default function Home() {
               <div className="mb-2 text-black text-sm" role="alert">{error}</div>
             )}
             <ChatPanel
-              chatHistory={chatHistory.map(msg =>
-                msg.role === "assistant"
-                  ? { ...msg, content: msg.content }
-                  : msg
+              // For each message in chatHistory, if the message is from the assistant,
+              // convert its content from markdown to HTML using marked.parse, so it can be rendered as HTML.
+              // User messages are left unchanged.
+              chatHistory={chatHistory.map(message =>
+                message.role === "assistant"
+                  ? { ...message, content: marked.parse(message.content as string, { async: false }) }
+                  : message
               )}
               userInput={userInput}
               onInputChange={setUserInput}
