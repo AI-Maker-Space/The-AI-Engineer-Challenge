@@ -33,8 +33,8 @@ export default function RootLayout({
               <Image
                 src="/chatty-cat.svg"
                 alt="ChattyCat logo"
-                width={140}
-                height={140}
+                width={150}
+                height={150}
                 priority
               />
               <span

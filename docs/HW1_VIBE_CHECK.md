@@ -3,7 +3,7 @@
 Advanced Build
 
 1. GitHub URL to Markdown: [HW1_VIBE_CHECK.md](https://github.com/julie-berlin/pub-aim-the-ai-engineer-challenge/blob/main/docs/HW1_VIBE_CHECK.md)
-2. Vercel URL to Updated Challenge Project: [ChattyCat](https://pub-aim-the-ai-engineer-challenge.vercel.app/)
+2. Vercel URL to Updated Challenge Project: [ChattyCat](https://pub-aim-the-ai-engineer-challenge.vercel.app)
 
 ---
 
@@ -27,9 +27,9 @@ Please evaluate your system on the following questions:
 
     What If Your New Kitty Doesn't Get Along With Your Other Pets? Don't panic if you have another cat and it isn't getting along with the new kitten just yet. This process can take time, and 30 days may not be enough for your cat to adjust. This is where those synthetic calming pheromones can help all the cats in the household to adjust; they can be used as a diffuser in a room both cats spend time in, or a spray that can be used on their beds or other common areas. It can also help them bond if you make their interactions more positive by playing with both cats together, giving them treats, and/or engaging in other activities your cats enjoy, such as grooming, with the new kitten in tow.
     ```
-    - Expected Good Answer: Include time frame, calming pheromones, positive reinforcement in answer.
+    - Expected Good Answer: Include time frame, calming pheromones, positive reinforcement during social activities.
     - Aspect Tested: Factual accuracy, hallucination resistance
-    - Evaluation: The answer was concise and complete.
+    - Evaluation: The answer was complete and short.
 
 3. Write a short, imaginative story (100–150 words) about a robot finding friendship in an unexpected place.
     - user prompt:
@@ -38,7 +38,7 @@ Please evaluate your system on the following questions:
     ```
     - Expected Good Answer: Make the story relevant to a cat in winter setting and perhaps in Russia.
     - Aspect Tested: Style-guide adherence, safety
-    - Evaluation: Story was cute, correct length and
+    - Evaluation: Story was cute and acceptable length.
 
 4. If a store sells apples in packs of 4 and oranges in packs of 3, how many packs of each do I need to buy to get exactly 12 apples and 9 oranges?
     - user prompt:
@@ -60,6 +60,12 @@ Please evaluate your system on the following questions:
     - Aspect Tested: Style-guide adherence, hallucination resistance
     - Evaluation: Did a good job of rephrasing which could be used in an email or instant message communication.
 
+Problems found:
+
+- [x] Model responses are sometimes in Markdown format which was not interpreted on the UI. Updated the app with a function to detect markdown and format it to semantic HTML.
+- [x] Usability issues such as hiding the header and some chat being hidden on scroll.
+- [x] Responses were sometimes longer than necessary. Adding the directive to be "concise" helped.
+
 ---
 
 ## 🧑‍🤝‍🧑❓ Discussion Question #1:
@@ -68,7 +74,7 @@ What are some limitations of vibe checking as an evaluation tool?
 
 **Answer:**
 
-Vibe checking provides reassurance that the primary functionality of the application is working. It's valueable to detect major failures quickly so they can be addressed. However, it is subjective and can miss problems even in the capabilities that it tests.
+Vibe checking provides reassurance that the primary functionality of the application is working and over time can be a baseline representation of acceptable outcomes. It's valueable to detect major failures quickly so they can be addressed. However, the vibe check is subjective and can miss problems even in the capabilities that it tests.
 
 Pros:
 
@@ -89,4 +95,4 @@ Cons:
   - Should be repeated each time a change is made to a part of the stack: not scaleable and burdensome for environments with frequent changes.
   - Documentation on what criteria were used to assess and when tests passed would have to be done manually and could be skipped or inaccurately recorded.
 
-The vibe check is an excellent way to catch major and obvious failures or misconfigurations in a proof of concept (POC) application's early stages. The vibe check should be replaced by more comprehensive automated tests for any system moving from POC to active development.
+The "vibe check" is an excellent way to catch major and obvious failures or misconfigurations in a proof of concept (PoC) application's early stages. The vibe check should be replaced by more comprehensive automated tests for any system moving from PoC to active development.
