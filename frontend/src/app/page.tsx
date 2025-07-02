@@ -5,6 +5,8 @@ import { apiClient } from "@/utils/apiClient";
 import { SYSTEM_PROMPT, DEFAULT_DEVELOPER_PROMPT, CHAT_HISTORY_KEY } from "../constants";
 import ChatPanel, { ChatMessage } from "../components/ChatPanel";
 import Sidebar from "../components/Sidebar";
+import { useRagChat } from "../hooks/useRagChat";
+import { RagChatRequest } from "../types/document";
 
 export default function Home() {
   // State for configuration
@@ -16,6 +18,12 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // State for document management
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+
+  // RAG chat hook
+  const { chatWithDocument, loading: ragLoading, error: ragError } = useRagChat();
 
   // Load chat history from localStorage
   useEffect(() => {
@@ -53,35 +61,70 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const responseBody = await apiClient(
-        `${SYSTEM_PROMPT} ${developerPrompt}`,
-        userMsg.content,
-        apiKey
-      );
+      if (selectedDocumentId) {
+        // RAG chat mode
+        const ragRequest: RagChatRequest = {
+          user_message: userMsg.content,
+          api_key: apiKey,
+          document_id: selectedDocumentId,
+          model: "gpt-4o-mini",
+          k_chunks: 3
+        };
 
-      const assistantMsg: ChatMessage = { role: "assistant", content: "" };
-      const reader = responseBody.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
+        const assistantMsg: ChatMessage = { role: "assistant", content: "" };
 
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        if (value) {
-          const chunk = decoder.decode(value);
-          assistantMsg.content += chunk;
-          setChatHistory((prev) => {
-            // If last message is assistant, append, else add new
-            if (prev.length && prev[prev.length - 1].role === "assistant") {
-              return [
-                ...prev.slice(0, -1),
-                { ...prev[prev.length - 1], content: assistantMsg.content },
-              ];
-            } else {
-              return [...prev, { ...assistantMsg }];
-            }
-          });
+        await chatWithDocument(
+          ragRequest,
+          (chunk: string) => {
+            assistantMsg.content += chunk;
+            setChatHistory((prev) => {
+              if (prev.length && prev[prev.length - 1].role === "assistant") {
+                return [
+                  ...prev.slice(0, -1),
+                  { ...prev[prev.length - 1], content: assistantMsg.content },
+                ];
+              } else {
+                return [...prev, { ...assistantMsg }];
+              }
+            });
+          },
+          () => {
+            setLoading(false);
+          }
+        );
+      } else {
+        // Regular chat mode
+        const responseBody = await apiClient(
+          `${SYSTEM_PROMPT} ${developerPrompt}`,
+          userMsg.content,
+          apiKey
+        );
+
+        const assistantMsg: ChatMessage = { role: "assistant", content: "" };
+        const reader = responseBody.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+
+        while (!done) {
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+          if (value) {
+            const chunk = decoder.decode(value);
+            assistantMsg.content += chunk;
+            setChatHistory((prev) => {
+              // If last message is assistant, append, else add new
+              if (prev.length && prev[prev.length - 1].role === "assistant") {
+                return [
+                  ...prev.slice(0, -1),
+                  { ...prev[prev.length - 1], content: assistantMsg.content },
+                ];
+              } else {
+                return [...prev, { ...assistantMsg }];
+              }
+            });
+          }
         }
+        setLoading(false);
       }
     } catch (err: unknown) {
       if (typeof err === "string") {
@@ -91,7 +134,6 @@ export default function Home() {
       } else {
         setError("Failed to get response from backend.");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -104,12 +146,33 @@ export default function Home() {
     }
   };
 
+  // Handler for document selection
+  const handleDocumentSelect = (documentId: string) => {
+    setSelectedDocumentId(documentId || null);
+  };
+
+  // Handler for document deletion
+  const handleDocumentDelete = (documentId: string) => {
+    if (selectedDocumentId === documentId) {
+      setSelectedDocumentId(null);
+    }
+  };
+
   // Clear error when user types or updates API key
   useEffect(() => {
     if (error && (userInput || apiKey)) {
       setError(null);
     }
   }, [userInput, apiKey]);
+
+  // Handle RAG errors
+  useEffect(() => {
+    if (ragError) {
+      setError(ragError);
+    }
+  }, [ragError]);
+
+  const isLoading = loading || ragLoading;
 
   return (
     <div className="flex min-h-screen">
@@ -118,6 +181,9 @@ export default function Home() {
         onApiKeyChange={setApiKey}
         developerPrompt={developerPrompt}
         onDeveloperPromptChange={setDeveloperPrompt}
+        selectedDocumentId={selectedDocumentId}
+        onDocumentSelect={handleDocumentSelect}
+        onDocumentDelete={handleDocumentDelete}
       />
       {/* Main chat area */}
       <section>
@@ -125,6 +191,11 @@ export default function Home() {
           <div className="flex flex-col w-full max-w-screen">
             {error && (
               <div className="mb-2 text-black text-sm" role="alert">{error}</div>
+            )}
+            {selectedDocumentId && (
+              <div className="mb-2 p-2 bg-olive-100 border border-olive-200 rounded text-sm text-olive-800">
+                📄 RAG Mode: Chatting with uploaded document
+              </div>
             )}
             <ChatPanel
               // For each message in chatHistory, if the message is from the assistant,
@@ -138,7 +209,7 @@ export default function Home() {
               userInput={userInput}
               onInputChange={setUserInput}
               onSend={handleSend}
-              loading={loading}
+              loading={isLoading}
               onClearChat={handleClearChat}
               clearChatDisabled={chatHistory.length === 0}
               renderAssistantHtml={true}
