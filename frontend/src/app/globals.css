@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+:root {
+  --background: #f7f3e8;
+  --foreground: #3e2c1c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Quicksand', 'Noto Serif JP', Garamond, serif;
+  min-height: 100vh;
+  position: relative;
+}
+
+.font-quicksand {
+  font-family: 'Quicksand', 'Noto Serif JP', Garamond, serif;
+}
+.font-noto-serif {
+  font-family: 'Noto Serif JP', Garamond, serif;
+}
+
+.bg-ghibli-parchment {
+  background: repeating-linear-gradient(135deg, #f7f3e8 0px, #f7f3e8 40px, #f3ecd7 40px, #f3ecd7 80px);
+}
+
+.ghibli-shadow {
+  box-shadow: 0 4px 24px 0 rgba(60, 50, 30, 0.10), 0 1.5px 6px 0 rgba(60, 50, 30, 0.08);
+}
+
+.ghibli-rounded {
+  border-radius: 18px;
+}
+
+.ghibli-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.18;
+  background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+  mix-blend-mode: multiply;
+}
+
+/* Hand-drawn button style */
+.ghibli-btn {
+  border-radius: 16px;
+  background: #e6dcc3;
+  border: 2.5px solid #b7a77a;
+  color: #3e2c1c;
+  font-family: 'Quicksand', 'Noto Serif JP', Garamond, serif;
+  font-weight: 700;
+  box-shadow: 0 2px 8px 0 rgba(60, 50, 30, 0.10);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+}
+.ghibli-btn:hover {
+  background: #f3ecd7;
+  box-shadow: 0 4px 24px 0 rgba(60, 50, 30, 0.18);
+  transform: translateY(-2px) scale(1.04) rotate(-1deg);
+  filter: brightness(1.05) drop-shadow(0 0 6px #ffe9b3);
+}
+
+/* Soft input style */
+.ghibli-input {
+  border-radius: 14px;
+  border: 2px solid #e6dcc3;
+  background: #f7f3e8;
+  color: #3e2c1c;
+  font-family: 'Quicksand', 'Noto Serif JP', Garamond, serif;
+  padding-left: 2.5rem;
+  box-shadow: 0 1.5px 6px 0 rgba(60, 50, 30, 0.08);
+}
+
+/* For icons inside inputs */
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b7a77a;
+  font-size: 1.2rem;
+}

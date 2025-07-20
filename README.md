@@ -178,7 +178,7 @@ Check it out 👇
 
 A big shoutout to the @AI Makerspace for all making this possible. Couldn't have done it without the incredible community there. 🤗🙏
 
-Looking forward to building with the community! 🙌✨ Here's to many more creations ahead! 🥂🎉
+Looking forward to building with the community! 🙌✨ Here's to many more creations ahead! 🥂🎉
 
 Who else is diving into the world of AI? Let's connect! 🌐💡
 

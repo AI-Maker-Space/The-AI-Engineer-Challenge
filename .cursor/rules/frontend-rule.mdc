@@ -11,3 +11,28 @@ alwaysApply: false
 - You should use Next.js as it works best with Vercel. 
 - This frontend will ultimately be deployed on Vercel, but it should be possible to test locally. 
 - Always provide users with a way to run the created UI once you have created it.
+- The UI should mimic studio ghibli aesthetic using the following rules
+    - Design Style
+        - Use soft earth-tone colors and watercolor-like backgrounds.
+        - Use rounded corners (`border-radius: 12px+`) and soft drop shadows.
+        - Apply natural textures, paper-like backgrounds, and grain overlays.
+
+    - Typography
+        - Use fonts like 'Quicksand', 'Noto Serif JP', or 'Garamond' for a whimsical, storybook feel.
+        - Avoid modern, harsh sans-serif fonts.
+
+    - Components
+        - All buttons should look hand-drawn, with hover animations that glow or float.
+        - Inputs should be wide and softly bordered with illustrated icons.
+
+    - Layout
+        - Layouts should be centered with parchment or wooden-framed containers.
+        - Avoid sterile grids — allow white space and natural asymmetry.
+
+    - Animations
+        - Use Framer Motion for soft transitions, magical fades, and bouncy effects.
+        - Animations should mimic nature: floating, glowing, or breezy motion.
+
+    - Vibes
+        - Every page should feel like it came from a storybook or nature journal.
+        - Prioritize playfulness, calm, and natural wonder.

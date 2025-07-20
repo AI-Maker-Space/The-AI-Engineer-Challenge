@@ -1,0 +1,9 @@
+Task 1:
+Modify the application (frontend and backend) to: 
+
+- Allow the user to upload a PDF
+- Index the PDF using the `aimakerspace` library
+- Chat with the PDF using a simple RAG system built with the `aimakerspace` library
+
+Task 2:
+TBD
