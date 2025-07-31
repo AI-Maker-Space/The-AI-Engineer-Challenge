@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Download, RotateCcw, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { Download, RotateCcw, Filter, ChevronDown, ChevronUp, Crown, Gift } from 'lucide-react';
 import './TestCaseTable.css';
 
-const TestCaseTable = ({ testCases, onDownloadCSV, onReset }) => {
+const TestCaseTable = ({ testCases, onDownloadCSV, onReset, usageInfo }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -62,12 +62,35 @@ const TestCaseTable = ({ testCases, onDownloadCSV, onReset }) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
+  const renderUsageBadge = () => {
+    if (!usageInfo) return null;
+    
+    if (usageInfo.using_own_key) {
+      return (
+        <div className="usage-badge unlimited">
+          <Crown size={16} />
+          <span>Unlimited Access</span>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="usage-badge free-tier">
+        <Gift size={16} />
+        <span>{usageInfo.remaining_today || 0} free uses remaining</span>
+      </div>
+    );
+  };
+
   return (
     <div className="test-case-table-container">
       <div className="table-header">
         <div className="table-title">
           <h2>Generated Test Cases ({filteredTestCases.length})</h2>
-          <p>AI-generated test cases based on your PRD</p>
+          <div className="title-row">
+            <p>AI-generated test cases based on your PRD</p>
+            {renderUsageBadge()}
+          </div>
         </div>
         
         <div className="table-actions">

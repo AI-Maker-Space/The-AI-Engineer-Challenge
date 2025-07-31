@@ -12,19 +12,45 @@
   transition: all 0.3s ease;
   background: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.file-upload-area.free-tier {
+  border-color: #10b981;
+}
+
+.file-upload-area.unlimited {
+  border-color: #fbbf24;
 }
 
 .file-upload-area:not(.disabled):not(.loading):hover {
-  border-color: #667eea;
   background: rgba(102, 126, 234, 0.02);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+.file-upload-area.free-tier:not(.disabled):not(.loading):hover {
+  border-color: #059669;
+  background: rgba(16, 185, 129, 0.02);
+}
+
+.file-upload-area.unlimited:not(.disabled):not(.loading):hover {
+  border-color: #f59e0b;
+  background: rgba(251, 191, 36, 0.02);
+}
+
 .file-upload-area.drag-active {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
   transform: scale(1.02);
+}
+
+.file-upload-area.drag-active.free-tier {
+  border-color: #059669;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.file-upload-area.drag-active.unlimited {
+  border-color: #f59e0b;
+  background: rgba(251, 191, 36, 0.05);
 }
 
 .file-upload-area.disabled {
@@ -35,8 +61,15 @@
 }
 
 .file-upload-area.loading {
-  border-color: #667eea;
   cursor: wait;
+}
+
+.file-upload-area.loading.free-tier {
+  border-color: #10b981;
+}
+
+.file-upload-area.loading.unlimited {
+  border-color: #fbbf24;
 }
 
 .upload-content {
@@ -47,8 +80,35 @@
 }
 
 .upload-icon {
+  position: relative;
   color: #667eea;
   opacity: 0.8;
+}
+
+.file-upload-area.free-tier .upload-icon {
+  color: #10b981;
+}
+
+.file-upload-area.unlimited .upload-icon {
+  color: #fbbf24;
+}
+
+.tier-indicator {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  background: white;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload-area.free-tier .tier-indicator {
+  color: #10b981;
+}
+
+.file-upload-area.unlimited .tier-indicator {
+  color: #fbbf24;
 }
 
 .animate-spin {
@@ -99,7 +159,7 @@
 }
 
 .upload-tips ul {
-  margin: 0;
+  margin: 0 0 1rem 0;
   padding-left: 1.5rem;
   color: #666;
 }
@@ -111,6 +171,24 @@
 
 .upload-tips li:last-child {
   margin-bottom: 0;
+}
+
+.free-tier-reminder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  color: #065f46;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.free-tier-reminder svg {
+  color: #10b981;
 }
 
 @media (max-width: 768px) {

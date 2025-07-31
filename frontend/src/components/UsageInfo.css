@@ -1,0 +1,152 @@
+.usage-info {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 1rem;
+}
+
+.usage-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid;
+}
+
+.usage-card.free-tier {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.usage-card.unlimited {
+  border-left-color: #fbbf24;
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+}
+
+.usage-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tier-icon {
+  color: inherit;
+}
+
+.usage-card.free-tier .tier-icon {
+  color: #10b981;
+}
+
+.usage-card.unlimited .tier-icon {
+  color: #fbbf24;
+}
+
+.tier-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.tier-info p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.usage-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stat-value.warning {
+  color: #ef4444;
+}
+
+.usage-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.limit-reached {
+  padding: 0.75rem;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.unlimited-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 6px;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.benefit svg {
+  color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+  .usage-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .stat {
+    padding: 0.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+} 

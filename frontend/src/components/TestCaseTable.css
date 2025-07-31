@@ -22,10 +22,44 @@
   font-weight: 700;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .table-title p {
   margin: 0;
   color: #666;
   font-size: 1rem;
+}
+
+.usage-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 2px solid;
+}
+
+.usage-badge.free-tier {
+  background: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+  border-color: #10b981;
+}
+
+.usage-badge.unlimited {
+  background: rgba(251, 191, 36, 0.1);
+  color: #92400e;
+  border-color: #fbbf24;
+}
+
+.usage-badge svg {
+  opacity: 0.8;
 }
 
 .table-actions {
@@ -286,6 +320,10 @@
   .table-header {
     flex-direction: column;
     align-items: stretch;
+  }
+  
+  .title-row {
+    justify-content: space-between;
   }
   
   .table-actions {

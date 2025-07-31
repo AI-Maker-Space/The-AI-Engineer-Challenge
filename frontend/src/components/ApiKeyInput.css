@@ -8,17 +8,53 @@
 }
 
 .api-key-header {
+  margin-bottom: 1rem;
+}
+
+.header-main {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   color: #333;
 }
 
-.api-key-header h3 {
+.header-main h3 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
+  flex: 1;
+}
+
+.optional-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.free-tier-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.free-tier-notice svg {
+  color: #10b981;
 }
 
 .api-key-input-container {
@@ -70,6 +106,11 @@
   text-align: center;
 }
 
+.api-key-help p {
+  margin: 0;
+  line-height: 1.5;
+}
+
 .api-key-help a {
   color: #667eea;
   text-decoration: none;
@@ -78,4 +119,8 @@
 
 .api-key-help a:hover {
   text-decoration: underline;
+}
+
+.api-key-help strong {
+  color: #10b981;
 } 
