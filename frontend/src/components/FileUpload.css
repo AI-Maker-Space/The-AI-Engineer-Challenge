@@ -1,0 +1,128 @@
+.file-upload-section {
+  width: 100%;
+  max-width: 600px;
+}
+
+.file-upload-area {
+  border: 3px dashed #ccc;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload-area:not(.disabled):not(.loading):hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.02);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.file-upload-area.drag-active {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: scale(1.02);
+}
+
+.file-upload-area.disabled {
+  border-color: #ddd;
+  background: #f9f9f9;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.file-upload-area.loading {
+  border-color: #667eea;
+  cursor: wait;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.upload-icon {
+  color: #667eea;
+  opacity: 0.8;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.upload-text h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.upload-text p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.file-types {
+  font-size: 0.875rem;
+  color: #999;
+  font-style: italic;
+}
+
+.upload-tips {
+  margin-top: 2rem;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.upload-tips h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.upload-tips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #666;
+}
+
+.upload-tips li {
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.upload-tips li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .file-upload-area {
+    padding: 2rem 1rem;
+  }
+  
+  .upload-text h3 {
+    font-size: 1.25rem;
+  }
+  
+  .upload-tips {
+    padding: 1rem;
+  }
+} 

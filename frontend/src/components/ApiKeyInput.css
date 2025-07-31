@@ -1,0 +1,81 @@
+.api-key-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+.api-key-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.api-key-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.api-key-input-container {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.api-key-input {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.api-key-input::placeholder {
+  color: #999;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.toggle-visibility:hover {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.api-key-help {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+}
+
+.api-key-help a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.api-key-help a:hover {
+  text-decoration: underline;
+} 

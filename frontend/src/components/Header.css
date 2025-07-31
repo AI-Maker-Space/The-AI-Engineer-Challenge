@@ -1,0 +1,78 @@
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.header-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.header-icon {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #667eea;
+}
+
+.zap-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  color: #ffd700;
+  background: white;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.header-title {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.header-description {
+  font-size: 1.2rem;
+  color: #666;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+}
+
+.supported-formats {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.format-tag {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 1rem;
+  }
+  
+  .header-title {
+    font-size: 2.5rem;
+  }
+  
+  .header-description {
+    font-size: 1.1rem;
+  }
+} 

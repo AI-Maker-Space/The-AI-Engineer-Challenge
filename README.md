@@ -184,3 +184,182 @@ Who else is diving into the world of AI? Let's connect! 🌐💡
 
 #FirstLLMApp 
 ```
+
+# PRD to Test Case Generator
+
+🚀 An AI-powered application that transforms Product Requirements Documents (PRDs) into comprehensive test cases using Google Gemini AI.
+
+## ✨ Features
+
+- **📄 Multi-format Support**: Upload PRDs in PDF, JPEG, JPG, or PNG formats
+- **🤖 AI-Powered Analysis**: Uses Google Gemini AI to extract content and generate test cases
+- **📊 Interactive Results**: View test cases in a beautiful, sortable, and filterable table
+- **📁 CSV Export**: Download generated test cases as CSV files
+- **🎨 Modern UI**: Clean, responsive design with drag & drop functionality
+- **🔐 Secure**: API keys are handled securely and not stored
+
+## 🏗️ Architecture
+
+- **Backend**: FastAPI (Python) with Google Gemini AI integration
+- **Frontend**: React with modern UI components
+- **File Processing**: PDF text extraction and image text recognition
+- **AI Integration**: Google Gemini 1.5 Pro for content analysis and test case generation
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- Node.js 14+
+- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
+
+### Backend Setup
+
+1. Navigate to the API directory:
+   ```bash
+   cd api
+   ```
+
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Start the backend server:
+   ```bash
+   python app.py
+   ```
+
+   The API will be available at `http://localhost:8000`
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install Node.js dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+
+   The frontend will be available at `http://localhost:3000`
+
+## 📖 Usage
+
+1. **Get API Key**: Obtain a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+
+2. **Enter API Key**: Paste your API key in the application
+
+3. **Upload PRD**: Drag & drop or click to upload your PRD file
+
+4. **AI Processing**: Wait for the AI to analyze your document and generate test cases
+
+5. **Review & Export**: View the generated test cases and download as CSV if needed
+
+## 📁 Project Structure
+
+```
+The-AI-Engineer-Challenge/
+├── api/                          # Backend FastAPI application
+│   ├── app.py                   # Main API application
+│   ├── requirements.txt         # Python dependencies
+│   └── README.md               # Backend documentation
+├── frontend/                    # React frontend application
+│   ├── public/                 # Static files
+│   ├── src/                    # React source code
+│   │   ├── components/         # React components
+│   │   │   ├── Header.js       # App header
+│   │   │   ├── ApiKeyInput.js  # API key input
+│   │   │   ├── FileUpload.js   # File upload component
+│   │   │   └── TestCaseTable.js # Results table
+│   │   ├── App.js              # Main App component
+│   │   └── index.js            # React entry point
+│   ├── package.json            # Node.js dependencies
+│   └── README.md              # Frontend documentation
+├── .gitignore                  # Git ignore rules
+└── README.md                   # This file
+```
+
+## 🔧 API Endpoints
+
+### `POST /api/upload-prd`
+Upload a PRD file and generate test cases.
+
+**Request:**
+- `file`: Uploaded file (PDF, JPEG, JPG, PNG)
+- `gemini_api_key`: Google Gemini API key
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Successfully generated 15 test cases",
+  "test_cases": [
+    {
+      "test_case_id": "TC001",
+      "feature": "User Authentication",
+      "scenario": "User login with valid credentials",
+      "test_steps": "1. Navigate to login page\n2. Enter valid email\n3. Enter valid password\n4. Click login button",
+      "expected_result": "User is successfully logged in and redirected to dashboard",
+      "priority": "High",
+      "category": "Functional"
+    }
+  ]
+}
+```
+
+### `POST /api/download-csv`
+Download test cases as CSV file.
+
+### `GET /api/health`
+Health check endpoint.
+
+## 🧪 Test Case Categories
+
+The AI generates test cases across multiple categories:
+
+- **Functional**: Core feature functionality
+- **UI/UX**: User interface and experience
+- **Performance**: Speed and efficiency tests
+- **Security**: Security and data protection
+- **Integration**: System integration tests
+- **Edge Case**: Boundary and error conditions
+
+## 📊 Test Case Priorities
+
+- **High**: Critical functionality that must work
+- **Medium**: Important features with moderate impact
+- **Low**: Nice-to-have features or edge cases
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+If you encounter any issues or have questions:
+
+1. Check the [FAQ and Common Issues](FAQandCommonIssues.md)
+2. Review the individual README files in `/api` and `/frontend` directories
+3. Open an issue on GitHub
+
+## 🙏 Acknowledgments
+
+- Google Gemini AI for powerful text analysis capabilities
+- FastAPI for the robust backend framework
+- React community for excellent frontend tools and libraries
