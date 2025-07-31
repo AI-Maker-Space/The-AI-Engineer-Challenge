@@ -4,7 +4,7 @@ import csv
 import json
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-import pandas as pd
+# Removed pandas - using built-in csv module instead
 from PIL import Image
 import PyPDF2
 import google.generativeai as genai
@@ -286,10 +286,17 @@ async def get_usage_info(request: Request):
 async def download_csv(test_cases: List[TestCase]):
     """Download test cases as CSV file"""
     try:
-        # Convert test cases to DataFrame
-        df_data = []
+        # Create CSV content using built-in csv module (lighter than pandas)
+        csv_buffer = io.StringIO()
+        fieldnames = ['Test Case ID', 'Feature', 'Scenario', 'Test Steps', 'Expected Result', 'Priority', 'Category']
+        writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
+        
+        # Write header
+        writer.writeheader()
+        
+        # Write test case data
         for tc in test_cases:
-            df_data.append({
+            writer.writerow({
                 'Test Case ID': tc.test_case_id,
                 'Feature': tc.feature,
                 'Scenario': tc.scenario,
@@ -299,11 +306,6 @@ async def download_csv(test_cases: List[TestCase]):
                 'Category': tc.category
             })
         
-        df = pd.DataFrame(df_data)
-        
-        # Create CSV content
-        csv_buffer = io.StringIO()
-        df.to_csv(csv_buffer, index=False)
         csv_content = csv_buffer.getvalue()
         
         # Return as streaming response
