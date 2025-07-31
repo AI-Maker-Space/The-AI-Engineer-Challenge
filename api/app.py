@@ -7,13 +7,16 @@ from datetime import datetime, timedelta
 import pandas as pd
 from PIL import Image
 import PyPDF2
-import magic
 import google.generativeai as genai
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize FastAPI application
 app = FastAPI(title="PRD to Test Case Generator API")
@@ -198,10 +201,9 @@ def generate_test_cases(prd_content: str, gemini_model) -> List[TestCase]:
 @app.post("/api/upload-prd", response_model=ProcessResponse)
 async def upload_prd(
     request: Request,
-    file: UploadFile = File(...),
-    user_api_key: Optional[str] = Form(None)
+    file: UploadFile = File(...)
 ):
-    """Upload PRD file and generate test cases with hybrid API key approach"""
+    """Upload PRD file and generate test cases using built-in API key"""
     
     # Validate file type
     allowed_types = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
@@ -212,42 +214,27 @@ async def upload_prd(
             detail="Unsupported file type. Please upload PDF, JPEG, JPG, or PNG files."
         )
     
-    # Determine which API key to use and check usage
-    client_id = get_client_identifier(request)
-    usage_info = {}
+    # Check if built-in API key is available
+    if not BUILT_IN_GEMINI_KEY:
+        raise HTTPException(
+            status_code=503, 
+            detail="Service temporarily unavailable. Please try again later."
+        )
     
-    if user_api_key and user_api_key.strip():
-        # User provided their own API key - unlimited usage
-        api_key_to_use = user_api_key.strip()
-        usage_info = {
-            "tier": "unlimited",
-            "using_own_key": True,
-            "message": "Using your personal API key - unlimited usage"
-        }
-    else:
-        # Use built-in API key with rate limiting
-        if not BUILT_IN_GEMINI_KEY:
-            raise HTTPException(
-                status_code=503, 
-                detail="Free tier temporarily unavailable. Please provide your own Gemini API key."
-            )
-        
-        usage_info = check_free_tier_usage(client_id)
-        
-        if not usage_info["can_use"]:
-            raise HTTPException(
-                status_code=429,
-                detail=f"Daily free limit ({FREE_TIER_DAILY_LIMIT} uses) reached. Please provide your own Gemini API key for unlimited usage or try again tomorrow."
-            )
-        
-        api_key_to_use = BUILT_IN_GEMINI_KEY
-        usage_info["using_own_key"] = False
-        usage_info["message"] = f"Using free tier - {usage_info['remaining_today']} uses remaining today"
+    # Check rate limiting
+    client_id = get_client_identifier(request)
+    usage_info = check_free_tier_usage(client_id)
+    
+    if not usage_info["can_use"]:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Daily limit ({FREE_TIER_DAILY_LIMIT} uses) reached. Please try again tomorrow."
+        )
 
     try:
-        # Configure Gemini with the chosen API key
-        genai.configure(api_key=api_key_to_use)
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        # Configure Gemini with built-in API key
+        genai.configure(api_key=BUILT_IN_GEMINI_KEY)
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Read file content
         file_content = await file.read()
@@ -264,19 +251,18 @@ async def upload_prd(
         # Generate test cases
         test_cases = generate_test_cases(prd_text, model)
         
-        # Update usage tracking for free tier
-        if not (user_api_key and user_api_key.strip()):
-            increment_free_tier_usage(client_id)
-            # Refresh usage info after incrementing
-            usage_info = check_free_tier_usage(client_id)
-            usage_info["using_own_key"] = False
-            usage_info["message"] = f"✅ Used free tier - {usage_info['remaining_today']} uses remaining today"
+        # Update usage tracking
+        increment_free_tier_usage(client_id)
+        
+        # Get updated usage info
+        updated_usage_info = check_free_tier_usage(client_id)
+        updated_usage_info["message"] = f"✅ Success! {updated_usage_info['remaining_today']} uses remaining today"
         
         return ProcessResponse(
             success=True,
             message=f"Successfully generated {len(test_cases)} test cases",
             test_cases=test_cases,
-            usage_info=usage_info
+            usage_info=updated_usage_info
         )
         
     except HTTPException:
@@ -291,7 +277,7 @@ async def get_usage_info(request: Request):
     usage_info = check_free_tier_usage(client_id)
     
     return {
-        "has_built_in_key": bool(BUILT_IN_GEMINI_KEY),
+        "service_available": bool(BUILT_IN_GEMINI_KEY),
         "free_tier_available": bool(BUILT_IN_GEMINI_KEY),
         **usage_info
     }

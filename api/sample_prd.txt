@@ -1,0 +1,1 @@
+This is a sample Product Requirements Document. The app should allow users to login with email and password. Users should be able to create, edit, and delete tasks. The system should send email notifications when tasks are completed.

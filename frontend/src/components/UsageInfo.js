@@ -1,17 +1,17 @@
 import React from 'react';
-import { Zap, Crown, Gift, TrendingUp } from 'lucide-react';
+import { Zap, Gift } from 'lucide-react';
 import './UsageInfo.css';
 
-const UsageInfo = ({ usageInfo, freeTierAvailable, hasUserApiKey }) => {
-  if (!usageInfo && !freeTierAvailable) return null;
+const UsageInfo = ({ usageInfo, serviceAvailable }) => {
+  if (!usageInfo && !serviceAvailable) return null;
 
-  const renderFreeTierInfo = () => (
-    <div className="usage-card free-tier">
+  const renderServiceInfo = () => (
+    <div className="usage-card service-tier">
       <div className="usage-header">
         <Gift className="tier-icon" size={24} />
         <div className="tier-info">
-          <h3>Free Tier Active</h3>
-          <p>No API key needed!</p>
+          <h3>Free AI-Powered Service</h3>
+          <p>Transform your PRDs into test cases instantly!</p>
         </div>
       </div>
       
@@ -43,42 +43,15 @@ const UsageInfo = ({ usageInfo, freeTierAvailable, hasUserApiKey }) => {
       
       {(usageInfo?.remaining_today || 5) === 0 && (
         <div className="limit-reached">
-          ⚠️ Daily limit reached! Use your own API key for unlimited access.
+          ⏰ Daily limit reached! Come back tomorrow for more free uses.
         </div>
       )}
     </div>
   );
 
-  const renderUnlimitedInfo = () => (
-    <div className="usage-card unlimited">
-      <div className="usage-header">
-        <Crown className="tier-icon" size={24} />
-        <div className="tier-info">
-          <h3>Unlimited Access</h3>
-          <p>Using your personal API key</p>
-        </div>
-      </div>
-      
-      <div className="unlimited-benefits">
-        <div className="benefit">
-          <TrendingUp size={16} />
-          <span>No daily limits</span>
-        </div>
-        <div className="benefit">
-          <Zap size={16} />
-          <span>Faster processing</span>
-        </div>
-        <div className="benefit">
-          <Crown size={16} />
-          <span>Priority access</span>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="usage-info">
-      {hasUserApiKey ? renderUnlimitedInfo() : renderFreeTierInfo()}
+      {renderServiceInfo()}
     </div>
   );
 };

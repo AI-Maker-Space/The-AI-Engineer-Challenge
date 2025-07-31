@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, Image, Loader2, Gift, Crown } from 'lucide-react';
+import { Upload, FileText, Loader2, Gift, AlertCircle } from 'lucide-react';
 import './FileUpload.css';
 
-const FileUpload = ({ onFileUpload, loading, disabled, usageInfo, hasUserApiKey }) => {
+const FileUpload = ({ onFileUpload, loading, usageInfo, serviceAvailable }) => {
   const [dragActive, setDragActive] = useState(false);
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -20,7 +20,7 @@ const FileUpload = ({ onFileUpload, loading, disabled, usageInfo, hasUserApiKey 
       'image/png': ['.png']
     },
     multiple: false,
-    disabled: disabled || loading
+    disabled: loading // Only disable during loading
   });
 
   const getFileIcon = () => {
@@ -34,35 +34,33 @@ const FileUpload = ({ onFileUpload, loading, disabled, usageInfo, hasUserApiKey 
     if (loading) {
       return {
         title: "Processing your PRD...",
-        subtitle: "This may take a few moments while AI analyzes your document"
-      };
-    }
-    
-    if (disabled && !usageInfo?.can_use) {
-      return {
-        title: "Daily limit reached",
-        subtitle: "Please provide your own API key or try again tomorrow"
-      };
-    }
-    
-    if (disabled) {
-      return {
-        title: "Please provide an API key",
-        subtitle: "Free tier is currently unavailable"
+        subtitle: "AI is analyzing your document and generating test cases"
       };
     }
     
     if (isDragActive) {
       return {
         title: "Drop your PRD file here",
-        subtitle: hasUserApiKey ? "Using unlimited tier" : `${usageInfo?.remaining_today || 5} free uses remaining`
+        subtitle: "Ready to transform into comprehensive test cases"
       };
     }
     
-    return {
-      title: "Upload your PRD file",
-      subtitle: hasUserApiKey ? "Unlimited usage with your API key" : `${usageInfo?.remaining_today || 5} free uses remaining today`
-    };
+    if (usageInfo?.remaining_today > 0) {
+      return {
+        title: "Upload your PRD file",
+        subtitle: `${usageInfo.remaining_today} free uses remaining today`
+      };
+    } else if (usageInfo?.remaining_today === 0) {
+      return {
+        title: "Daily limit reached",
+        subtitle: "Come back tomorrow for more free uses"
+      };
+    } else {
+      return {
+        title: "Upload your PRD file",
+        subtitle: "Free AI-powered test case generation"
+      };
+    }
   };
 
   const message = getUploadMessage();
@@ -71,7 +69,7 @@ const FileUpload = ({ onFileUpload, loading, disabled, usageInfo, hasUserApiKey 
     <div className="file-upload-section">
       <div 
         {...getRootProps()} 
-        className={`file-upload-area ${isDragActive ? 'drag-active' : ''} ${disabled ? 'disabled' : ''} ${loading ? 'loading' : ''} ${hasUserApiKey ? 'unlimited' : 'free-tier'}`}
+        className={`file-upload-area ${isDragActive ? 'drag-active' : ''} ${loading ? 'loading' : ''} service-tier`}
       >
         <input {...getInputProps()} />
         
@@ -80,24 +78,22 @@ const FileUpload = ({ onFileUpload, loading, disabled, usageInfo, hasUserApiKey 
             {getFileIcon()}
             {!loading && (
               <div className="tier-indicator">
-                {hasUserApiKey ? <Crown size={20} /> : <Gift size={20} />}
+                <Gift size={20} />
               </div>
             )}
           </div>
           
           <div className="upload-text">
             <h3>{message.title}</h3>
-            {!disabled && (
-              <p>
-                {message.subtitle}<br />
-                <span className="file-types">PDF, JPEG, JPG, PNG files supported</span>
-              </p>
-            )}
+            <p>
+              {message.subtitle}<br />
+              <span className="file-types">PDF, JPEG, JPG, PNG files supported</span>
+            </p>
           </div>
         </div>
       </div>
 
-      {!disabled && !loading && (
+      {!loading && (
         <div className="upload-tips">
           <h4>💡 Tips for better results:</h4>
           <ul>
@@ -107,14 +103,30 @@ const FileUpload = ({ onFileUpload, loading, disabled, usageInfo, hasUserApiKey 
             <li>PDFs with selectable text provide the best results</li>
           </ul>
           
-          {!hasUserApiKey && usageInfo && (
-            <div className="free-tier-reminder">
-              <Gift size={16} />
-              <span>
-                Free tier: {usageInfo.remaining_today} of {usageInfo.daily_limit} uses remaining today
-              </span>
-            </div>
-          )}
+          <div className="service-info">
+            {usageInfo?.remaining_today > 0 ? (
+              <div className="usage-reminder">
+                <Gift size={16} />
+                <span>
+                  {usageInfo.remaining_today} of {usageInfo.daily_limit} free uses remaining today
+                </span>
+              </div>
+            ) : usageInfo?.remaining_today === 0 ? (
+              <div className="limit-info">
+                <AlertCircle size={16} />
+                <span>
+                  Daily limit reached. Resets tomorrow for more free uses!
+                </span>
+              </div>
+            ) : (
+              <div className="service-reminder">
+                <Gift size={16} />
+                <span>
+                  Free AI-powered service • No sign-up required
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

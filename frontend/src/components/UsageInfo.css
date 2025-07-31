@@ -12,14 +12,9 @@
   border-left: 4px solid;
 }
 
-.usage-card.free-tier {
-  border-left-color: #10b981;
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-}
-
-.usage-card.unlimited {
-  border-left-color: #fbbf24;
-  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+.usage-card.service-tier {
+  border-left-color: #667eea;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
 }
 
 .usage-header {
@@ -30,15 +25,7 @@
 }
 
 .tier-icon {
-  color: inherit;
-}
-
-.usage-card.free-tier .tier-icon {
-  color: #10b981;
-}
-
-.usage-card.unlimited .tier-icon {
-  color: #fbbf24;
+  color: #667eea;
 }
 
 .tier-info h3 {
@@ -100,7 +87,7 @@
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #10b981, #059669);
+  background: linear-gradient(90deg, #667eea, #764ba2);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -113,27 +100,6 @@
   color: #dc2626;
   font-size: 0.875rem;
   text-align: center;
-}
-
-.unlimited-benefits {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.benefit {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  background: rgba(251, 191, 36, 0.1);
-  border-radius: 6px;
-  color: #92400e;
-  font-weight: 500;
-}
-
-.benefit svg {
-  color: #fbbf24;
 }
 
 @media (max-width: 768px) {

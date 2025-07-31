@@ -15,61 +15,36 @@
   position: relative;
 }
 
-.file-upload-area.free-tier {
-  border-color: #10b981;
+.file-upload-area.service-tier {
+  border-color: #667eea;
 }
 
-.file-upload-area.unlimited {
-  border-color: #fbbf24;
-}
-
-.file-upload-area:not(.disabled):not(.loading):hover {
+.file-upload-area:not(.loading):hover {
   background: rgba(102, 126, 234, 0.02);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.file-upload-area.free-tier:not(.disabled):not(.loading):hover {
-  border-color: #059669;
-  background: rgba(16, 185, 129, 0.02);
-}
-
-.file-upload-area.unlimited:not(.disabled):not(.loading):hover {
-  border-color: #f59e0b;
-  background: rgba(251, 191, 36, 0.02);
+.file-upload-area.service-tier:not(.loading):hover {
+  border-color: #4c51bf;
+  background: rgba(102, 126, 234, 0.02);
 }
 
 .file-upload-area.drag-active {
   transform: scale(1.02);
 }
 
-.file-upload-area.drag-active.free-tier {
-  border-color: #059669;
-  background: rgba(16, 185, 129, 0.05);
-}
-
-.file-upload-area.drag-active.unlimited {
-  border-color: #f59e0b;
-  background: rgba(251, 191, 36, 0.05);
-}
-
-.file-upload-area.disabled {
-  border-color: #ddd;
-  background: #f9f9f9;
-  cursor: not-allowed;
-  opacity: 0.6;
+.file-upload-area.drag-active.service-tier {
+  border-color: #4c51bf;
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .file-upload-area.loading {
   cursor: wait;
 }
 
-.file-upload-area.loading.free-tier {
-  border-color: #10b981;
-}
-
-.file-upload-area.loading.unlimited {
-  border-color: #fbbf24;
+.file-upload-area.loading.service-tier {
+  border-color: #667eea;
 }
 
 .upload-content {
@@ -85,14 +60,6 @@
   opacity: 0.8;
 }
 
-.file-upload-area.free-tier .upload-icon {
-  color: #10b981;
-}
-
-.file-upload-area.unlimited .upload-icon {
-  color: #fbbf24;
-}
-
 .tier-indicator {
   position: absolute;
   bottom: -8px;
@@ -101,14 +68,7 @@
   border-radius: 50%;
   padding: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.file-upload-area.free-tier .tier-indicator {
-  color: #10b981;
-}
-
-.file-upload-area.unlimited .tier-indicator {
-  color: #fbbf24;
+  color: #667eea;
 }
 
 .animate-spin {
@@ -173,22 +133,44 @@
   margin-bottom: 0;
 }
 
-.free-tier-reminder {
+.service-info {
+  margin-top: 1rem;
+}
+
+.usage-reminder,
+.service-reminder {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 8px;
-  color: #065f46;
+  color: #4c51bf;
   font-size: 0.875rem;
   font-weight: 500;
-  margin-top: 1rem;
 }
 
-.free-tier-reminder svg {
-  color: #10b981;
+.usage-reminder svg,
+.service-reminder svg {
+  color: #667eea;
+}
+
+.limit-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.2);
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.limit-info svg {
+  color: #f59e0b;
 }
 
 @media (max-width: 768px) {
