@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, Gift } from 'lucide-react';
+import { Gift } from 'lucide-react';
 import './UsageInfo.css';
 
 const UsageInfo = ({ usageInfo, serviceAvailable }) => {

@@ -4,7 +4,6 @@ import { Upload, FileText, Loader2, Gift, AlertCircle } from 'lucide-react';
 import './FileUpload.css';
 
 const FileUpload = ({ onFileUpload, loading, usageInfo, serviceAvailable }) => {
-  const [dragActive, setDragActive] = useState(false);
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
