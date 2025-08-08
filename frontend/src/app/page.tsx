@@ -55,39 +55,42 @@ export default function Home() {
   }
 
   return (
-    <main style={{ maxWidth: 600, margin: "2rem auto", padding: 24 }}>
-      <h1>OpenAI Chat Frontend</h1>
-      <div style={{ marginBottom: 16 }}>
-        <strong>API Health:</strong> {health === null ? "Checking..." : health}
-      </div>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <label>
-          Developer Message:
-          <input value={devMsg} onChange={e => setDevMsg(e.target.value)} required style={{ width: "100%" }} />
-        </label>
-        <label>
-          User Message:
-          <input value={userMsg} onChange={e => setUserMsg(e.target.value)} required style={{ width: "100%" }} />
-        </label>
-        <label>
-          Model:
-          <input value={model} onChange={e => setModel(e.target.value)} style={{ width: "100%" }} />
-        </label>
-        <label>
-          OpenAI API Key:
-          <input value={apiKey} onChange={e => setApiKey(e.target.value)} required type="password" style={{ width: "100%" }} />
-        </label>
-        <button type="submit" disabled={loading} style={{ padding: "8px 16px" }}>
-          {loading ? "Sending..." : "Send"}
-        </button>
-      </form>
-      {error && <div style={{ color: "red", marginTop: 16 }}>Error: {error}</div>}
-      {response && (
-        <div style={{ marginTop: 24 }}>
-          <strong>Response:</strong>
-          <pre style={{ background: "#222", color: "#eee", padding: 12, borderRadius: 4, whiteSpace: "pre-wrap", wordBreak: "break-word", overflowX: "auto" }}>{response}</pre>
+    <>
+      <style>{`body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; }`}</style>
+      <main style={{ maxWidth: 600, margin: "2rem auto", padding: 24 }}>
+        <h1>OpenAI Chat Frontend</h1>
+        <div style={{ marginBottom: 16 }}>
+          <strong>API Health:</strong> {health === null ? "Checking..." : health}
         </div>
-      )}
-    </main>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <label>
+            Developer Message:
+            <input value={devMsg} onChange={e => setDevMsg(e.target.value)} required style={{ width: "100%" }} />
+          </label>
+          <label>
+            User Message:
+            <input value={userMsg} onChange={e => setUserMsg(e.target.value)} required style={{ width: "100%" }} />
+          </label>
+          <label>
+            Model:
+            <input value={model} onChange={e => setModel(e.target.value)} style={{ width: "100%" }} />
+          </label>
+          <label>
+            OpenAI API Key:
+            <input value={apiKey} onChange={e => setApiKey(e.target.value)} required type="password" style={{ width: "100%" }} />
+          </label>
+          <button type="submit" disabled={loading} style={{ padding: "8px 16px" }}>
+            {loading ? "Sending..." : "Send"}
+          </button>
+        </form>
+        {error && <div style={{ color: "red", marginTop: 16 }}>Error: {error}</div>}
+        {response && (
+          <div style={{ marginTop: 24 }}>
+            <strong>Response:</strong>
+            <pre style={{ background: "#222", color: "#eee", padding: 12, borderRadius: 4, whiteSpace: "pre-wrap", wordBreak: "break-word", overflowX: "auto" }}>{response}</pre>
+          </div>
+        )}
+      </main>
+    </>
   );
 }
