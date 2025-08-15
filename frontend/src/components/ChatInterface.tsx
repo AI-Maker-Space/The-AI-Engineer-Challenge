@@ -62,7 +62,6 @@ const ChatInterface: React.FC = () => {
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No response body');
 
-      let assistantMessage = '';
       const assistantMessageId = (Date.now() + 1).toString();
       
       const assistantMessageObj: Message = {
@@ -79,12 +78,12 @@ const ChatInterface: React.FC = () => {
         if (done) break;
 
         const chunk = new TextDecoder().decode(value);
-        assistantMessage += chunk;
-
+        
+        // Update the message content using functional state update
         setMessages(prev => 
           prev.map(msg => 
             msg.id === assistantMessageId 
-              ? { ...msg, content: assistantMessage }
+              ? { ...msg, content: msg.content + chunk }
               : msg
           )
         );

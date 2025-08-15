@@ -1,7 +1,13 @@
 {
     "version": 2,
     "builds": [
-      { "src": "frontend/package.json", "use": "@vercel/next" },
+      { 
+        "src": "frontend/package.json", 
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "build"
+        }
+      },
       { 
         "src": "api/app.py",
         "use": "@vercel/python"
