@@ -1,0 +1,114 @@
+.api-key-input {
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.input-header h3 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.expand-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.input-fields {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.input-fields.expanded {
+  max-height: 500px;
+  padding: 1.5rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.api-key-field,
+.model-select,
+.developer-message-field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.api-key-field:focus,
+.model-select:focus,
+.developer-message-field:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.api-key-field {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+.model-select {
+  cursor: pointer;
+}
+
+.developer-message-field {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.input-group small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #6c757d;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .input-header {
+    padding: 1rem;
+  }
+  
+  .input-fields.expanded {
+    padding: 1rem;
+  }
+}

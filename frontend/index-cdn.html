@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Engineer Challenge Chat</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .App {
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .App-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .App-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .App-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+        }
+
+        .chat-interface {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .clear-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .api-key-input {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-header h3 {
+            margin: 0;
+            color: #495057;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .expand-btn:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .input-fields {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .input-fields.expanded {
+            max-height: 500px;
+            padding: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #495057;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .api-key-field,
+        .model-select,
+        .developer-message-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .api-key-field:focus,
+        .model-select:focus,
+        .developer-message-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .api-key-field {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .model-select {
+            cursor: pointer;
+        }
+
+        .developer-message-field {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .input-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #6c757d;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .messages-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .welcome-message h3 {
+            color: #495057;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-message p {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .chat-message:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .chat-message.user {
+            border-left: 4px solid #667eea;
+        }
+
+        .chat-message.assistant {
+            border-left: 4px solid #28a745;
+        }
+
+        .chat-message.system {
+            border-left: 4px solid #ffc107;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .role-icon {
+            font-size: 1.2rem;
+        }
+
+        .role-name {
+            font-weight: 600;
+            color: #495057;
+            flex: 1;
+        }
+
+        .timestamp {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        .message-content {
+            color: #212529;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading-message {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .input-container {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            min-height: 60px;
+            max-height: 120px;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .message-input:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                border-radius: 15px;
+                margin: 0 1rem;
+            }
+            
+            .chat-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .messages-container {
+                height: 300px;
+            }
+            
+            .input-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .send-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // ChatMessage Component
+        const ChatMessage = ({ message }) => {
+            const formatTime = (date) => {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            };
+
+            const getRoleDisplayName = (role) => {
+                switch (role) {
+                    case 'user':
+                        return 'You';
+                    case 'assistant':
+                        return 'AI Assistant';
+                    case 'system':
+                        return 'System';
+                    default:
+                        return role;
+                }
+            };
+
+            const getRoleIcon = (role) => {
+                switch (role) {
+                    case 'user':
+                        return '👤';
+                    case 'assistant':
+                        return '🤖';
+                    case 'system':
+                        return '⚙️';
+                    default:
+                        return '💬';
+                }
+            };
+
+            return (
+                <div className={`chat-message ${message.role}`}>
+                    <div className="message-header">
+                        <span className="role-icon">{getRoleIcon(message.role)}</span>
+                        <span className="role-name">{getRoleDisplayName(message.role)}</span>
+                        <span className="timestamp">{formatTime(message.timestamp)}</span>
+                    </div>
+                    <div className="message-content">
+                        {message.content}
+                    </div>
+                </div>
+            );
+        };
+
+        // ApiKeyInput Component
+        const ApiKeyInput = ({ 
+            apiKey, 
+            onApiKeyChange, 
+            model, 
+            onModelChange, 
+            developerMessage, 
+            onDeveloperMessageChange 
+        }) => {
+            const [isExpanded, setIsExpanded] = useState(false);
+
+            const availableModels = [
+                'gpt-4.1-mini',
+                'gpt-4o-mini',
+                'gpt-4o',
+                'gpt-4-turbo',
+                'gpt-3.5-turbo'
+            ];
+
+            return (
+                <div className="api-key-input">
+                    <div className="input-header">
+                        <h3>Configuration</h3>
+                        <button 
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="expand-btn"
+                        >
+                            {isExpanded ? '▼' : '▶'}
+                        </button>
+                    </div>
+                    
+                    <div className={`input-fields ${isExpanded ? 'expanded' : ''}`}>
+                        <div className="input-group">
+                            <label htmlFor="api-key">OpenAI API Key *</label>
+                            <input
+                                id="api-key"
+                                type="password"
+                                value={apiKey}
+                                onChange={(e) => onApiKeyChange(e.target.value)}
+                                placeholder="sk-..."
+                                className="api-key-field"
+                            />
+                            <small>Your API key is stored locally and never sent to our servers</small>
+                        </div>
+
+                        <div className="input-group">
+                            <label htmlFor="model">Model</label>
+                            <select
+                                id="model"
+                                value={model}
+                                onChange={(e) => onModelChange(e.target.value)}
+                                className="model-select"
+                            >
+                                {availableModels.map((modelOption) => (
+                                    <option key={modelOption} value={modelOption}>
+                                        {modelOption}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="input-group">
+                            <label htmlFor="developer-message">Developer Message (Optional)</label>
+                            <textarea
+                                id="developer-message"
+                                value={developerMessage}
+                                onChange={(e) => onDeveloperMessageChange(e.target.value)}
+                                placeholder="Set the AI's behavior and context (e.g., 'You are a helpful coding assistant')"
+                                className="developer-message-field"
+                                rows={3}
+                            />
+                            <small>This message sets the AI's role and behavior for the conversation</small>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ChatInterface Component
+        const ChatInterface = () => {
+            const [messages, setMessages] = useState([]);
+            const [inputMessage, setInputMessage] = useState('');
+            const [developerMessage, setDeveloperMessage] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [apiKey, setApiKey] = useState('');
+            const [model, setModel] = useState('gpt-4.1-mini');
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const handleSendMessage = async () => {
+                if (!inputMessage.trim() || !apiKey.trim()) return;
+
+                const userMessage = {
+                    id: Date.now().toString(),
+                    role: 'user',
+                    content: inputMessage,
+                    timestamp: new Date()
+                };
+
+                setMessages(prev => [...prev, userMessage]);
+                setInputMessage('');
+                setIsLoading(true);
+
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            developer_message: developerMessage || 'You are a helpful AI assistant.',
+                            user_message: inputMessage,
+                            model: model,
+                            api_key: apiKey
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const reader = response.body?.getReader();
+                    if (!reader) throw new Error('No response body');
+
+                    let assistantMessage = '';
+                    const assistantMessageId = (Date.now() + 1).toString();
+                    
+                    const assistantMessageObj = {
+                        id: assistantMessageId,
+                        role: 'assistant',
+                        content: '',
+                        timestamp: new Date()
+                    };
+
+                    setMessages(prev => [...prev, assistantMessageObj]);
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        const chunk = new TextDecoder().decode(value);
+                        assistantMessage += chunk;
+
+                        setMessages(prev => 
+                            prev.map(msg => 
+                                msg.id === assistantMessageId 
+                                    ? { ...msg, content: assistantMessage }
+                                    : msg
+                            )
+                        );
+                    }
+
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    const errorMessage = {
+                        id: Date.now().toString(),
+                        role: 'assistant',
+                        content: 'Sorry, there was an error processing your request. Please check your API key and try again.',
+                        timestamp: new Date()
+                    };
+                    setMessages(prev => [...prev, errorMessage]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            };
+
+            const clearChat = () => {
+                setMessages([]);
+            };
+
+            return (
+                <div className="chat-interface">
+                    <div className="chat-container">
+                        <div className="chat-header">
+                            <h2>Chat Interface</h2>
+                            <button onClick={clearChat} className="clear-btn">
+                                Clear Chat
+                            </button>
+                        </div>
+
+                        <ApiKeyInput 
+                            apiKey={apiKey} 
+                            onApiKeyChange={setApiKey}
+                            model={model}
+                            onModelChange={setModel}
+                            developerMessage={developerMessage}
+                            onDeveloperMessageChange={setDeveloperMessage}
+                        />
+
+                        <div className="messages-container">
+                            {messages.length === 0 && (
+                                <div className="welcome-message">
+                                    <h3>Welcome to AI Engineer Challenge Chat!</h3>
+                                    <p>Enter your OpenAI API key above and start chatting with AI models.</p>
+                                    <p>You can customize the developer message to set the AI's behavior and context.</p>
+                                </div>
+                            )}
+                            
+                            {messages.map((message) => (
+                                <ChatMessage key={message.id} message={message} />
+                            ))}
+                            
+                            {isLoading && (
+                                <div className="loading-message">
+                                    <div className="typing-indicator">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        <div className="input-container">
+                            <textarea
+                                value={inputMessage}
+                                onChange={(e) => setInputMessage(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
+                                disabled={!apiKey.trim() || isLoading}
+                                className="message-input"
+                            />
+                            <button
+                                onClick={handleSendMessage}
+                                disabled={!inputMessage.trim() || !apiKey.trim() || isLoading}
+                                className="send-button"
+                            >
+                                {isLoading ? 'Sending...' : 'Send'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // App Component
+        const App = () => {
+            return (
+                <div className="App">
+                    <header className="App-header">
+                        <h1>AI Engineer Challenge Chat</h1>
+                        <p>Interactive chat interface powered by OpenAI GPT models</p>
+                    </header>
+                    <main>
+                        <ChatInterface />
+                    </main>
+                </div>
+            );
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
