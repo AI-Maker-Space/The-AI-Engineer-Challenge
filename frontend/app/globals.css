@@ -1,0 +1,152 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  height: 100vh;
+  background-color: #343541;
+  color: #ececf1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.message {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #40414f;
+  border: 1px solid #565869;
+}
+
+.message.user {
+  background-color: #2d2d2d;
+  border-color: #4a4a4a;
+}
+
+.message.assistant {
+  background-color: #40414f;
+  border-color: #565869;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #8e8ea0;
+}
+
+.message-content {
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  background-color: #40414f;
+  border-radius: 8px;
+  border: 1px solid #565869;
+}
+
+.input-field {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #565869;
+  border-radius: 6px;
+  background-color: #2d2d2d;
+  color: #ececf1;
+  font-size: 16px;
+  resize: none;
+  min-height: 50px;
+  max-height: 150px;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.send-button {
+  padding: 12px 24px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.send-button:hover {
+  background-color: #005a9e;
+}
+
+.send-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007acc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.settings {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #40414f;
+  border-radius: 8px;
+  border: 1px solid #565869;
+}
+
+.settings input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #565869;
+  border-radius: 4px;
+  background-color: #2d2d2d;
+  color: #ececf1;
+}
+
+.settings label {
+  display: block;
+  margin-bottom: 5px;
+  color: #8e8ea0;
+  font-size: 14px;
+}
