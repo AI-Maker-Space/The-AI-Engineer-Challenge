@@ -28,14 +28,19 @@ class ChatRequest(BaseModel):
     developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
-    api_key: str          # OpenAI API key for authentication
+    api_key: Optional[str] = None  # Optional client-provided key, overrides env if present
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        # Initialize OpenAI client with the provided API key
-        client = OpenAI(api_key=request.api_key)
+        # Read API key from environment for server-side secret management
+        api_key = request.api_key or os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("No API key provided. Send 'api_key' in the request or set OPENAI_API_KEY on server.")
+
+        # Initialize OpenAI client with the server-side API key
+        client = OpenAI(api_key=api_key)
         
         # Create an async generator function for streaming responses
         async def generate():

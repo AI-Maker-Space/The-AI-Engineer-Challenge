@@ -1,188 +1,163 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from "react";
 
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-}
+type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+};
 
-export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [apiKey, setApiKey] = useState('')
-  const [developerMessage, setDeveloperMessage] = useState('You are a helpful AI assistant.')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+export default function HomePage() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    containerRef.current?.scrollTo({ top: containerRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || !apiKey.trim() || isLoading) return
+  async function handleSend() {
+    if (!input.trim()) return;
+    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: "user", content: input.trim() };
+    setMessages((m) => [...m, userMsg]);
+    setInput("");
+    setIsSending(true);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputValue.trim(),
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    setInputValue('')
-    setIsLoading(true)
-
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const res = await fetch(`${baseUrl}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          developer_message: developerMessage,
-          user_message: userMessage.content,
-          model: 'gpt-4.1-mini',
-          api_key: apiKey
+          developer_message: "You are a helpful assistant.",
+          user_message: userMsg.content,
+          model: "gpt-4.1-mini",
+          api_key: apiKey || undefined,
         }),
-      })
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response')
+      if (!res.ok || !res.body) {
+        throw new Error(`Request failed: ${res.status}`);
       }
 
-      const reader = response.body?.getReader()
-      if (!reader) throw new Error('No reader available')
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantBuffer = "";
+      const assistantId = crypto.randomUUID();
+      setMessages((m) => [...m, { id: assistantId, role: "assistant", content: "" }]);
 
-      let assistantMessage = ''
-      const assistantMessageId = (Date.now() + 1).toString()
-
-      // Add initial assistant message
-      const initialAssistantMessage: Message = {
-        id: assistantMessageId,
-        role: 'assistant',
-        content: '',
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, initialAssistantMessage])
-
-      // Stream the response
       while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        const chunk = new TextDecoder().decode(value)
-        assistantMessage += chunk
-
-        // Update the assistant message in real-time
-        setMessages(prev => prev.map(msg => 
-          msg.id === assistantMessageId 
-            ? { ...msg, content: assistantMessage }
-            : msg
-        ))
+        const { done, value } = await reader.read();
+        if (done) break;
+        assistantBuffer += decoder.decode(value, { stream: true });
+        setMessages((m) => m.map((msg) => (msg.id === assistantId ? { ...msg, content: assistantBuffer } : msg)));
       }
-
-    } catch (error) {
-      console.error('Error:', error)
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: 'Sorry, I encountered an error. Please check your API key and try again.',
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, errorMessage])
+    } catch (err: any) {
+      setMessages((m) => [
+        ...m,
+        { id: crypto.randomUUID(), role: "assistant", content: `Error: ${err?.message || String(err)}` },
+      ]);
     } finally {
-      setIsLoading(false)
+      setIsSending(false);
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void handleSend();
     }
   }
 
   return (
-    <div className="chat-container">
-      <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#ececf1' }}>
-        ChatGPT-Style Chat Interface
-      </h1>
-
-      {/* Settings Section */}
-      <div className="settings">
-        <label htmlFor="apiKey">OpenAI API Key:</label>
-        <input
-          id="apiKey"
-          type="password"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          placeholder="Enter your OpenAI API key (sk-...)"
-        />
-        
-        <label htmlFor="developerMessage">System Message:</label>
-        <input
-          id="developerMessage"
-          type="text"
-          value={developerMessage}
-          onChange={(e) => setDeveloperMessage(e.target.value)}
-          placeholder="Instructions for the AI assistant"
-        />
-      </div>
-
-      {/* Messages */}
-      <div className="messages">
-        {messages.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#8e8ea0', marginTop: '50px' }}>
-            <p>Start a conversation by typing a message below!</p>
+    <main style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+      <header style={{ padding: 16, borderBottom: "1px solid #eee" }}>
+        <h1 style={{ margin: 0 }}>Chat</h1>
+        <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
+          <input
+            type="password"
+            placeholder="Enter OpenAI API Key (optional)"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "8px 10px",
+              borderRadius: 8,
+              border: "1px solid #e5e7eb",
+              outline: "none",
+              minWidth: 280,
+            }}
+          />
+        </div>
+      </header>
+      <div
+        ref={containerRef}
+        style={{ flex: 1, overflowY: "auto", padding: 16, background: "#fafafa" }}
+      >
+        {messages.length === 0 ? (
+          <div style={{ color: "#666" }}>Say hi! Type a message below.</div>
+        ) : (
+          <div style={{ display: "grid", gap: 12 }}>
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                style={{
+                  maxWidth: 720,
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  background: m.role === "user" ? "#e6f0ff" : "white",
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 4 }}>{m.role}</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{m.content}</div>
+              </div>
+            ))}
           </div>
         )}
-        
-        {messages.map(message => (
-          <div key={message.id} className={`message ${message.role}`}>
-            <div className="message-header">
-              <span>{message.role === 'user' ? 'You' : 'AI Assistant'}</span>
-              <span>{message.timestamp.toLocaleTimeString()}</span>
-            </div>
-            <div className="message-content">{message.content}</div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
       </div>
-
-      {/* Input Section */}
-      <div className="input-container">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void handleSend();
+        }}
+        style={{ display: "flex", gap: 8, padding: 12, borderTop: "1px solid #eee" }}
+      >
         <textarea
-          className="input-field"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={apiKey ? "Type your message here..." : "Please enter your API key first"}
-          disabled={!apiKey || isLoading}
-          rows={1}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Message..."
+          rows={2}
           style={{
-            height: 'auto',
-            minHeight: '50px',
-            maxHeight: '150px'
-          }}
-          onInput={(e) => {
-            const target = e.target as HTMLTextAreaElement
-            target.style.height = 'auto'
-            target.style.height = Math.min(target.scrollHeight, 150) + 'px'
+            flex: 1,
+            resize: "none",
+            padding: 10,
+            borderRadius: 8,
+            border: "1px solid #e5e7eb",
+            outline: "none",
           }}
         />
         <button
-          className="send-button"
-          onClick={handleSendMessage}
-          disabled={!inputValue.trim() || !apiKey || isLoading}
+          type="submit"
+          disabled={isSending || input.trim().length === 0}
+          style={{
+            padding: "0 16px",
+            borderRadius: 8,
+            border: "1px solid #2563eb",
+            background: isSending ? "#93c5fd" : "#3b82f6",
+            color: "white",
+            cursor: isSending ? "not-allowed" : "pointer",
+          }}
         >
-          {isLoading ? <div className="loading"></div> : 'Send'}
+          Send
         </button>
-      </div>
-    </div>
-  )
+      </form>
+    </main>
+  );
 }
+
+
