@@ -11,7 +11,7 @@ export default function HomePage() {
   )
   const [userMessage, setUserMessage] = useState('Hello!')
   const [model, setModel] = useState('gpt-4.1-mini')
-  const [apiKey, setApiKey] = useState('')
+  // API key is now read server-side from OPENAI_API_KEY; no client key needed
   const [isLoading, setIsLoading] = useState(false)
   const [transcript, setTranscript] = useState<Array<{ role: Role; content: string }>>([
     { role: 'developer', content: 'System: You are a concise, helpful assistant.' },
@@ -19,10 +19,6 @@ export default function HomePage() {
   const controllerRef = useRef<AbortController | null>(null)
 
   async function handleSend() {
-    if (!apiKey) {
-      alert('Please paste your OpenAI API Key')
-      return
-    }
     setIsLoading(true)
     controllerRef.current = new AbortController()
     setTranscript((t) => [
@@ -39,7 +35,7 @@ export default function HomePage() {
           developer_message: developerMessage,
           user_message: userMessage,
           model,
-          api_key: apiKey,
+          // api_key omitted; backend uses OPENAI_API_KEY from env
         }),
         signal: controllerRef.current.signal,
       })
@@ -93,14 +89,6 @@ export default function HomePage() {
 
       <div className="card col" style={{ gap: 16 }}>
         <div className="row" style={{ gap: 16 }}>
-          <input
-            className="input"
-            type="password"
-            placeholder="OpenAI API Key"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            style={{ flex: 1 }}
-          />
           <select
             className="select"
             value={model}

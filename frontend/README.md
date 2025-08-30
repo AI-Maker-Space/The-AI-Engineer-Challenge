@@ -25,7 +25,7 @@ npm run dev
 Open `http://localhost:3000`.
 
 #### Using the App
-- Paste your OpenAI API key in the input.
+- Backend now reads `OPENAI_API_KEY` from environment, so the UI no longer asks for a key.
 - Adjust messages and model if desired.
 - Click Send. The response will stream into the transcript.
 

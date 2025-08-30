@@ -6,11 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 # Import OpenAI client for interacting with OpenAI's API
 from openai import OpenAI
+from dotenv import load_dotenv
 import os
 from typing import Optional
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
+
+# Load environment variables from a local .env file in development, if present
+load_dotenv()
 
 # Configure CORS (Cross-Origin Resource Sharing) middleware
 # This allows the API to be accessed from different domains/origins
@@ -28,14 +32,19 @@ class ChatRequest(BaseModel):
     developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
-    api_key: str          # OpenAI API key for authentication
+    api_key: Optional[str] = None  # Optional API key; falls back to env var when not provided
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        # Initialize OpenAI client with the provided API key
-        client = OpenAI(api_key=request.api_key)
+        # Resolve API key: prefer request.api_key, fallback to env var
+        resolved_api_key = request.api_key or os.getenv("OPENAI_API_KEY")
+        if not resolved_api_key:
+            raise HTTPException(status_code=400, detail="Missing OpenAI API key. Provide api_key or set OPENAI_API_KEY.")
+
+        # Initialize OpenAI client with the resolved API key
+        client = OpenAI(api_key=resolved_api_key)
         
         # Create an async generator function for streaming responses
         async def generate():
