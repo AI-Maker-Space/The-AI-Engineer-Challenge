@@ -43,7 +43,14 @@ export default function HomePage() {
         }),
         signal: controllerRef.current.signal,
       })
-      if (!res.ok || !res.body) throw new Error('Request failed')
+      if (!res.ok) {
+        let errorText = ''
+        try {
+          errorText = await res.text()
+        } catch {}
+        throw new Error(`HTTP ${res.status} ${res.statusText}${errorText ? ` - ${errorText}` : ''}`)
+      }
+      if (!res.body) throw new Error('No response body')
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
