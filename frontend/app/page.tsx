@@ -1,0 +1,149 @@
+'use client'
+
+import { useState, useRef } from 'react'
+import './globals.css'
+
+type Role = 'developer' | 'user' | 'assistant'
+
+export default function HomePage() {
+  const [developerMessage, setDeveloperMessage] = useState(
+    'You are a concise, helpful assistant.'
+  )
+  const [userMessage, setUserMessage] = useState('Hello!')
+  const [model, setModel] = useState('gpt-4.1-mini')
+  const [apiKey, setApiKey] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [transcript, setTranscript] = useState<Array<{ role: Role; content: string }>>([
+    { role: 'developer', content: 'System: You are a concise, helpful assistant.' },
+  ])
+  const controllerRef = useRef<AbortController | null>(null)
+
+  async function handleSend() {
+    if (!apiKey) {
+      alert('Please paste your OpenAI API Key')
+      return
+    }
+    setIsLoading(true)
+    controllerRef.current = new AbortController()
+    setTranscript((t) => [
+      ...t,
+      { role: 'user', content: userMessage },
+      { role: 'assistant', content: '' },
+    ])
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          developer_message: developerMessage,
+          user_message: userMessage,
+          model,
+          api_key: apiKey,
+        }),
+        signal: controllerRef.current.signal,
+      })
+      if (!res.ok || !res.body) throw new Error('Request failed')
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+
+      let assistantText = ''
+      for (;;) {
+        const { done, value } = await reader.read()
+        if (done) break
+        assistantText += decoder.decode(value, { stream: true })
+        setTranscript((t) => {
+          const copy = t.slice()
+          // Overwrite the last assistant message with the streamed content
+          copy[copy.length - 1] = { role: 'assistant', content: assistantText }
+          return copy
+        })
+      }
+    } catch (err) {
+      console.error(err)
+      setTranscript((t) => [
+        ...t,
+        { role: 'assistant', content: 'Error: ' + (err as Error).message },
+      ])
+    } finally {
+      setIsLoading(false)
+      controllerRef.current = null
+    }
+  }
+
+  function handleAbort() {
+    controllerRef.current?.abort()
+    setIsLoading(false)
+  }
+
+  return (
+    <div className="container">
+      <h1>AI Engineer Chat</h1>
+      <p style={{ color: 'var(--muted)' }}>
+        Frontend for FastAPI backend at <code>/api/chat</code>
+      </p>
+
+      <div className="card col" style={{ gap: 16 }}>
+        <div className="row" style={{ gap: 16 }}>
+          <input
+            className="input"
+            type="password"
+            placeholder="OpenAI API Key"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <select
+            className="select"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+          >
+            <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+            <option value="gpt-4o-mini">gpt-4o-mini</option>
+            <option value="gpt-4o">gpt-4o</option>
+          </select>
+        </div>
+
+        <textarea
+          className="textarea"
+          rows={3}
+          placeholder="Developer (system) message"
+          value={developerMessage}
+          onChange={(e) => setDeveloperMessage(e.target.value)}
+        />
+
+        <div className="row">
+          <input
+            className="input"
+            placeholder="Your message"
+            value={userMessage}
+            onChange={(e) => setUserMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSend()
+            }}
+            style={{ flex: 1 }}
+          />
+          <button className="button" onClick={handleSend} disabled={isLoading}>
+            {isLoading ? 'Streaming…' : 'Send'}
+          </button>
+          {isLoading && (
+            <button className="button" onClick={handleAbort}>Stop</button>
+          )}
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <div className="logs">
+          {transcript.map((m, i) => (
+            <div key={i} className={`msg-${m.role}`}>
+              <strong>{m.role}:</strong> {m.content}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+

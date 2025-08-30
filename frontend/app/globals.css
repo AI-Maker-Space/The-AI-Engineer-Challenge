@@ -1,0 +1,69 @@
+:root {
+  --bg: #0b0f19;
+  --panel: #111826;
+  --text: #e6edf3;
+  --muted: #a0aec0;
+  --accent: #6ee7b7;
+  --accent-2: #60a5fa;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+}
+
+* { box-sizing: border-box; }
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 16px 80px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.row { display: flex; gap: 12px; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+
+.input,
+.textarea,
+.select {
+  background: #0c1322;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.button {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #0b0f19;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.logs {
+  white-space: pre-wrap;
+  line-height: 1.5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+.msg-user { color: var(--accent-2); }
+.msg-dev { color: var(--accent); }
+.msg-assistant { color: var(--text); }
+
+
