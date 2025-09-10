@@ -411,10 +411,19 @@ Remember: Start with ## and use markdown formatting throughout your entire respo
             # If response doesn't start with ##, add it
             lines = response_text.strip().split('\n')
             if lines:
-                first_line = lines[0].strip()
+                # Find the first non-empty line
+                first_line = None
+                for line in lines:
+                    if line.strip():
+                        first_line = line.strip()
+                        break
+                
                 if first_line and not first_line.startswith('#'):
-                    # Add ## to the first line if it's not already a heading
-                    lines[0] = f"## {first_line}"
+                    # Add ## to the first non-empty line
+                    for i, line in enumerate(lines):
+                        if line.strip() == first_line:
+                            lines[i] = f"## {first_line}"
+                            break
                     response_text = '\n'.join(lines)
         
         return response_text
