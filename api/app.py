@@ -34,7 +34,7 @@ app.add_middleware(
 BUILT_IN_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # Rate limiting configuration
-FREE_TIER_DAILY_LIMIT = 5  # 5 free uses per day
+FREE_TIER_DAILY_LIMIT = 999999  # Unlimited for local development
 usage_tracker = {}  # In production, use Redis or database
 
 # Data models
@@ -499,7 +499,7 @@ async def health_check():
         "status": "ok", 
         "service": "PRD to Test Case Generator",
         "free_tier_available": bool(BUILT_IN_GEMINI_KEY),
-        "daily_free_limit": FREE_TIER_DAILY_LIMIT
+        "daily_free_limit": "unlimited (local dev)"
     }
 
 # Entry point for running the application
