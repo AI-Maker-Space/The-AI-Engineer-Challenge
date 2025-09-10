@@ -356,13 +356,13 @@ async def generate_llm_response(prompt: str, context: str = "", api_key: str = "
         model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Construct the full prompt with context
-        full_prompt = f"""You are an expert QA engineer and test case specialist. 
+        full_prompt = f"""You are an expert QA engineer. Provide detailed, structured responses with clear formatting. 
         
 Context: {context}
 
 User Query: {prompt}
 
-Please provide a helpful, detailed response focused on improving test case quality, coverage, and effectiveness. If the user is asking about refining existing test cases, provide specific suggestions for improvement."""
+FORMAT YOUR RESPONSE WITH: 1) Clear headings and subheadings, 2) Bullet points for lists, 3) Numbered steps when appropriate, 4) Bold text for key concepts, 5) Proper spacing between sections. Be comprehensive but well-organized."""
 
         response = model.generate_content(full_prompt)
         return response.text
