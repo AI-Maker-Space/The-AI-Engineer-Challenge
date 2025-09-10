@@ -358,27 +358,50 @@ async def generate_llm_response(prompt: str, context: str = "", api_key: str = "
         # Use provided API key or built-in key
         gemini_key = api_key if api_key else BUILT_IN_GEMINI_KEY
         if not gemini_key:
-            raise ValueError("No API key provided")
+            return """## ⚠️ API Key Required
+
+To use the chatbot functionality, you need to provide a Google Gemini API key.
+
+### How to get an API key:
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Sign in with your Google account
+3. Create a new API key
+4. Copy the key and paste it in the API key field
+
+### Alternative:
+You can also set the `GEMINI_API_KEY` environment variable in the backend for automatic usage."""
         
         genai.configure(api_key=gemini_key)
         model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Construct the full prompt with context
-        full_prompt = f"""You are a helpful AI assistant for a PRD to Test Case Generator application. Provide clear, well-structured responses that are easy to read and understand.
+        full_prompt = f"""You are a helpful AI assistant. You MUST format your responses using proper markdown syntax for maximum readability.
 
-RESPONSE FORMATTING RULES:
-- Use proper markdown formatting (## for headings, **bold**, *italic*, bullet points with -, numbered lists with 1.)
-- Break up long responses into clear sections with headings
-- Use bullet points and numbered lists for better readability
-- Keep responses concise but comprehensive
-- Use code blocks with ``` for any code examples
-- Be conversational but professional
+CRITICAL FORMATTING REQUIREMENTS:
+1. Use ## for main headings
+2. Use ### for subheadings  
+3. Use **bold text** for emphasis
+4. Use bullet points with - for lists
+5. Use numbered lists with 1. 2. 3. for steps
+6. Use `code` for technical terms
+7. Use ``` for code blocks
+8. Break content into clear sections with headings
+
+EXAMPLE FORMAT:
+## Main Topic
+### Key Concept 1
+- **Important point**: Explanation
+- **Another point**: More details
+
+### Key Concept 2
+1. **Step one**: Description
+2. **Step two**: More details
 
 CONTEXT: {context}
 
 USER QUERY: {prompt}
 
-Please provide a well-structured response following the formatting rules above."""
+RESPOND WITH PROPER MARKDOWN FORMATTING AS SHOWN ABOVE."""
         response = model.generate_content(full_prompt)
         return response.text
         
