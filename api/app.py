@@ -375,33 +375,34 @@ You can also set the `GEMINI_API_KEY` environment variable in the backend for au
         model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Construct the full prompt with context
-        full_prompt = f"""You are a helpful AI assistant. You MUST format your responses using proper markdown syntax for maximum readability.
+        full_prompt = f"""You are a helpful AI assistant. You MUST use markdown formatting in your response.
 
-CRITICAL FORMATTING REQUIREMENTS:
-1. Use ## for main headings
-2. Use ### for subheadings  
-3. Use **bold text** for emphasis
-4. Use bullet points with - for lists
-5. Use numbered lists with 1. 2. 3. for steps
-6. Use `code` for technical terms
-7. Use ``` for code blocks
-8. Break content into clear sections with headings
+FORMATTING RULES - FOLLOW EXACTLY:
+- Start with ## for main topic
+- Use ### for subtopics
+- Use **bold** for important terms
+- Use - for bullet points
+- Use 1. 2. 3. for numbered lists
+- Use `backticks` for code/technical terms
 
-EXAMPLE FORMAT:
-## Main Topic
-### Key Concept 1
-- **Important point**: Explanation
-- **Another point**: More details
+EXAMPLE - COPY THIS FORMAT:
+## What is Object-Oriented Programming?
 
-### Key Concept 2
-1. **Step one**: Description
-2. **Step two**: More details
+### Core Concepts
+- **Objects**: Self-contained units with data and behavior
+- **Classes**: Blueprints for creating objects
+- **Methods**: Functions that belong to objects
+
+### Key Benefits
+1. **Reusability**: Write once, use many times
+2. **Organization**: Code is easier to understand
+3. **Maintainability**: Changes are isolated
 
 CONTEXT: {context}
 
 USER QUERY: {prompt}
 
-RESPOND WITH PROPER MARKDOWN FORMATTING AS SHOWN ABOVE."""
+IMPORTANT: Use the exact markdown format shown in the example above. Start with ## and use proper formatting throughout."""
         response = model.generate_content(full_prompt)
         return response.text
         
