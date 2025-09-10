@@ -364,18 +364,21 @@ async def generate_llm_response(prompt: str, context: str = "", api_key: str = "
         model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Construct the full prompt with context
-        full_prompt = f"""You are a helpful AI assistant. Answer the user's question directly and naturally. Do not analyze the question as a QA task unless it's specifically about testing or quality assurance.
+        full_prompt = f"""You are a helpful AI assistant for a PRD to Test Case Generator application. Provide clear, well-structured responses that are easy to read and understand.
 
-If the user asks you to write a story, write the story.
-If the user asks a math question, solve the math problem.
-If the user asks for an explanation, explain it directly.
-If the user asks for a summary, provide a summary.
+RESPONSE FORMATTING RULES:
+- Use proper markdown formatting (## for headings, **bold**, *italic*, bullet points with -, numbered lists with 1.)
+- Break up long responses into clear sections with headings
+- Use bullet points and numbered lists for better readability
+- Keep responses concise but comprehensive
+- Use code blocks with ``` for any code examples
+- Be conversational but professional
 
-Use clear formatting when it helps (headings, bullet points, numbered lists). Be conversational and helpful.
+CONTEXT: {context}
 
-Context: {context}
+USER QUERY: {prompt}
 
-User Query: {prompt}"""
+Please provide a well-structured response following the formatting rules above."""
         response = model.generate_content(full_prompt)
         return response.text
         
@@ -471,7 +474,15 @@ async def refine_test_cases(request: RefineTestCasesRequest, http_request: Reque
 
 {context}
 
-Provide helpful suggestions for making these test cases clearer, more comprehensive, and more effective. Use clear formatting with headings and bullet points when helpful."""
+RESPONSE FORMATTING REQUIREMENTS:
+- Use clear markdown formatting with ## headings
+- Organize suggestions into logical sections
+- Use bullet points (-) for individual suggestions
+- Use numbered lists (1.) for step-by-step improvements
+- Use **bold** for important points
+- Provide specific, actionable recommendations
+
+Provide helpful suggestions for making these test cases clearer, more comprehensive, and more effective."""
 
         # Generate LLM response
         response_text = await generate_llm_response(
