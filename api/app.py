@@ -319,6 +319,14 @@ async def download_csv(test_cases: List[TestCase]):
         raise HTTPException(status_code=500, detail=f"Error generating CSV: {str(e)}")
 
 @app.get("/api/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "ok", 
+        "service": "PRD to Test Case Generator",
+        "free_tier_available": bool(BUILT_IN_GEMINI_KEY),
+        "daily_free_limit": "unlimited (local dev)"
+    }
 
 # Additional data models for prompting tool
 class ChatMessage(BaseModel):
@@ -356,7 +364,18 @@ async def generate_llm_response(prompt: str, context: str = "", api_key: str = "
         model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Construct the full prompt with context
-        full_prompt = f"""Answer the user's question directly and helpfully. Use clear formatting when it helps. Be natural and conversational.nnContext: {context}nnUser Query: {prompt}"""
+        full_prompt = f"""You are a helpful AI assistant. Answer the user's question directly and naturally. Do not analyze the question as a QA task unless it's specifically about testing or quality assurance.
+
+If the user asks you to write a story, write the story.
+If the user asks a math question, solve the math problem.
+If the user asks for an explanation, explain it directly.
+If the user asks for a summary, provide a summary.
+
+Use clear formatting when it helps (headings, bullet points, numbered lists). Be conversational and helpful.
+
+Context: {context}
+
+User Query: {prompt}"""
         response = model.generate_content(full_prompt)
         return response.text
         
@@ -448,16 +467,11 @@ async def refine_test_cases(request: RefineTestCasesRequest, http_request: Reque
             context += f"   Category: {tc.category}\n\n"
         
         # Create refinement prompt
-        refinement_prompt = f"""Please analyze and refine the following test cases based on this feedback: "{request.refinement_prompt}"
+        refinement_prompt = f"""Please help improve these test cases based on this feedback: "{request.refinement_prompt}"
 
 {context}
 
-Please provide:
-1. Specific suggestions for improvement
-2. Updated test cases in JSON format if applicable
-3. Explanation of the changes made
-
-Focus on improving test coverage, clarity, and effectiveness."""
+Provide helpful suggestions for making these test cases clearer, more comprehensive, and more effective. Use clear formatting with headings and bullet points when helpful."""
 
         # Generate LLM response
         response_text = await generate_llm_response(
@@ -485,15 +499,6 @@ Focus on improving test coverage, clarity, and effectiveness."""
             response="",
             usage_info=usage_info if 'usage_info' in locals() else {}
         )
-
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "ok", 
-        "service": "PRD to Test Case Generator",
-        "free_tier_available": bool(BUILT_IN_GEMINI_KEY),
-        "daily_free_limit": "unlimited (local dev)"
-    }
 
 # Entry point for running the application
 if __name__ == "__main__":
