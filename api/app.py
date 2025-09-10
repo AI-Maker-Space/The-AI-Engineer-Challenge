@@ -356,16 +356,7 @@ async def generate_llm_response(prompt: str, context: str = "", api_key: str = "
         model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Construct the full prompt with context
-        full_prompt = f"""CRITICAL INSTRUCTION: If the user asks for creative writing, math problems, explanations, or summaries, answer directly without any QA analysis. Only use QA analysis for questions specifically about test cases or testing.
-
-You are a helpful AI assistant. CRITICAL: If the user asks for creative writing, math problems, explanations, or summaries, answer directly without any QA analysis. Only use QA analysis for questions specifically about test cases or testing. 
-        
-Context: {context}
-
-User Query: {prompt}
-
-For test case questions: Use structured QA format with headings and bullet points. For other questions: Answer directly without QA analysis. Use formatting only when it helps clarity."""
-
+        full_prompt = f"""Answer the user's question directly and helpfully. Use clear formatting when it helps. Be natural and conversational.nnContext: {context}nnUser Query: {prompt}"""
         response = model.generate_content(full_prompt)
         return response.text
         
