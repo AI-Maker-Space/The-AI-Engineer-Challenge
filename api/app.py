@@ -404,7 +404,20 @@ RESPONSE FORMAT (copy this structure):
 
 Remember: Start with ## and use markdown formatting throughout your entire response."""
         response = model.generate_content(full_prompt)
-        return response.text
+        response_text = response.text
+        
+        # Post-process to ensure proper markdown formatting
+        if not response_text.startswith('##'):
+            # If response doesn't start with ##, add it
+            lines = response_text.strip().split('\n')
+            if lines:
+                first_line = lines[0].strip()
+                if first_line and not first_line.startswith('#'):
+                    # Add ## to the first line if it's not already a heading
+                    lines[0] = f"## {first_line}"
+                    response_text = '\n'.join(lines)
+        
+        return response_text
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating response: {str(e)}")
