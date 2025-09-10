@@ -5,6 +5,7 @@ import FileUpload from './components/FileUpload';
 import TestCaseTable from './components/TestCaseTable';
 import Header from './components/Header';
 import UsageInfo from './components/UsageInfo';
+import PromptingTool from './components/PromptingTool';
 import './App.css';
 
 function App() {
@@ -136,6 +137,7 @@ function App() {
           </div>
         )}
       </div>
+      <PromptingTool testCases={testCases} apiKey={usageInfo?.api_key} />
     </div>
   );
 }
