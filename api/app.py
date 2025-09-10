@@ -408,23 +408,35 @@ Remember: Start with ## and use markdown formatting throughout your entire respo
         
         # Post-process to ensure proper markdown formatting
         if not response_text.startswith('##'):
-            # If response doesn't start with ##, add it
+            # Restructure the response with proper markdown formatting
             lines = response_text.strip().split('\n')
-            if lines:
-                # Find the first non-empty line
-                first_line = None
-                for line in lines:
-                    if line.strip():
-                        first_line = line.strip()
-                        break
-                
-                if first_line and not first_line.startswith('#'):
-                    # Add ## to the first non-empty line
-                    for i, line in enumerate(lines):
-                        if line.strip() == first_line:
-                            lines[i] = f"## {first_line}"
-                            break
-                    response_text = '\n'.join(lines)
+            formatted_lines = []
+            
+            # Add main heading
+            formatted_lines.append("## Object-Oriented Programming Explanation")
+            formatted_lines.append("")
+            
+            # Process the content
+            current_section = None
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                    
+                # Check if this looks like a section header
+                if any(keyword in line.lower() for keyword in ['objects:', 'properties:', 'methods:', 'the power', 'in short', 'let\'s say']):
+                    if current_section:
+                        formatted_lines.append("")
+                    formatted_lines.append(f"### {line}")
+                    current_section = line
+                else:
+                    # Regular content line
+                    if line.startswith('* '):
+                        formatted_lines.append(line)
+                    else:
+                        formatted_lines.append(f"- {line}")
+            
+            response_text = '\n'.join(formatted_lines)
         
         return response_text
         
