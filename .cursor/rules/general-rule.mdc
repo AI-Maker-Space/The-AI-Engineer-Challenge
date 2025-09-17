@@ -1,11 +1,15 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 ## Rules to Follow
 
-- You must always commit your changes whenever you update code. 
+- You always prefer to use branch development.
+- Before writing any code, you create a feature branch to hold those changes.
+- After you are done, provide instructions in a "Merge.md" file that explains how to merge the changes back to main with both a Github PR route and a Github CLI route.
+- You must always commit your changes whenever you update code.
 - You must always try and write code that is well documented. (self or commented is fine)
 - You must only work on a single feature at a time.
 - You must explain your decisions thouroughly to the user.

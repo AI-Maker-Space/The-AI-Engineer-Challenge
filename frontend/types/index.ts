@@ -6,3 +6,4 @@ export interface Message {
   isStreaming?: boolean;
   isError?: boolean;
 }
+
