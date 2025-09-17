@@ -1,5 +1,5 @@
 # Import required FastAPI components for building the API
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 # Import Pydantic for data validation and settings management
@@ -7,7 +7,12 @@ from pydantic import BaseModel
 # Import OpenAI client for interacting with OpenAI's API
 from openai import OpenAI
 import os
-from typing import Optional
+from typing import Optional, List
+import PyPDF2
+import io
+from aimakerspace.vectordatabase import VectorDatabase
+from aimakerspace.openai_utils.chatmodel import ChatOpenAI
+import asyncio
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -22,18 +27,73 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers in requests
 )
 
+# Global vector database instance
+vector_db = VectorDatabase()
+
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
 class ChatRequest(BaseModel):
-    developer_message: str  # Message from the developer/system
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
     api_key: str          # OpenAI API key for authentication
+
+def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
+    """Extract text from PDF and split it into chunks."""
+    pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file))
+    chunks = []
+    
+    for page in pdf_reader.pages:
+        text = page.extract_text()
+        # Split text into smaller chunks (simple approach - split by paragraphs)
+        paragraphs = text.split('\n\n')
+        chunks.extend([p.strip() for p in paragraphs if p.strip()])
+    
+    return chunks
+
+@app.post("/api/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
+    if not api_key:
+        raise HTTPException(status_code=400, detail="API key is required")
+    
+    try:
+        # Read the PDF file
+        contents = await file.read()
+        
+        # Extract text from PDF
+        text_chunks = extract_text_from_pdf(contents)
+        
+        if not text_chunks:
+            raise HTTPException(status_code=400, detail="No text could be extracted from the PDF")
+        
+        # Initialize vector database with the chunks
+        global vector_db
+        vector_db = VectorDatabase()
+        await vector_db.abuild_from_list(text_chunks)
+        
+        return {"message": "PDF processed successfully", "chunk_count": len(text_chunks)}
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
+        if not vector_db.vectors:
+            raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
+
+        # Get relevant chunks from the vector database
+        relevant_chunks = vector_db.search_by_text(
+            request.user_message,
+            k=3,
+            return_as_text=True
+        )
+
+        # Create the system message with context
+        system_message = f"""You are a helpful AI assistant that answers questions based ONLY on the provided context. 
+If the question cannot be answered using the context, say that you cannot answer the question with the available information.
+Do not make up or infer information that is not in the context.
+
+Context from the PDF:
+{' '.join(relevant_chunks)}"""
+
         # Initialize OpenAI client with the provided API key
         client = OpenAI(api_key=request.api_key)
         
@@ -43,7 +103,7 @@ async def chat(request: ChatRequest):
             stream = client.chat.completions.create(
                 model=request.model,
                 messages=[
-                    {"role": "developer", "content": request.developer_message},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": request.user_message}
                 ],
                 stream=True  # Enable streaming response

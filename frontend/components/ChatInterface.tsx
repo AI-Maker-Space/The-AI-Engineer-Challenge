@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Settings, MessageSquare, User, Bot } from "lucide-react";
 import MessageBubble from "./MessageBubble";
+import PDFUpload from "./PDFUpload";
 import { Message } from "@/types";
 
 interface ChatInterfaceProps {
@@ -14,12 +15,10 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userMessage, setUserMessage] = useState("");
-  const [developerMessage, setDeveloperMessage] = useState(
-    "You are a helpful AI assistant. Please provide clear and helpful responses."
-  );
   const [model, setModel] = useState("gpt-4.1-mini");
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isPdfUploaded, setIsPdfUploaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,7 +33,7 @@ export default function ChatInterface({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userMessage.trim() || isLoading) return;
+    if (!userMessage.trim() || isLoading || !isPdfUploaded) return;
 
     const newUserMessage: Message = {
       id: Date.now().toString(),
@@ -69,7 +68,6 @@ export default function ChatInterface({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            developer_message: developerMessage,
             user_message: userMessage,
             model,
             api_key: apiKey,
@@ -192,18 +190,7 @@ export default function ChatInterface({
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              System Message
-            </label>
-            <textarea
-              value={developerMessage}
-              onChange={(e) => setDeveloperMessage(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
-              placeholder="Define how the AI should behave..."
-            />
-          </div>
+          <PDFUpload apiKey={apiKey} onUploadSuccess={() => setIsPdfUploaded(true)} />
         </div>
       )}
 
@@ -213,9 +200,11 @@ export default function ChatInterface({
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-muted-foreground">
               <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">Ready to chat!</h3>
+              <h3 className="text-lg font-medium mb-2">Upload a PDF to start</h3>
               <p className="text-sm">
-                Start a conversation by typing a message below.
+                {isPdfUploaded
+                  ? "PDF uploaded! Start asking questions about the document."
+                  : "Click the settings icon to upload a PDF and start chatting."}
               </p>
             </div>
           </div>
