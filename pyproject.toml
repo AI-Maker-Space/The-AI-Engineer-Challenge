@@ -3,11 +3,12 @@ name = "beyond-chatgpt"
 version = "0.1.0"
 description = "gpt-like-a-dev"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11,<3.12"
 dependencies = [
     "fastapi>=0.115.12",
     "jupyter>=1.1.1",
     "openai",
     "pydantic>=2.11.4",
     "uvicorn>=0.34.2",
+    "python-multipart>=0.0.18",
 ]

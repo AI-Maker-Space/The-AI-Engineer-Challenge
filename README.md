@@ -84,6 +84,17 @@ Got everything in place? Let's move on!
 </details>
 
 <details>
+  <summary>⚙️ Backend Setup with uv</summary>
+
+1. Install the [`uv`](https://github.com/astral-sh/uv) package manager (`pip install uv`). `uv` will download and manage Python 3.11 for you the first time you run a project command.
+2. From the project root, install dependencies with `uv sync`. This creates `.venv/` (and fetches Python 3.11 automatically if needed).
+3. Set your OpenAI API key in the shell before running the server, for example `export OPENAI_API_KEY=sk-...`.
+4. Start the backend directly from the project root with `uv run uvicorn api.app:app --reload` (or `uv run python api/app.py` for a one-off run).
+5. Additional backend details live in `api/README.md`.
+
+</details>
+
+<details>
   <summary>🔥Setting Up for Vibe Coding Success </summary>
 
 While it is a bit counter-intuitive to set things up before jumping into vibe-coding - it's important to remember that there exists a gradient betweeen AI-Assisted Development and Vibe-Coding. We're only reaching *slightly* into AI-Assisted Development for this challenge, but it's worth it!

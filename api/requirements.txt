@@ -1,5 +1,0 @@
-fastapi==0.115.12
-uvicorn==0.34.2
-openai==1.77.0
-pydantic==2.11.4
-python-multipart==0.0.18
