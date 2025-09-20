@@ -1,0 +1,218 @@
+/* QA Automation Hub Header */
+.tab-navigation {
+  background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
+  color: var(--color-text-inverse);
+  padding: 0;
+  box-shadow: var(--shadow-lg);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 3rem;
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-header-icon {
+  background: var(--color-hover);
+  padding: 1rem;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.app-header-content {
+  flex: 1;
+}
+
+.app-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #ffffff 0%, #e8eaff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-description {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  background: var(--color-bg-tertiary);
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tab-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-button:hover {
+  background: var(--color-hover);
+  color: var(--color-text-inverse);
+  transform: translateY(-1px);
+}
+
+.tab-button.active {
+  background: var(--color-active);
+  color: var(--color-text-inverse);
+  border-bottom-color: var(--color-success);
+  backdrop-filter: blur(10px);
+}
+
+.tab-button.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-success) 0%, var(--color-info) 100%);
+}
+
+.tab-icon {
+  background: var(--color-hover);
+  padding: 0.75rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active .tab-icon {
+  background: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.tab-content {
+  flex: 1;
+  text-align: left;
+}
+
+.tab-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.tab-description {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
+.tab-button.active .tab-description {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1.5rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .app-header-left {
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+    gap: 1rem;
+  }
+  
+  .app-header-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .app-title {
+    font-size: 2rem;
+  }
+  
+  .app-description {
+    font-size: 1rem;
+  }
+  
+  .tab-nav {
+    flex-direction: column;
+  }
+  
+  .tab-button {
+    padding: 1rem 1.5rem;
+    min-width: auto;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+  
+  .tab-button.active {
+    border-left-color: var(--color-success);
+    border-bottom-color: transparent;
+  }
+  
+  .tab-button.active::before {
+    height: auto;
+    width: 2px;
+    top: 0;
+    bottom: 0;
+    right: auto;
+  }
+}
+
+/* Animation for tab content loading */
+.tab-content-container {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

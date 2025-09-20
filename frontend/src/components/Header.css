@@ -1,9 +1,10 @@
 .header {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-bg-elevated);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--color-border-primary);
   padding: 2rem 0;
   text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .header-content {
@@ -16,7 +17,7 @@
   position: relative;
   display: inline-block;
   margin-bottom: 1rem;
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .zap-icon {
@@ -24,7 +25,7 @@
   top: -8px;
   right: -8px;
   color: #ffd700;
-  background: white;
+  background: var(--color-bg-elevated);
   border-radius: 50%;
   padding: 2px;
 }
@@ -32,7 +33,7 @@
 .header-title {
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -42,7 +43,7 @@
 
 .header-description {
   font-size: 1.2rem;
-  color: #666;
+  color: var(--color-text-secondary);
   margin: 0 0 1.5rem 0;
   line-height: 1.6;
 }
@@ -55,8 +56,8 @@
 }
 
 .format-tag {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
+  color: var(--color-text-inverse);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.875rem;
