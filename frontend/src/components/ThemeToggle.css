@@ -1,0 +1,72 @@
+/* Theme Toggle Switch */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  outline: none;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.theme-toggle-track {
+  width: 52px;
+  height: 28px;
+  background: var(--color-toggle-track);
+  border-radius: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 2px solid var(--color-toggle-border);
+}
+
+.theme-toggle-thumb {
+  width: 24px;
+  height: 24px;
+  background: var(--color-toggle-thumb);
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-toggle-icon);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-thumb.light {
+  left: 0;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+}
+
+.theme-toggle-thumb.dark {
+  left: 24px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: #60a5fa;
+}
+
+/* Theme Variables */
+:root[data-theme="light"] {
+  --color-toggle-track: #e2e8f0;
+  --color-toggle-border: #cbd5e1;
+  --color-toggle-thumb: #ffffff;
+  --color-toggle-icon: #64748b;
+}
+
+:root[data-theme="dark"] {
+  --color-toggle-track: #374151;
+  --color-toggle-border: #4b5563;
+  --color-toggle-thumb: #1f2937;
+  --color-toggle-icon: #9ca3af;
+}

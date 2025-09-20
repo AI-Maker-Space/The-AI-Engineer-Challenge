@@ -1,0 +1,116 @@
+/* PRD Generator Tab Styles */
+.prd-generator {
+  min-height: 100vh;
+  background: var(--color-bg-secondary, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+}
+
+.tab-header {
+  background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
+  color: var(--color-text-inverse);
+  padding: 3rem 3rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.tab-header-icon {
+  background: var(--color-hover);
+  padding: 1.5rem;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-header-content h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--color-text-inverse);
+}
+
+.tab-header-content p {
+  font-size: 1.1rem;
+  margin: 0 0 1.5rem 0;
+  opacity: 0.95;
+  line-height: 1.5;
+  color: var(--color-text-inverse);
+}
+
+.supported-formats {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.format-tag {
+  background: var(--color-hover);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-secondary);
+  transition: all 0.3s ease;
+  color: var(--color-text-inverse);
+}
+
+.format-tag:hover {
+  background: var(--color-active);
+  transform: translateY(-1px);
+}
+
+.tab-content {
+  padding: 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  background: var(--color-bg-secondary, #f8fafc);
+}
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.results-section {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tab-header {
+    padding: 2rem 1rem 1.5rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .tab-header-content h2 {
+    font-size: 1.75rem;
+  }
+  
+  .tab-header-content p {
+    font-size: 1rem;
+  }
+  
+  .tab-content {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
