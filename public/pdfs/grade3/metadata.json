@@ -1,0 +1,13 @@
+{
+  "source_references": [
+    "NASA Kids - https://www.nasa.gov/audience/forkids/",
+    "National Geographic Kids - https://kids.nationalgeographic.com/",
+    "Smithsonian National Museum of Natural History - https://naturalhistory.si.edu/education/kids"
+  ],
+  "model_used": "Claude 3.5 Sonnet (Anthropic)",
+  "grade_level": "Grade 3 (Ages 8-9)",
+  "content_approach": "Age-appropriate scientific facts with engaging storytelling",
+  "creation_date": "2025-09-20",
+  "total_pdfs": 10,
+  "average_content_length": "~90 lines per PDF (16 paragraphs)"
+}

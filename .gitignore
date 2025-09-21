@@ -65,6 +65,9 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# Kids Tutor Database (local development only)
+/data/kids_tutor.db
+
 # Flask stuff:
 instance/
 .webassets-cache

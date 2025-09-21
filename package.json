@@ -1,0 +1,29 @@
+{
+  "name": "the-ai-engineer-challenge",
+  "version": "1.0.0",
+  "description": "<p align = \"center\" draggable=”false” ><img src=\"https://github.com/AI-Maker-Space/LLM-Dev-101/assets/37101144/d1343317-fa2f-41e1-8af1-1dbb18399719\"       width=\"200px\"      height=\"auto\"/> </p>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalrow/The-AI-Engineer-Challenge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lalrow/The-AI-Engineer-Challenge/issues"
+  },
+  "homepage": "https://github.com/lalrow/The-AI-Engineer-Challenge#readme",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.2.0",
+    "tsx": "^4.20.5"
+  }
+}
