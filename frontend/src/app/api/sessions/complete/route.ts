@@ -5,7 +5,7 @@ import {
   logConversation,
   getKidQuizHistory,
   updateQuizAnswer
-} from '../../../../../lib/db';
+} from '../../../../lib/db';
 
 /**
  * Complete Session API Endpoint

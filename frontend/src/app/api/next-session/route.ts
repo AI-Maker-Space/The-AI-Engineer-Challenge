@@ -6,7 +6,7 @@ import {
   getAllPDFMetadata,
   logConversation,
   saveQuizQuestion 
-} from '../../../../lib/db';
+} from '../../../lib/db';
 
 /**
  * Next Session API Endpoint

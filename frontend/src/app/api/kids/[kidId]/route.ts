@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getKidById } from '../../../../../../lib/db';
+import { getKidById } from '../../../../lib/db';
 
 /**
  * Get Kid by ID API Endpoint
