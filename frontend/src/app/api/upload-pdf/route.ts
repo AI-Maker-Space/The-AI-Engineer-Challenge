@@ -4,9 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import path from 'path';
-import fs from 'fs';
 import { insertPDFMetadata } from '../../../../lib/db';
 import { embedPDF } from '../../../lib/embeddings';
 
@@ -57,22 +54,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create upload directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), 'public', 'pdfs', 'uploaded');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    // Generate unique filename
+    // Generate unique filename (for database reference only)
     const timestamp = Date.now();
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}_${originalName}`;
-    const filepath = path.join(uploadDir, filename);
 
-    // Save file to disk
+    // Process file in memory (no filesystem writes on Vercel)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(filepath, buffer);
 
     // Extract text content
     const content = await extractTextFromPDF(buffer);
