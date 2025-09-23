@@ -27,6 +27,7 @@ const eslintConfig = [
       "@typescript-eslint/no-unused-vars": "off", 
       "react/no-unescaped-entities": "off",
       "@next/next/no-html-link-for-pages": "off",
+      "prefer-const": "off",
       // Change exhaustive-deps from error to warning
       "react-hooks/exhaustive-deps": "warn",
     },
