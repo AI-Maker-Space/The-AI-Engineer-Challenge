@@ -5,3 +5,4 @@ pydantic==2.11.4
 python-multipart==0.0.18
 PyPDF2==3.0.1
 numpy==1.26.4
+python-dotenv==1.0.1

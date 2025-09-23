@@ -27,8 +27,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers in requests
 )
 
-# Global vector database instance
-vector_db = VectorDatabase()
+# Global vector database instance and embedding model
+vector_db = None
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
@@ -67,10 +67,13 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
         
         # Initialize vector database with the chunks
         global vector_db
+        os.environ["OPENAI_API_KEY"] = api_key
         vector_db = VectorDatabase()
         await vector_db.abuild_from_list(text_chunks)
         
         return {"message": "PDF processed successfully", "chunk_count": len(text_chunks)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
@@ -85,6 +88,8 @@ async def chat(request: ChatRequest):
             k=3,
             return_as_text=True
         )
+
+        print(relevant_chunks)
 
         # Create the system message with context
         system_message = f"""You are a helpful AI assistant that answers questions based ONLY on the provided context. 
