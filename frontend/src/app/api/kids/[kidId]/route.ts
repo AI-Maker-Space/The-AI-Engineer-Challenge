@@ -10,19 +10,20 @@ import { getKidById } from '../../../../lib/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { kidId: string } }
+  context: { params: { kidId: string } }
 ) {
   try {
-    const kidId = parseInt(params.kidId);
+    const { kidId } = context.params;
+    const kidIdNum = parseInt(kidId);
     
-    if (isNaN(kidId)) {
+    if (isNaN(kidIdNum)) {
       return NextResponse.json(
         { error: 'Invalid kid ID' },
         { status: 400 }
       );
     }
 
-    const kid = getKidById(kidId);
+    const kid = getKidById(kidIdNum);
     
     if (!kid) {
       return NextResponse.json(
