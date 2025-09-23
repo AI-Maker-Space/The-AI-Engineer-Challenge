@@ -10,10 +10,10 @@ import { getKidById } from '../../../../lib/db';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { kidId: string } }
+  context: { params: Promise<{ kidId: string }> }
 ) {
   try {
-    const { kidId } = context.params;
+    const { kidId } = await context.params;
     const kidIdNum = parseInt(kidId);
     
     if (isNaN(kidIdNum)) {

@@ -42,12 +42,13 @@ interface ProgressResponse {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { kidId: string } }
+  context: { params: Promise<{ kidId: string }> }
 ) {
   try {
-    const kidId = parseInt(params.kidId);
+    const { kidId } = await context.params;
+    const kidIdNum = parseInt(kidId);
     
-    if (isNaN(kidId)) {
+    if (isNaN(kidIdNum)) {
       return NextResponse.json(
         { error: 'Invalid kid ID' },
         { status: 400 }
@@ -55,7 +56,7 @@ export async function GET(
     }
 
     // Get kid information
-    const kid = getKidById(kidId);
+    const kid = getKidById(kidIdNum);
     if (!kid) {
       return NextResponse.json(
         { error: 'Kid not found' },
@@ -64,7 +65,7 @@ export async function GET(
     }
 
     // Get all sessions for this kid
-    const sessions = getKidSessions(kidId);
+    const sessions = getKidSessions(kidIdNum);
     
     // Calculate statistics
     const totalSessions = sessions.length;
