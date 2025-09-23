@@ -11,3 +11,23 @@ dependencies = [
     "pydantic>=2.11.4",
     "uvicorn>=0.34.2",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[project.optional-dependencies]
+dev = [
+    "python-lsp-server[all]>=1.9.0",  # Base LSP server
+    "pylsp-mypy>=0.6.8",              # Type checking
+    "python-lsp-ruff>=1.7.0",         # Linting
+    "pylsp-rope>=0.1.11",             # Refactoring
+    "jedi>=0.19.1",                   # Code completion
+]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+check_untyped_defs = true
+disallow_untyped_defs = true

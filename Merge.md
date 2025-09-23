@@ -1,65 +1,84 @@
-# Merging the PDF RAG System Feature
+# Deployment Instructions
 
-This document provides instructions for merging the PDF-based RAG system feature into the main branch.
+## Vercel Deployment
 
-## Changes Overview
+This project consists of three main components:
 
-The feature adds the following capabilities:
-1. PDF upload and processing endpoint in the backend
-2. PDF text extraction and indexing using the aimakerspace library
-3. RAG-based chat functionality that answers questions based on PDF content
-4. New frontend PDF upload component
-5. Updated chat interface to support PDF context
+1. Frontend (Next.js)
+2. API (FastAPI)
+3. AI Maker Space (Python package)
 
-## Merging via GitHub PR
+### Prerequisites
 
-1. Push the feature branch to GitHub:
-   ```bash
-   git push origin feature/pdf-rag-system
-   ```
+1. Install Vercel CLI:
 
-2. Go to GitHub and create a new Pull Request:
-   - Base branch: `main`
-   - Compare branch: `feature/pdf-rag-system`
-   - Title: "feat: implement PDF-based RAG system"
-   - Description: Include the changes overview from above
+```bash
+npm install -g vercel
+```
 
-3. Request review from team members
+2. Login to Vercel:
 
-4. After approval, merge the PR using the "Squash and merge" option
+```bash
+vercel login
+```
 
-## Merging via GitHub CLI
+### Deployment Steps
 
-1. Install GitHub CLI if not already installed:
-   ```bash
-   brew install gh
-   ```
+1. Deploy the project:
 
-2. Authenticate with GitHub:
-   ```bash
-   gh auth login
-   ```
+```bash
+vercel
+```
 
-3. Create and merge PR:
-   ```bash
-   gh pr create --title "feat: implement PDF-based RAG system" --body "Implements PDF upload and RAG-based chat functionality" --base main
-   gh pr merge --squash
-   ```
+This will:
 
-## Testing After Merge
+- Deploy the Next.js frontend
+- Deploy the FastAPI backend
+- Set up the proper routing between components
 
-1. Pull the latest changes:
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
+2. After deployment, Vercel will provide you with:
 
-2. Install new dependencies:
-   ```bash
-   cd api && pip install -r requirements.txt
-   ```
+- Production URL
+- Preview URLs for future deployments
+- Project dashboard link
 
-3. Test the new functionality:
-   - Upload a PDF file through the UI
-   - Ask questions about the PDF content
-   - Verify that responses are based on the PDF context
+### Environment Variables
+
+Make sure to set these environment variables in your Vercel project dashboard:
+
+- `OPENAI_API_KEY`: Your OpenAI API key
+- Any other environment variables required by your application
+
+### Monitoring
+
+1. Visit the Vercel dashboard to monitor:
+
+- Build logs
+- Deployment status
+- Function execution
+- Error logs
+
+### Troubleshooting
+
+If you encounter issues:
+
+1. Check the build logs in Vercel dashboard
+2. Verify all environment variables are set
+3. Ensure all dependencies are properly listed in package.json and requirements.txt
+4. Check the Function logs for runtime errors
+
+## Alternative: GitHub PR Route
+
+1. Create a PR:
+
+```bash
+gh pr create --title "Deploy to Vercel" --body "Deploy latest changes to Vercel"
+```
+
+2. After PR is merged:
+
+```bash
+gh pr merge
+```
+
+Vercel will automatically deploy changes when merged to main branch.

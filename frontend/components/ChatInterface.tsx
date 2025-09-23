@@ -190,7 +190,10 @@ export default function ChatInterface({
             </select>
           </div>
 
-          <PDFUpload apiKey={apiKey} onUploadSuccess={() => setIsPdfUploaded(true)} />
+          <PDFUpload
+            apiKey={apiKey}
+            onUploadSuccess={() => setIsPdfUploaded(true)}
+          />
         </div>
       )}
 
@@ -200,7 +203,9 @@ export default function ChatInterface({
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-muted-foreground">
               <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">Upload a PDF to start</h3>
+              <h3 className="text-lg font-medium mb-2">
+                Upload a PDF to start
+              </h3>
               <p className="text-sm">
                 {isPdfUploaded
                   ? "PDF uploaded! Start asking questions about the document."
@@ -260,4 +265,3 @@ export default function ChatInterface({
     </div>
   );
 }
-
