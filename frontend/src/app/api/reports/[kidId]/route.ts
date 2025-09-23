@@ -3,7 +3,7 @@ import {
   getKidById, 
   getKidSessions, 
   getKidQuizHistory 
-} from '../../../../../../lib/db';
+} from '../../../../../lib/db';
 
 /**
  * Kid Progress Report API Endpoint

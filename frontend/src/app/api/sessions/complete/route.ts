@@ -4,7 +4,10 @@ import {
   updateReadingTime, 
   logConversation,
   getKidQuizHistory,
-  updateQuizAnswer
+  updateQuizAnswer,
+  markTopicCompleted,
+  getAllPDFMetadata,
+  getSessionById
 } from '../../../../lib/db';
 
 /**
@@ -45,13 +48,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get session data to find kidId and pdfName
+    const session = getSessionById(sessionId);
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
     // Save quiz score and reading time
     saveQuizScore(sessionId, score);
     updateReadingTime(sessionId, readingTime);
 
     // Log completion
     logConversation(
-      0, // We'll need to get kidId from session, for now using 0
+      session.kidId,
       'system',
       `Session completed with score: ${score}% in ${readingTime} seconds`,
       'system_message',
@@ -61,13 +73,32 @@ export async function POST(request: NextRequest) {
     // Log each quiz answer
     answers.forEach((answer, index) => {
       logConversation(
-        0, // We'll need to get kidId from session
+        session.kidId,
         'user',
         `Quiz answer ${index + 1}: ${answer}`,
         'quiz_answer',
         sessionId
       );
     });
+
+    // Check if this topic should be marked as completed
+    // Mark as completed if score >= 70% (good understanding)
+    if (score >= 70) {
+      // Get PDF metadata to find topic and subtopic
+      const allPDFs = getAllPDFMetadata();
+      const pdfMetadata = allPDFs.find(pdf => pdf.filename === session.pdfName);
+      
+      if (pdfMetadata) {
+        markTopicCompleted(
+          session.kidId, 
+          pdfMetadata.topic, 
+          pdfMetadata.subtopic || '', 
+          score
+        );
+        
+        console.log(`🎯 Topic completed: ${pdfMetadata.topic} - ${pdfMetadata.subtopic} (Score: ${score}%)`);
+      }
+    }
 
     // Note: In a full implementation, we would:
     // 1. Get the session to find kidId and pdfName

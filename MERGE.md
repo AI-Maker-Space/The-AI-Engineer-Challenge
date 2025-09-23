@@ -1,34 +1,40 @@
-# MERGE Instructions - RAG Functionality Branch
+# MERGE Instructions - Kids Science Tutor with Persistent RAG
 
 ## Branch Information
-- **Feature Branch**: `copy_rag`
+- **Feature Branch**: `feature/activity-2-kids-tutor-quiz`
 - **Target Branch**: `main`
-- **Purpose**: Add PDF upload and RAG (Retrieval Augmented Generation) functionality to the chat application
+- **Purpose**: Complete Kids Science Tutor MVP with persistent SQLite embeddings and RAG integration
 
 ## Changes Summary
-This branch adds comprehensive RAG functionality to the existing chat application:
+This branch transforms the application into a comprehensive Kids Science Tutor with persistent RAG functionality:
 
-### Backend Changes (`api/app.py`)
-- ✅ **RAG Class**: Inlined RAG implementation with OpenAI embeddings and chat completions
-- ✅ **PDF Processing**: Added PDF text extraction using PyPDF2
-- ✅ **New Endpoints**:
-  - `POST /api/upload-pdf` - Upload and index PDF documents
-  - `POST /api/rag-chat` - Chat using RAG context from uploaded PDFs
-  - `GET /api/rag-status/{user_id}` - Check RAG index status for users
-- ✅ **File Persistence**: Conversation and RAG index storage in `/tmp/` for serverless compatibility
-- ✅ **Dependencies**: Added numpy, PyPDF2, python-multipart, python-dotenv
+### Database & Backend Changes
+- ✅ **SQLite Integration**: Complete database system with `better-sqlite3` 
+- ✅ **Persistent Embeddings**: `pdf_embeddings` table with integer foreign keys to `pdf_metadata`
+- ✅ **Database Schema**: Kids, sessions, conversations, quiz_questions, pdf_metadata, completed_topics
+- ✅ **RAG System**: Moved from temporary JSON to persistent SQLite storage
+- ✅ **Auto-Initialization**: Automatically embeds Grade-3 PDFs on startup if OpenAI key exists
 
-### Frontend Changes (`frontend/src/app/page.tsx`)
-- ✅ **PDF Upload UI**: File input and upload functionality
-- ✅ **Chat Mode Toggle**: Switch between "Normal Chat" and "RAG Chat" modes
-- ✅ **RAG Status Display**: Shows whether user has uploaded and indexed a PDF
-- ✅ **Enhanced Chat Input**: Textarea with auto-resize and Shift+Enter support
-- ✅ **User ID Management**: Persistent user identification via localStorage
+### Kids Science Tutor Features
+- ✅ **Kid Login System**: Name + PIN authentication (`/login`)
+- ✅ **Reading Sessions**: Dynamic content from vector search, 30-line chunks, 5-minute timer
+- ✅ **Adaptive Quizzing**: OpenAI-generated questions from PDF content, tracks previous questions
+- ✅ **Progress Tracking**: Topics completed, quiz scores, session history
+- ✅ **Parent Reports**: Comprehensive progress dashboard (`/report/[kidId]`)
+- ✅ **10 Grade-3 Science PDFs**: Auto-generated content (Planets, Constellations, Rocks, etc.)
 
-### Configuration Changes
-- ✅ **Dependencies**: Updated `pyproject.toml` and `api/requirements.txt`
-- ✅ **Proxy Setup**: Added `frontend/next.config.ts` for local development API routing
-- ✅ **Test Files**: Created 5 vocabulary PDFs for testing RAG functionality
+### Admin & RAG Features  
+- ✅ **PDF Upload System**: Parents can upload PDFs with metadata tracking
+- ✅ **Vector Database**: Semantic search with cosine similarity, FTS5 full-text search
+- ✅ **Reindex Endpoint**: `/api/reindex` to rebuild embeddings from scratch
+- ✅ **Health Monitoring**: `/api/health` shows database and embeddings status
+- ✅ **Enhanced Landing Page**: Admin tools, system health, Kids Tutor navigation
+
+### Technical Improvements
+- ✅ **File Organization**: Moved `lib/db.ts` to `frontend/lib/db.ts` for better Next.js integration
+- ✅ **Import Path Fixes**: Corrected all relative imports across API routes
+- ✅ **Error Handling**: Comprehensive logging and error recovery
+- ✅ **UI Fixes**: Quiz option text visibility, responsive design improvements
 
 ## Merge Options
 
@@ -36,14 +42,14 @@ This branch adds comprehensive RAG functionality to the existing chat applicatio
 
 #### Step 1: Push the feature branch
 ```bash
-git push origin copy_rag
+git push origin feature/activity-2-kids-tutor-quiz
 ```
 
 #### Step 2: Create Pull Request
 1. Go to your GitHub repository
-2. Click "Compare & pull request" for the `copy_rag` branch
+2. Click "Compare & pull request" for the `feature/activity-2-kids-tutor-quiz` branch
 3. Fill in the PR details:
-   - **Title**: "Add RAG functionality with PDF upload and chat"
+   - **Title**: "Complete Kids Science Tutor MVP with Persistent RAG System"
    - **Description**: Copy the changes summary from above
 4. Assign reviewers if needed
 5. Click "Create pull request"
@@ -73,14 +79,14 @@ gh auth login
 #### Step 1: Push and create PR
 ```bash
 # Push the feature branch
-git push origin copy_rag
+git push origin feature/activity-2-kids-tutor-quiz
 
 # Create pull request via CLI
 gh pr create \
-  --title "Add RAG functionality with PDF upload and chat" \
-  --body "Comprehensive RAG implementation with PDF upload, document indexing, and context-aware chat functionality. Includes frontend UI updates, backend API endpoints, and test PDFs for vocabulary learning." \
+  --title "Complete Kids Science Tutor MVP with Persistent RAG System" \
+  --body "Full Kids Science Tutor implementation with persistent SQLite embeddings, adaptive quizzing, progress tracking, and admin tools. Includes database schema, vector search, auto-initialization, and comprehensive error handling." \
   --base main \
-  --head copy_rag
+  --head feature/activity-2-kids-tutor-quiz
 ```
 
 #### Step 2: Review and merge via CLI
@@ -102,10 +108,10 @@ gh pr merge --rebase
 #### Step 3: Cleanup
 ```bash
 # Delete the feature branch locally
-git branch -d copy_rag
+git branch -d feature/activity-2-kids-tutor-quiz
 
 # Delete the remote feature branch
-git push origin --delete copy_rag
+git push origin --delete feature/activity-2-kids-tutor-quiz
 ```
 
 ## Post-Merge Verification
@@ -116,13 +122,16 @@ After merging, verify the deployment works correctly:
 2. **Test Core Functionality**:
    ```bash
    curl -s https://your-app.vercel.app/api/health
-   curl -s https://your-app.vercel.app/api/rag-status/test-user
+   curl -s https://your-app.vercel.app/api/kids/login -d '{"name":"Test","pin":"1234"}'
    ```
-3. **Test UI**: 
-   - Upload a PDF file
-   - Switch to RAG chat mode
-   - Ask questions about the PDF content
-4. **Verify Persistence**: Check that conversations are maintained
+3. **Test Kids Tutor Flow**: 
+   - Visit `/login` and create a test kid
+   - Start a reading session at `/read/[kidId]`
+   - Complete quiz and check progress at `/report/[kidId]`
+4. **Test Admin Features**:
+   - Upload a PDF via the landing page
+   - Use "Rebuild Vector DB" button
+   - Check system health endpoint
 
 ## Rollback Plan (If Issues Occur)
 
@@ -140,12 +149,13 @@ git push origin main
 ```
 
 ## Notes
-- **Serverless Limitation**: RAG indexes stored in `/tmp/` will be lost after ~15 minutes of inactivity
-- **API Key Required**: Users must provide their own OpenAI API key for functionality
-- **File Size Limits**: PDF uploads are subject to Vercel's request size limits (~4.5MB)
-- **Dependencies**: All Python dependencies are properly specified in requirements.txt for Vercel deployment
+- **Persistent Storage**: All data now stored in SQLite (`data/kids_tutor.db`) - survives deployments
+- **Auto-Initialization**: Grade-3 PDFs automatically embedded on first startup with OpenAI key
+- **Node.js Version**: Requires Node.js 20+ for `better-sqlite3` compatibility
+- **Environment Variables**: `OPENAI_API_KEY` required for embeddings and quiz generation
+- **Database Migration**: Automatically handles schema updates and data migration
 
 ---
-**Created**: September 19, 2025  
+**Created**: September 23, 2025  
 **Author**: AI Assistant  
-**Branch**: copy_rag → main
+**Branch**: feature/activity-2-kids-tutor-quiz → main

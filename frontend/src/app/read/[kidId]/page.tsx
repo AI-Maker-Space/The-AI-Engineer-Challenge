@@ -107,12 +107,19 @@ export default function ReadingPage() {
         body: JSON.stringify({ kidId }),
       });
 
+      const data = await response.json();
+      
+      // Check if all topics are completed
+      if (data.completed) {
+        setError(data.error || 'You have completed all available topics! 🎉');
+        return;
+      }
+      
       if (!response.ok) {
-        throw new Error('Failed to start session');
+        throw new Error(data.error || 'Failed to start session');
       }
 
-      const data: SessionData = await response.json();
-      setSessionData(data);
+      setSessionData(data as SessionData);
       setPageState('reading');
       setTimeLeft(300); // Reset timer to 5 minutes
       setIsTimerActive(true);
@@ -364,7 +371,7 @@ export default function ReadingPage() {
                       className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
                         userAnswers[currentQuestionIndex] === option
                           ? 'border-blue-500 bg-blue-50 text-blue-800'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-800'
                       }`}
                     >
                       <span className="font-medium mr-3">

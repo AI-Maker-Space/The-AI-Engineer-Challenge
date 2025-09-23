@@ -44,6 +44,8 @@ export default function Home() {
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [ragStatus, setRagStatus] = useState<RAGStatus | null>(null);
   const [chatMode, setChatMode] = useState<'normal' | 'rag'>('normal');
+  const [rebuildStatus, setRebuildStatus] = useState<'idle' | 'rebuilding'>('idle');
+  const [rebuildMessage, setRebuildMessage] = useState<string>('');
 
   // Generate or retrieve user ID on component mount
   useEffect(() => {
@@ -296,6 +298,85 @@ export default function Home() {
     }
   };
 
+  const handleRebuildVectorDB = async () => {
+    if (!apiKey.trim()) {
+      setRebuildMessage('Please enter your OpenAI API key first');
+      return;
+    }
+
+    if (!confirm('This will clear all existing embeddings and rebuild them from scratch. Continue?')) {
+      return;
+    }
+
+    setRebuildStatus('rebuilding');
+    setRebuildMessage('Clearing existing embeddings and rebuilding...');
+
+    try {
+      const response = await fetch('/api/reindex', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          api_key: apiKey,
+          confirm: true
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setRebuildMessage(`✅ ${result.message} - ${result.details.pdfsProcessed} PDFs processed`);
+        // Refresh health status
+        checkHealth();
+      } else {
+        setRebuildMessage(`❌ ${result.error}: ${result.details}`);
+      }
+    } catch (error) {
+      setRebuildMessage(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setRebuildStatus('idle');
+    }
+  };
+
+  const handleAdminFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!apiKey.trim()) {
+      alert('Please enter your OpenAI API key first');
+      return;
+    }
+
+    setUploadStatus('Uploading and processing...');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('api_key', apiKey);
+      formData.append('user_type', 'admin');
+
+      const response = await fetch('/api/upload-pdf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setUploadStatus(`✅ ${result.message} - ${result.chunks_created} chunks created`);
+        // Clear the file input
+        event.target.value = '';
+        // Refresh health status
+        checkHealth();
+      } else {
+        setUploadStatus(`❌ ${result.error}: ${result.details || ''}`);
+      }
+    } catch (error) {
+      setUploadStatus(`❌ Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === 'application/pdf') {
@@ -329,6 +410,104 @@ export default function Home() {
             <p className="text-xl text-blue-100">
               Your First LLM-powered Application with Next.js & Vercel
             </p>
+          </div>
+
+          {/* Kids Science Tutor Section */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 shadow-xl">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <span className="text-2xl">🎓</span>
+              Kids Science Tutor
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <a 
+                href="/login" 
+                className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-xl transition-colors block text-center"
+              >
+                <div className="text-2xl mb-2">👶</div>
+                <div className="font-semibold">Kids Login</div>
+                <div className="text-sm opacity-90">Start learning science!</div>
+              </a>
+              
+              <a 
+                href="/read/1" 
+                className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-xl transition-colors block text-center"
+              >
+                <div className="text-2xl mb-2">📚</div>
+                <div className="font-semibold">Demo Reading</div>
+                <div className="text-sm opacity-90">Try the reading experience</div>
+          </a>
+        </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a 
+                href="/report/1" 
+                className="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-xl transition-colors block text-center"
+              >
+                <div className="text-2xl mb-2">📊</div>
+                <div className="font-semibold">Parent Report</div>
+                <div className="text-sm opacity-90">View progress reports</div>
+              </a>
+              
+              <button 
+                onClick={() => window.open('/api/health', '_blank')}
+                className="bg-gray-500 hover:bg-gray-600 text-white p-4 rounded-xl transition-colors"
+              >
+                <div className="text-2xl mb-2">🏥</div>
+                <div className="font-semibold">System Health</div>
+                <div className="text-sm opacity-90">Check embeddings status</div>
+              </button>
+            </div>
+          </div>
+
+          {/* Admin Section */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 shadow-xl">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <span className="text-2xl">⚙️</span>
+              Admin Tools
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <button 
+                onClick={handleRebuildVectorDB}
+                disabled={rebuildStatus === 'rebuilding'}
+                className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-500 text-white p-4 rounded-xl transition-colors"
+              >
+                <div className="text-2xl mb-2">🔄</div>
+                <div className="font-semibold">
+                  {rebuildStatus === 'rebuilding' ? 'Rebuilding...' : 'Rebuild Vector DB'}
+                </div>
+                <div className="text-sm opacity-90">Clear and reload all embeddings</div>
+              </button>
+              
+              <div className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-xl">
+                <div className="text-2xl mb-2">📁</div>
+                <div className="font-semibold">Upload PDF</div>
+                <div className="text-sm opacity-90 mb-2">Add content to vector DB</div>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleAdminFileChange}
+                  className="w-full text-sm bg-white/20 rounded p-1"
+                />
+              </div>
+            </div>
+            
+            {rebuildMessage && (
+              <div className={`p-3 rounded-lg mb-4 ${
+                rebuildMessage.includes('✅') ? 'bg-green-500/20' : 'bg-red-500/20'
+              }`}>
+                {rebuildMessage}
+              </div>
+            )}
+            
+            {uploadStatus && (
+              <div className={`p-3 rounded-lg ${
+                uploadStatus.includes('✅') ? 'bg-green-500/20' : 'bg-red-500/20'
+              }`}>
+                {uploadStatus}
+              </div>
+            )}
           </div>
 
           {/* API Status Section */}
@@ -593,8 +772,8 @@ export default function Home() {
               🚀 Part of the AI Engineer Challenge by{' '}
               <a 
                 href="https://github.com/AI-Maker-Space/The-AI-Engineer-Challenge" 
-                target="_blank" 
-                rel="noopener noreferrer"
+          target="_blank"
+          rel="noopener noreferrer"
                 className="text-yellow-400 hover:text-yellow-300 underline"
               >
                 AI Makerspace

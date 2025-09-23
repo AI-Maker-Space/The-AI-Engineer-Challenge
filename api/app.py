@@ -18,6 +18,9 @@ from typing import List, Dict, Any
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
 
+# Import the PDF auto-loader
+from startup_pdf_loader import initialize_pdf_rag_system
+
 # File-based storage for user conversations (persists across serverless function calls)
 CONVERSATIONS_FILE = "/tmp/conversations.json"
 RAG_INDEX_FILE = "/tmp/rag_index.json"
@@ -31,14 +34,20 @@ class RAG:
         self.documents = []
         self.embeddings = []
     
-    def add_document(self, text: str):
-        """Add a document to the RAG system"""
+    def add_document(self, text: str, metadata: Dict = None):
+        """Add a document to the RAG system with optional metadata"""
         # Split text into chunks
         chunks = self._split_text(text)
-        self.documents.extend(chunks)
         
-        # Generate embeddings for chunks
+        # Add chunks with metadata
         for chunk in chunks:
+            doc_entry = {
+                "text": chunk,
+                "metadata": metadata or {}
+            }
+            self.documents.append(doc_entry)
+            
+            # Generate embeddings for chunks
             embedding = self._get_embedding(chunk)
             self.embeddings.append(embedding)
     
@@ -87,8 +96,14 @@ class RAG:
         similarities.sort(key=lambda x: x[1], reverse=True)
         top_docs = [self.documents[i] for i, _ in similarities[:3]]
         
-        # Create context from top documents
-        context = "\n\n".join(top_docs)
+        # Create context from top documents (extract text from document entries)
+        context_texts = []
+        for doc in top_docs:
+            if isinstance(doc, dict):
+                context_texts.append(doc["text"])
+            else:
+                context_texts.append(str(doc))
+        context = "\n\n".join(context_texts)
         
         # Generate response using OpenAI
         try:
@@ -109,6 +124,18 @@ class RAG:
 
 # Global RAG instance
 rag_system = None
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize RAG system with Grade-3 PDFs on startup"""
+    global rag_system
+    
+    print("🚀 FastAPI server starting up...")
+    print("📚 RAG system will be initialized when first API key is provided")
+    print("💡 Grade-3 PDFs will auto-upload on first RAG system use")
+    
+    # Note: RAG system initialization is deferred until we have an API key
+    # This will happen automatically on first /api/rag-chat or /api/upload-pdf request
 
 def load_conversations():
     """Load conversations from file"""
@@ -148,12 +175,26 @@ def extract_text_from_pdf(pdf_file: UploadFile) -> str:
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error extracting text from PDF: {str(e)}")
 
-def initialize_rag_system(api_key: str):
-    """Initialize the RAG system with OpenAI API key"""
+async def initialize_rag_system(api_key: str):
+    """Initialize the RAG system with OpenAI API key and auto-load PDFs"""
     global rag_system
     try:
         if rag_system is None:
+            print("🔄 Initializing RAG system...")
             rag_system = RAG(api_key=api_key)
+            
+            # Try to load existing RAG index
+            loaded_rag = load_rag_index(api_key)
+            if loaded_rag and len(loaded_rag.documents) > 0:
+                rag_system = loaded_rag
+                print(f"✅ RAG system loaded from index with {len(rag_system.documents)} documents")
+            else:
+                # Auto-upload Grade-3 PDFs if no existing index
+                print("📚 No existing RAG index found, loading Grade-3 PDFs...")
+                await initialize_pdf_rag_system(rag_system)
+                save_rag_index(rag_system)
+                print("💾 RAG index saved with Grade-3 PDFs")
+                
         return rag_system
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error initializing RAG system: {str(e)}")
@@ -308,7 +349,7 @@ async def upload_pdf(
             raise HTTPException(status_code=400, detail="No text content found in PDF")
         
         # Initialize RAG system
-        rag = initialize_rag_system(api_key)
+        rag = await initialize_rag_system(api_key)
         
         # Index the PDF content
         rag.add_document(pdf_text)
@@ -338,7 +379,7 @@ async def rag_chat(request: RAGChatRequest):
     """Chat with the uploaded PDF using RAG"""
     try:
         # Initialize RAG system
-        rag = initialize_rag_system(request.api_key)
+        rag = await initialize_rag_system(request.api_key)
         
         # Load fresh conversations
         user_conversations = load_conversations()

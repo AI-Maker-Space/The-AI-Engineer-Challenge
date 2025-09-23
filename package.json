@@ -25,5 +25,10 @@
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.2.0",
     "tsx": "^4.20.5"
+  },
+  "dependencies": {
+    "openai": "^5.22.0",
+    "pdf-parse": "^1.1.1",
+    "sqlite3": "^5.1.7"
   }
 }
