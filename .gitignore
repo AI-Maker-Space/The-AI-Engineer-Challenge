@@ -17,7 +17,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/ - commented out to allow frontend/lib/ to be tracked
 lib64/
 parts/
 sdist/
