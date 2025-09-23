@@ -10,17 +10,22 @@ import fs from 'fs';
 import { insertPDFMetadata } from '../../../../lib/db';
 import { embedPDF } from '../../../lib/embeddings';
 
-// Simple PDF text extraction (placeholder)
+// PDF text extraction using pdf-parse
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // This is a simplified approach
-  // In production, you'd want to use a proper PDF parser like pdf-parse
   try {
-    const text = buffer.toString('utf8');
-    // Basic cleanup to extract readable text
-    return text.replace(/[^\x20-\x7E\n]/g, ' ').trim();
+    // Dynamic import for pdf-parse (Node.js only)
+    const pdfParse = (await import('pdf-parse')).default;
+    const data = await pdfParse(buffer);
+    return data.text;
   } catch (error) {
     console.error('PDF text extraction error:', error);
-    return '';
+    // Fallback to basic extraction
+    try {
+      const text = buffer.toString('utf8');
+      return text.replace(/[^\x20-\x7E\n]/g, ' ').trim();
+    } catch {
+      return '';
+    }
   }
 }
 
