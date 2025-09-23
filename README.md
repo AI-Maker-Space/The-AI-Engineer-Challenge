@@ -79,7 +79,7 @@ Got everything in place? Let's move on!
      cursor .
      ```
 
-4. Check out the existing backend code found in `/api/app.py`
+4. This project now uses Next.js API routes instead of a separate backend
 
 </details>
 
@@ -107,7 +107,7 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 </details>
 
 <details>
-  <summary>😎 Vibe Coding a Front End for the FastAPI Backend</summary>
+  <summary>😎 Vibe Coding a Kids Science Tutor Application</summary>
 
 1. Use `Command-L` or `CTRL-L` to open the Cursor chat console. 
 
@@ -121,7 +121,24 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 
 > NOTE: If you run into any errors, copy and paste them back into the Cursor chat window - and ask Cursor to fix them!
 
-> NOTE: You have been provided with a backend in the `/api` folder - please ensure your Front End integrates with it!
+> NOTE: This application uses Next.js API routes for all backend functionality. All API endpoints are located in `/frontend/src/app/api/` directory.
+
+### Available API Endpoints
+
+The application provides the following API endpoints:
+
+- `GET /api/health` - Health check with system status
+- `GET /api/endpoints` - List all available API endpoints
+- `POST /api/kids/login` - Kids login authentication
+- `GET /api/kids/[kidId]` - Get kid details by ID
+- `GET /api/reports/[kidId]` - Get kid progress report
+- `POST /api/upload-pdf` - Upload PDF files
+- `POST /api/reindex` - Rebuild vector database
+- `POST /api/next-session` - Get next reading session
+- `POST /api/start-session` - Start reading session
+- `POST /api/quiz` - Submit quiz answers
+
+Visit `/api/endpoints` to see a complete list with descriptions.
 
 </details>
 

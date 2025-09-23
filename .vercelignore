@@ -1,4 +1,2 @@
-api/
-api/
-api/
-api/
+# Vercel ignore file - FastAPI backend has been removed
+# Only Next.js frontend is deployed

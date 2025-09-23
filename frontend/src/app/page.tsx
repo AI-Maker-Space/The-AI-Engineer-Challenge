@@ -767,7 +767,7 @@ export default function Home() {
 
           {/* Footer */}
           <div className="text-center mt-8 text-blue-200">
-            <p>Built with Next.js, FastAPI, and deployed on Vercel</p>
+            <p>Built with Next.js and deployed on Vercel</p>
             <p className="text-sm mt-2">
               🚀 Part of the AI Engineer Challenge by{' '}
               <a 
