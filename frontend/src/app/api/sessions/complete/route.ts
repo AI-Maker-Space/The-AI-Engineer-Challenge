@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         markTopicCompleted(
           session.kidId, 
           pdfMetadata.topic, 
-          pdfMetadata.subtopic || '', 
+          pdfMetadata.subtopic, 
           score
         );
         
