@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { clearEmbeddings } from '../../../../lib/db';
+import { clearEmbeddings } from '@/lib/db';
 import { autoInitializeEmbeddings } from '../../../lib/auto-initialize';
 
 export async function POST(request: NextRequest) {

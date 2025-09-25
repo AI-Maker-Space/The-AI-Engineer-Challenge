@@ -8,7 +8,7 @@ import {
   markTopicCompleted,
   getAllPDFMetadata,
   getSessionById
-} from '../../../../lib/db';
+} from '@/lib/db';
 
 /**
  * Complete Session API Endpoint

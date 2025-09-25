@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getDatabaseStats, getEmbeddingsCount } from '../../../../lib/db';
+import { getDatabaseStats, getEmbeddingsCount } from '@/lib/db';
 
 export async function GET() {
   const availableEndpoints = [

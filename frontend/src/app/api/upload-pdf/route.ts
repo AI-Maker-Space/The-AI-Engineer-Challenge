@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { insertPDFMetadata } from '../../../../lib/db';
+import { insertPDFMetadata } from '@/lib/db';
 import { embedPDF } from '../../../lib/embeddings';
 
 // PDF text extraction using pdf-parse

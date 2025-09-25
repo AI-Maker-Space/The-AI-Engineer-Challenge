@@ -7,7 +7,7 @@ import {
   logConversation,
   saveQuizQuestion,
   getAvailableTopics 
-} from '../../../../lib/db';
+} from '@/lib/db';
 import { searchForRelevantContent } from '../../../lib/embeddings';
 
 /**
@@ -223,6 +223,7 @@ async function generateQuizQuestions(content: string, kidId: number, sessionNo: 
 export async function POST(request: NextRequest) {
   try {
     const body: NextSessionRequest = await request.json();
+    console.log("DEBUG /api/next-session request body:", body);
     const { kidId } = body;
 
     // Validate kid exists

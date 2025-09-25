@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getKidByNameAndPin, createKid } from '../../../../lib/db';
+import { getKidByNameAndPin, createKid } from '@/lib/db';
 
 /**
  * Kids Login API Endpoint

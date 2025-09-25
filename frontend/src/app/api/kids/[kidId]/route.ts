@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getKidById } from '../../../../lib/db';
+import { getKidById } from '@/lib/db';
 
 /**
  * Get Kid by ID API Endpoint
@@ -13,8 +13,11 @@ export async function GET(
   context: { params: Promise<{ kidId: string }> }
 ) {
   try {
+    console.log('[API] /api/kids/[kidId] called');
     const { kidId } = await context.params;
     const kidIdNum = parseInt(kidId);
+    
+    console.log(`[API] kidId=${kidId}, kidIdNum=${kidIdNum}`);
     
     if (isNaN(kidIdNum)) {
       return NextResponse.json(
@@ -23,9 +26,12 @@ export async function GET(
       );
     }
 
+    console.log(`[API] getKidById called with kidIdNum=${kidIdNum}`);
     const kid = getKidById(kidIdNum);
+    console.log(`[API] getKidById returned:`, kid);
     
     if (!kid) {
+      console.log(`[API] Kid not found for id=${kidIdNum}`);
       return NextResponse.json(
         { error: 'Kid not found' },
         { status: 404 }
