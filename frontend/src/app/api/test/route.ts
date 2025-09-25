@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET() {
   try {
     // Test if we can import the db module
-    const { initializeDatabase, getDatabaseStats } = await import('../../../lib/db');
+    const { initializeDatabase, getDatabaseStats } = await import('@/lib/db');
     
     // Initialize database
     initializeDatabase();

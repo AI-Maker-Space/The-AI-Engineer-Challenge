@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
   getKidById, 
-  getKidSessions, 
+  getKidProgress, 
   getKidQuizHistory 
-} from '../../../../../lib/db';
+} from '@/lib/db';
 
 /**
  * Kid Progress Report API Endpoint
@@ -65,19 +65,17 @@ export async function GET(
     }
 
     // Get all sessions for this kid
-    const sessions = getKidSessions(kidIdNum);
+    const progress = getKidProgress(kidIdNum);
+    const sessions = progress.totalSessions;
     
     // Calculate statistics
-    const totalSessions = sessions.length;
+    const totalSessions = sessions;
     
-    // Calculate average score (only from sessions with scores)
-    const sessionsWithScores = sessions.filter(s => s.quizScore !== null);
-    const averageScore = sessionsWithScores.length > 0 
-      ? sessionsWithScores.reduce((sum, s) => sum + (s.quizScore || 0), 0) / sessionsWithScores.length
-      : 0;
+    // Calculate average score
+    const averageScore = progress.averageScore;
 
-    // Get unique PDFs read
-    const pdfsRead = [...new Set(sessions.map(s => s.pdfName))];
+    // Get unique PDFs read (placeholder for now)
+    const pdfsRead = [];
 
     // Calculate words learned (estimate: 5 words per correct answer)
     // This is a simplified calculation - in a full implementation, 
