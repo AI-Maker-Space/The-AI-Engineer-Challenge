@@ -175,12 +175,14 @@ export interface Kid {
 }
 
 export function getKidByNameAndPin(name: string, pin: string): Kid | null {
+  ensureDatabasePopulated();
   const stmt = db.prepare('SELECT * FROM kids WHERE name = ? AND pin = ?');
   const result = stmt.get(name, pin) as Kid | undefined;
   return result || null;
 }
 
 export function createKid(name: string, pin: string): Kid {
+  ensureDatabasePopulated();
   const stmt = db.prepare('INSERT INTO kids (name, pin) VALUES (?, ?)');
   const result = stmt.run(name, pin);
   
@@ -189,6 +191,7 @@ export function createKid(name: string, pin: string): Kid {
 }
 
 export function getKidById(kidId: number): Kid | null {
+  ensureDatabasePopulated();
   const stmt = db.prepare('SELECT * FROM kids WHERE id = ?');
   const result = stmt.get(kidId) as Kid | undefined;
   return result || null;
@@ -472,7 +475,21 @@ export function isTopicCompleted(kidId: number, topic: string, subtopic: string)
   return !!stmt.get(kidId, topic, subtopic);
 }
 
+// Ensure database is populated with initial data (important for Vercel cold starts)
+function ensureDatabasePopulated(): void {
+  // Check if we have any PDF metadata
+  const metadataCount = db.prepare('SELECT COUNT(*) as count FROM pdf_metadata').get() as {count: number};
+  
+  if (metadataCount.count === 0) {
+    console.log('🔄 Database empty, populating initial data...');
+    populateInitialPDFMetadata();
+  }
+}
+
 export function getAvailableTopics(kidId: number): PDFMetadata[] {
+  // Ensure database is initialized and populated
+  ensureDatabasePopulated();
+  
   // Get all PDF metadata
   const allPDFs = getAllPDFMetadata();
   
