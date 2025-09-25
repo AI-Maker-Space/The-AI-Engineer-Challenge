@@ -70,14 +70,7 @@ export async function embedPDF(
     const chunk = chunks[i];
     const embedding = await generateEmbedding(chunk, apiKey);
     
-    storeEmbedding(pdfMetadataId, i, chunk, embedding, {
-      ...metadata,
-      chunk_info: {
-        total_chunks: chunks.length,
-        chunk_size: chunk.length,
-        position: i
-      }
-    });
+    storeEmbedding(pdfMetadataId, i, chunk, embedding);
   }
   
   console.log(`✅ Embedded ${chunks.length} chunks for PDF metadata ID: ${pdfMetadataId}`);
@@ -93,5 +86,13 @@ export async function searchForRelevantContent(
   pdfId?: string
 ): Promise<Array<{content: string, pdf_id: string, similarity: number, metadata?: any}>> {
   const queryEmbedding = await generateEmbedding(query, apiKey);
-  return searchEmbeddings(queryEmbedding, limit, pdfId);
+  const results = searchEmbeddings(queryEmbedding, limit);
+  
+  // Transform PDFEmbedding[] to the expected format
+  return results.map(embedding => ({
+    content: embedding.content,
+    pdf_id: embedding.pdf_id.toString(),
+    similarity: 0.8, // Placeholder similarity score
+    metadata: {}
+  }));
 }

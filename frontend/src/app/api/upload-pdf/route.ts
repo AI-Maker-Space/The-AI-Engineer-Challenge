@@ -78,17 +78,11 @@ export async function POST(request: NextRequest) {
       filename,
       title: file.name.replace('.pdf', ''),
       topic: 'Uploaded Content',
-      subtopic: null,
-      gradeLevel: 'Mixed',
-      sourceReferences: JSON.stringify([
-        `Uploaded by ${userType}`,
-        `Original filename: ${file.name}`,
-        `Upload date: ${new Date().toISOString()}`
-      ]),
-      modelUsed: null,
-      contentApproach: `${userType}-uploaded content`,
-      totalLines: content.split('\n').length,
-      fileSize: buffer.length
+      subtopic: 'User Upload',
+      grade: 'Mixed',
+      subject: 'General',
+      difficulty: 'Medium',
+      estimatedReadingTime: Math.ceil(content.split('\n').length / 10) // Rough estimate: 10 lines per minute
     };
 
     // Store metadata in database FIRST (required for foreign key)

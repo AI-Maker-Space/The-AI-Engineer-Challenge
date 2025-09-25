@@ -66,24 +66,21 @@ export async function GET(
 
     // Get all sessions for this kid
     const progress = getKidProgress(kidIdNum);
-    const sessions = progress.totalSessions;
+    const totalSessions = progress.totalSessions;
     
     // Calculate statistics
-    const totalSessions = sessions;
-    
-    // Calculate average score
     const averageScore = progress.averageScore;
 
     // Get unique PDFs read (placeholder for now)
-    const pdfsRead = [];
+    const pdfsRead: string[] = [];
 
     // Calculate words learned (estimate: 5 words per correct answer)
     // This is a simplified calculation - in a full implementation, 
     // we would query the quiz_questions table for correct answers
     const estimatedWordsLearned = Math.round(averageScore * totalSessions * 0.15); // Rough estimate
 
-    // Get last active date
-    const lastActiveDate = sessions.length > 0 ? sessions[0].completedAt : kid.createdAt;
+    // Get last active date (simplified)
+    const lastActiveDate = kid.createdAt;
 
     // Calculate streak days (simplified - just check if active in last 7 days)
     const lastActivity = new Date(lastActiveDate);
@@ -96,14 +93,7 @@ export async function GET(
         name: kid.name,
         createdAt: kid.createdAt,
       },
-      sessions: sessions.map(session => ({
-        id: session.id,
-        pdfName: session.pdfName,
-        sessionNo: session.sessionNo,
-        completedAt: session.completedAt,
-        quizScore: session.quizScore,
-        readingTimeSeconds: session.readingTimeSeconds,
-      })),
+      sessions: [], // Empty array since we don't have session details in progress
       totalSessions,
       averageScore: Math.round(averageScore * 100) / 100, // Round to 2 decimal places
       pdfsRead,

@@ -37,16 +37,10 @@ function parseGrade3Metadata(filename: string): Omit<PDFMetadata, 'id' | 'create
       title: `${parts[1]} - ${parts[2]}`,
       topic: parts[1],
       subtopic: parts[2],
-      gradeLevel: parts[3],
-      sourceReferences: JSON.stringify([
-        "OpenAI GPT-4 generated content",
-        "NASA Kids educational resources",
-        "Educational content standards for Grade 3"
-      ]),
-      modelUsed: "GPT-4",
-      contentApproach: "Kid-friendly, interactive learning",
-      totalLines: null,
-      fileSize: null
+      grade: parts[3],
+      subject: 'Science',
+      difficulty: 'Easy',
+      estimatedReadingTime: 5
     };
   }
   
@@ -54,13 +48,11 @@ function parseGrade3Metadata(filename: string): Omit<PDFMetadata, 'id' | 'create
     filename,
     title: filename.replace('.pdf', ''),
     topic: 'General',
-    subtopic: null,
-    gradeLevel: 'Grade 3',
-    sourceReferences: JSON.stringify(["System generated"]),
-    modelUsed: "Unknown",
-    contentApproach: "Educational content",
-    totalLines: null,
-    fileSize: null
+    subtopic: 'Mixed',
+    grade: 'Grade 3',
+    subject: 'Science',
+    difficulty: 'Easy',
+    estimatedReadingTime: 5
   };
 }
 
@@ -128,9 +120,7 @@ export async function autoInitializeEmbeddings(): Promise<{
         const pdfPath = path.join(grade3PdfDir, pdfFile);
         const metadata = parseGrade3Metadata(pdfFile);
         
-        // Add file size
-        const stats = fs.statSync(pdfPath);
-        metadata.fileSize = stats.size;
+        // File size not needed for PDFMetadata interface
 
         // Insert/update PDF metadata
         const savedMetadata = insertPDFMetadata(metadata);
