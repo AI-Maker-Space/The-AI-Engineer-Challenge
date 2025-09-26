@@ -17,6 +17,14 @@ import logging
 import time
 import uuid
 
+# LangChain / LangGraph
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.docstore.document import Document
+from langchain.vectorstores import FAISS
+from langgraph.graph import END, StateGraph
+from typing import TypedDict, Dict, Any
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
@@ -73,6 +81,7 @@ async def add_request_id_and_log(request: Request, call_next):
 # Using app.state avoids module-level globals and is concurrency-safe for a single-process app
 app.state.vector_db = None
 app.state.topics_set = set()
+app.state.qa_store = None  # LangChain vector store for agent
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
@@ -86,6 +95,13 @@ class ChatRequest(BaseModel):
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
     api_key: str          # OpenAI API key for authentication
     history: Optional[List[ChatMessage]] = None  # Prior conversation turns
+
+
+class TopicQuestionRequest(BaseModel):
+    topic: str
+    api_key: str
+    num_choices: int = 4
+    model: Optional[str] = "gpt-4.1-mini"
 
 def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
     """Extract text from PDF and split it into chunks."""
@@ -156,6 +172,53 @@ async def extract_topics_for_chunks(chunks: List[str], client: OpenAI, concurren
 
     return sorted(unique_topics)
 
+
+# ---------- LangGraph agent for topic-based MCQ generation ----------
+
+class AgentState(TypedDict):
+    topic: str
+    retrieved: List[Dict[str, Any]]
+    question: Dict[str, Any]
+
+
+def retrieve_node(state: AgentState) -> AgentState:
+    topic = state["topic"]
+    if app.state.qa_store is None:
+        return {**state, "retrieved": []}
+    retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 6})
+    docs = retriever.get_relevant_documents(topic)
+    return {**state, "retrieved": [{"content": d.page_content} for d in docs]}
+
+
+def question_node(state: AgentState) -> AgentState:
+    llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
+    context = "\n\n".join([d["content"] for d in state.get("retrieved", [])])[:6000]
+    prompt = (
+        "You are a tutor creating a single multiple-choice question (MCQ) based strictly on the provided context.\n"
+        "- Topic: " + state["topic"] + "\n"
+        "- Create a short fictional scenario that tests understanding of the topic.\n"
+        "- Provide exactly one question, 4 answer choices labeled A-D, and indicate the correct letter.\n"
+        "- Return valid JSON with keys: question, choices (array of {label, text}), correct (label), rationale.\n"
+        "Context:\n" + context
+    )
+    resp = llm.invoke(prompt)
+    try:
+        data = json.loads(resp.content)
+    except Exception:
+        # Fallback lightweight parser
+        data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": ""}
+    return {**state, "question": data}
+
+
+def build_graph():
+    graph = StateGraph(AgentState)
+    graph.add_node("retrieve", retrieve_node)
+    graph.add_node("question", question_node)
+    graph.set_entry_point("retrieve")
+    graph.add_edge("retrieve", "question")
+    graph.add_edge("question", END)
+    return graph.compile()
+
 @app.post("/api/upload-pdf")
 async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: str = None):
     if not api_key:
@@ -187,7 +250,13 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
             len(getattr(app.state.vector_db, "vectors", [])),
         )
         
-        # Extract hierarchical topics from each chunk and aggregate
+        # Build LangChain vector store for agent
+        splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=150)
+        docs = [Document(page_content=c) for c in splitter.split_text("\n\n".join(text_chunks))]
+        embeddings = OpenAIEmbeddings()
+        app.state.qa_store = FAISS.from_documents(docs, embeddings)
+
+        # Extract hierarchical topics from each chunk and aggregate (optional; disabled)
         # client = OpenAI(api_key=api_key)
         # topics_list = await extract_topics_for_chunks(text_chunks, client)
         # app.state.topics_set = set(topics_list)
@@ -272,6 +341,25 @@ Context from the PDF:
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
+
+
+@app.post("/api/topic-question")
+async def topic_question(req: TopicQuestionRequest):
+    try:
+        if app.state.qa_store is None:
+            raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
+        os.environ["OPENAI_API_KEY"] = req.api_key
+        graph = build_graph()
+        result = graph.invoke({"topic": req.topic, "retrieved": []})
+        q = result.get("question", {})
+        # Optionally truncate choices to the requested number
+        if isinstance(q.get("choices"), list) and req.num_choices > 0:
+            q["choices"] = q["choices"][: req.num_choices]
+        return q
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 # Entry point for running the application directly
 if __name__ == "__main__":
