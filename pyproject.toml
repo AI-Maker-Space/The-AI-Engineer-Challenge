@@ -10,10 +10,10 @@ dependencies = [
     "openai",
     "pydantic>=2.11.4",
     "uvicorn>=0.34.2",
-    "pypdf2>=3.0.0",
-    "numpy>=1.26",
-    "python-dotenv>=1.0.1",
-     "python-multipart>=0.0.18",
+    "pypdf2==3.0.1",
+    "numpy==1.26.4",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.18",
 ]
 
 [tool.ruff]

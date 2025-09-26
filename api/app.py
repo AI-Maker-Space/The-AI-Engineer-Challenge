@@ -11,6 +11,7 @@ from typing import Optional, List, Set
 import PyPDF2
 import io
 from aimakerspace.vectordatabase import VectorDatabase
+import asyncio
 import json
 
 # Initialize FastAPI application with a title
@@ -26,9 +27,10 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers in requests
 )
 
-# Global vector database instance and in-memory topics store
-vector_db = None
-extracted_topics: Set[str] = set()
+# App state for vector database instance and in-memory topics set
+# Using app.state avoids module-level globals and is concurrency-safe for a single-process app
+app.state.vector_db = None
+app.state.topics_set = set()
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
@@ -50,57 +52,61 @@ def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
     
     return chunks
 
-async def extract_topics_for_chunk(text: str, client: OpenAI, model: str = "gpt-4.1-mini") -> List[str]:
-    """Use the LLM to extract a concise list of topics from a chunk of text.
 
-    Returns a list of topic strings. If extraction fails, returns an empty list.
+def _extract_topics_sync(chunk_text: str, client: OpenAI) -> List[str]:
+    """Blocking helper that calls OpenAI to extract topics for a single chunk.
+
+    Returns a list of concise topic labels (strings). Falls back to an empty list
+    if the model output cannot be parsed as JSON.
     """
+    system_msg = (
+        "You extract concise topic labels from provided text. "
+        "Return ONLY a JSON array of 1-5 short noun-phrase topics."
+    )
+    user_msg = (
+        "Text chunk:\n" + chunk_text[:6000]
+    )
+    resp = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg},
+        ],
+        temperature=0,
+    )
+    content = resp.choices[0].message.content if resp.choices else "[]"
     try:
-        system_message = (
-            "You extract concise, high-signal topics."
-            " Return ONLY a JSON array of 1-5 short topic strings."
-            " Topics should be general (e.g., 'vector databases', 'tokenization') not quotes."
-        )
-        user_message = (
-            "Extract up to 5 hierarchical topics that summarize the text."
-            " Return only a JSON array of strings, no extra text.\n\nText:\n" + text[:4000]
-        )
-
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": user_message},
-            ],
-            stream=False,
-        )
-
-        content = response.choices[0].message.content if response.choices else "[]"
-        # Guard against non-JSON responses
-        content = content.strip()
-        if not content.startswith("["):
-            # Try to salvage by finding the first JSON array in the string
-            start_idx = content.find("[")
-            end_idx = content.rfind("]")
-            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
-                content = content[start_idx : end_idx + 1]
-            else:
-                return []
-
-        topics = json.loads(content)
-        if isinstance(topics, list):
-            # Normalize and filter
-            normalized: List[str] = []
-            for t in topics:
-                if not isinstance(t, str):
-                    continue
-                topic = t.strip()
-                if topic:
-                    normalized.append(topic)
-            return normalized
-        return []
+        parsed = json.loads(content)
+        if isinstance(parsed, list):
+            # Normalize topics: strip, lowercase, and remove empties
+            return [t.strip() for t in parsed if isinstance(t, str) and t.strip()]
     except Exception:
-        return []
+        pass
+    return []
+
+
+async def extract_topics_for_chunks(chunks: List[str], client: OpenAI, concurrency_limit: int = 5) -> List[str]:
+    """Extract topics for each chunk concurrently with a semaphore limit.
+
+    Aggregates topics into a unique, sorted list.
+    """
+    semaphore = asyncio.Semaphore(concurrency_limit)
+
+    async def run_for_chunk(chunk: str) -> List[str]:
+        async with semaphore:
+            return await asyncio.to_thread(_extract_topics_sync, chunk, client)
+
+    tasks = [run_for_chunk(chunk) for chunk in chunks]
+    all_results = await asyncio.gather(*tasks)
+
+    unique_topics: Set[str] = set()
+    for topic_list in all_results:
+        for topic in topic_list:
+            normalized = topic.strip()
+            if normalized:
+                unique_topics.add(normalized)
+
+    return sorted(unique_topics)
 
 @app.post("/api/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
@@ -118,30 +124,19 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
             raise HTTPException(status_code=400, detail="No text could be extracted from the PDF")
         
         # Initialize vector database with the chunks
-        global vector_db, extracted_topics
         os.environ["OPENAI_API_KEY"] = api_key
-        vector_db = VectorDatabase()
-        await vector_db.abuild_from_list(text_chunks)
-        # Reset topics for this upload
-        extracted_topics = set()
-
-        # Initialize OpenAI client for topic extraction
+        app.state.vector_db = VectorDatabase()
+        await app.state.vector_db.abuild_from_list(text_chunks)
+        
+        # Extract hierarchical topics from each chunk and aggregate
         client = OpenAI(api_key=api_key)
-
-        # Extract topics per chunk (sequential to keep rate low)
-        for chunk in text_chunks:
-            topics = await extract_topics_for_chunk(chunk, client)
-            # Deduplicate case-insensitively while preserving original
-            lowercase_seen = {t.lower() for t in extracted_topics}
-            for t in topics:
-                if t.lower() not in lowercase_seen:
-                    extracted_topics.add(t)
-                    lowercase_seen.add(t.lower())
+        topics_list = await extract_topics_for_chunks(text_chunks, client)
+        app.state.topics_set = set(topics_list)
         
         return {
             "message": "PDF processed successfully",
             "chunk_count": len(text_chunks),
-            "topics": sorted(extracted_topics),
+            "topics": topics_list,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -150,11 +145,11 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        if not vector_db.vectors:
+        if not app.state.vector_db or not app.state.vector_db.vectors:
             raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
 
         # Get relevant chunks from the vector database
-        relevant_chunks = vector_db.search_by_text(
+        relevant_chunks = app.state.vector_db.search_by_text(
             request.user_message,
             k=3,
             return_as_text=True

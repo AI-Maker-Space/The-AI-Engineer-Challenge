@@ -3,7 +3,6 @@
      height="auto"/>
 </p>
 
-
 ## <h1 align="center" id="heading"> 👋 Welcome to the AI Engineer Challenge</h1>
 
 ## 🤖 Your First Vibe Coding LLM Application
@@ -27,7 +26,6 @@ That's it! Head to the next step and start building your application!
 
 </details>
 
-
 <details>
   <summary>🏗️ Forking & Cloning This Repository</summary>
 
@@ -43,65 +41,56 @@ Got everything in place? Let's move on!
 
 1. Fork [this](https://github.com/AI-Maker-Space/The-AI-Engineer-Challenge) repo!
 
-     ![image](https://i.imgur.com/bhjySNh.png)
+   ![image](https://i.imgur.com/bhjySNh.png)
 
 1. Clone your newly created repo.
 
-     ``` bash
-     # First, navigate to where you want the project folder to be created
-     cd PATH_TO_DESIRED_PARENT_DIRECTORY
+   ```bash
+   # First, navigate to where you want the project folder to be created
+   cd PATH_TO_DESIRED_PARENT_DIRECTORY
 
-     # Then clone (this will create a new folder called The-AI-Engineer-Challenge)
-     git clone git@github.com:<YOUR GITHUB USERNAME>/The-AI-Engineer-Challenge.git
-     ```
+   # Then clone (this will create a new folder called The-AI-Engineer-Challenge)
+   git clone git@github.com:<YOUR GITHUB USERNAME>/The-AI-Engineer-Challenge.git
+   ```
 
-     > Note: This command uses SSH. If you haven't set up SSH with GitHub, the command will fail. In that case, use HTTPS by replacing `git@github.com:` with `https://github.com/` - you'll then be prompted for your GitHub username and personal access token.
+   > Note: This command uses SSH. If you haven't set up SSH with GitHub, the command will fail. In that case, use HTTPS by replacing `git@github.com:` with `https://github.com/` - you'll then be prompted for your GitHub username and personal access token.
 
-2. Verify your git setup:
+1. Verify your git setup:
 
-     ```bash
-     # Check that your remote is set up correctly
-     git remote -v
+   ```bash
+   # Check that your remote is set up correctly
+   git remote -v
 
-     # Check the status of your repository
-     git status
+   # Check the status of your repository
+   git status
 
-     # See which branch you're on
-     git branch
-     ```
+   # See which branch you're on
+   git branch
+   ```
 
-     <!-- > Need more help with git? Check out our [Detailed Git Setup Guide](docs/GIT_SETUP.md) for a comprehensive walkthrough of git configuration and best practices. -->
+    <!-- > Need more help with git? Check out our [Detailed Git Setup Guide](docs/GIT_SETUP.md) for a comprehensive walkthrough of git configuration and best practices. -->
 
-3. Open the freshly cloned repository inside Cursor!
+1. Open the freshly cloned repository inside Cursor!
 
-     ```bash
-     cd The-AI-Engineering-Challenge
-     cursor .
-     ```
+   ```bash
+   cd The-AI-Engineering-Challenge
+   cursor .
+   ```
 
-4. Check out the existing backend code found in `/api/app.py`
+1. Check out the existing backend code found in `/api/app.py`
 
-</details>
+### Root Python Environment with `uv`
 
-<details>
-  <summary>🧰 Root Python Environment with uv</summary>
+To keep things tidy, we use a single root-level virtual environment and install all Python deps at the repo root using `uv`.
 
-To keep things clean across `api/` and any future Python code, we use a single root virtual environment managed by uv.
-
-1. Install uv if you don't have it:
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-2. From the repo root, create and activate the venv, then install deps:
-```bash
+# At repo root
 uv venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-uv pip install -e .[dev]
-```
-3. Run the API:
-```bash
-cd api
-python app.py
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+uv sync                     # installs deps from pyproject.toml
+
+# Run the FastAPI server from root
+uv run python api/app.py
 ```
 
 </details>
@@ -109,38 +98,39 @@ python app.py
 <details>
   <summary>🔥Setting Up for Vibe Coding Success </summary>
 
-While it is a bit counter-intuitive to set things up before jumping into vibe-coding - it's important to remember that there exists a gradient betweeen AI-Assisted Development and Vibe-Coding. We're only reaching *slightly* into AI-Assisted Development for this challenge, but it's worth it!
+While it is a bit counter-intuitive to set things up before jumping into vibe-coding - it's important to remember that there exists a gradient betweeen AI-Assisted Development and Vibe-Coding. We're only reaching _slightly_ into AI-Assisted Development for this challenge, but it's worth it!
 
 1. Check out the rules in `.cursor/rules/` and add theme-ing information like colour schemes in `frontend-rule.mdc`! You can be as expressive as you'd like in these rules!
-2. We're going to index some docs to make our application more likely to succeed. To do this - we're going to start with `CTRL+SHIFT+P` (or `CMD+SHIFT+P` on Mac) and we're going to type "custom doc" into the search bar. 
+2. We're going to index some docs to make our application more likely to succeed. To do this - we're going to start with `CTRL+SHIFT+P` (or `CMD+SHIFT+P` on Mac) and we're going to type "custom doc" into the search bar.
 
-     ![image](https://i.imgur.com/ILx3hZu.png)
+   ![image](https://i.imgur.com/ILx3hZu.png)
+
 3. We're then going to copy and paste `https://nextjs.org/docs` into the prompt.
 
-     ![image](https://i.imgur.com/psBjpQd.png)
+   ![image](https://i.imgur.com/psBjpQd.png)
 
 4. We're then going to use the default configs to add these docs to our available and indexed documents.
 
-     ![image](https://i.imgur.com/LULLeaF.png)
+   ![image](https://i.imgur.com/LULLeaF.png)
 
 5. After that - you will do the same with Vercel's documentation. After which you should see:
 
-     ![image](https://i.imgur.com/hjyXhhC.png) 
+   ![image](https://i.imgur.com/hjyXhhC.png)
 
 </details>
 
 <details>
   <summary>😎 Vibe Coding a Front End for the FastAPI Backend</summary>
 
-1. Use `Command-L` or `CTRL-L` to open the Cursor chat console. 
+1. Use `Command-L` or `CTRL-L` to open the Cursor chat console.
 
 2. Set the chat settings to the following:
 
-     ![image](https://i.imgur.com/LSgRSgF.png)
+   ![image](https://i.imgur.com/LSgRSgF.png)
 
 3. Ask Cursor to create a frontend for your application. Iterate as much as you like!
 
-4. Run the frontend using the instructions Cursor provided. 
+4. Run the frontend using the instructions Cursor provided.
 
 > NOTE: If you run into any errors, copy and paste them back into the Cursor chat window - and ask Cursor to fix them!
 
@@ -157,19 +147,19 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 
 3. Run the command:
 
-     ```bash
-     npm install -g vercel
-     ```
+   ```bash
+   npm install -g vercel
+   ```
 
 4. Run the command:
 
-     ```bash
-     vercel
-     ```
+   ```bash
+   vercel
+   ```
 
 5. Follow the in-terminal instructions. (Below is an example of what you will see!)
 
-     ![image](https://i.imgur.com/D1iKGCq.png)
+   ![image](https://i.imgur.com/D1iKGCq.png)
 
 6. Once the build is completed - head to the provided link and try out your app!
 
@@ -179,13 +169,13 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 
 ### Vercel Link to Share
 
-You'll want to make sure you share you *domains* hyperlink to ensure people can access your app!
+You'll want to make sure you share you _domains_ hyperlink to ensure people can access your app!
 
 ![image](https://i.imgur.com/mpXIgIz.png)
 
 > NOTE: Test this is the public link by trying to open your newly deployed site in an Incognito browser tab!
 
-### 🎉 Congratulations! 
+### 🎉 Congratulations!
 
 You just deployed your first LLM-powered application! 🚀🚀🚀 Get on linkedin and post your results and experience! Make sure to tag us at @AIMakerspace!
 
@@ -205,5 +195,5 @@ Looking forward to building with the community! 🙌✨ Here's to many more cre
 
 Who else is diving into the world of AI? Let's connect! 🌐💡
 
-#FirstLLMApp 
+#FirstLLMApp
 ```

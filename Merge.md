@@ -1,3 +1,43 @@
+# Merge Instructions
+
+This repo follows a branch-based workflow. All work for this change was done on `feat/pdf-topics-root-venv`.
+
+## Create PR on GitHub (UI Route)
+
+1. Push your branch (if not already pushed):
+
+```bash
+git push -u origin feat/pdf-topics-root-venv
+```
+
+2. Open a Pull Request from `feat/pdf-topics-root-venv` into `main` on GitHub.
+3. Add reviewers and wait for approvals and CI to pass.
+4. Use “Squash and merge” or your preferred merge strategy.
+
+## GitHub CLI Route
+
+From the repo root:
+
+```bash
+git push -u origin feat/pdf-topics-root-venv
+gh pr create --fill --base main --head feat/pdf-topics-root-venv
+gh pr view --web   # optional, open in browser
+gh pr merge --merge   # or --squash / --rebase per your preference
+```
+
+## Post-merge cleanup
+
+```bash
+git checkout main
+git pull origin main
+git branch -d feat/pdf-topics-root-venv
+```
+
+## Notes for Reviewers
+
+- API `POST /api/upload-pdf` now also returns `topics: string[]` extracted from PDF chunks via OpenAI.
+- Docs updated to standardize on root-level `.venv` and `uv` for installs and running.
+
 # Deployment Instructions
 
 This project consists of two separate deployments:
@@ -121,39 +161,3 @@ gh pr merge
 ```
 
 Vercel will automatically deploy changes when merged to main branch for each project.
-
----
-
-## Merging Feature Branch back to main
-
-This repo prefers branch-based development. When you're ready to merge:
-
-### Option A: GitHub Pull Request (recommended)
-
-1. Push your branch:
-```bash
-git push -u origin <your-branch>
-```
-2. Open a PR on GitHub from `<your-branch>` into `main`.
-3. Request review, wait for checks, and merge via the UI.
-
-### Option B: GitHub CLI
-
-1. Create the PR:
-```bash
-gh pr create --base main --head <your-branch> \
-  --title "<feature>: description" \
-  --body "Implements <feature>. Includes tests/docs."
-```
-2. Merge when approved:
-```bash
-gh pr merge --squash --delete-branch
-```
-
-### After Merge
-
-- Pull latest main locally:
-```bash
-git checkout main && git pull
-```
-- Vercel will redeploy if connected.
