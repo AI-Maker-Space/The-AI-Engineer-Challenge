@@ -217,7 +217,8 @@ def retrieve_node(state: AgentState) -> AgentState:
     fetch_k = 24 if diversity < 0.5 else 36
     lambda_mult = 0.6 + 0.3 * min(1.0, max(0.0, diversity))
     retriever = app.state.qa_store.as_retriever(
-        search_kwargs={"k": k, "search_type": "mmr", "fetch_k": fetch_k, "lambda_mult": lambda_mult}
+        search_type="mmr",
+        search_kwargs={"k": k, "fetch_k": fetch_k, "lambda_mult": lambda_mult},
     )
 
     all_docs: List[Any] = []
