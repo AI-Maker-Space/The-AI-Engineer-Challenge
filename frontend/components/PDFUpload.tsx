@@ -3,10 +3,12 @@ import { Upload, Check, AlertCircle } from "lucide-react";
 
 interface PDFUploadProps {
   apiKey: string;
-  onUploadSuccess: () => void;
+  onUploadSuccess: (fileName: string) => void;
+  alreadyUploaded?: boolean;
+  fileName?: string;
 }
 
-export default function PDFUpload({ apiKey, onUploadSuccess }: PDFUploadProps) {
+export default function PDFUpload({ apiKey, onUploadSuccess, alreadyUploaded, fileName }: PDFUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "success" | "error"
@@ -50,7 +52,11 @@ export default function PDFUpload({ apiKey, onUploadSuccess }: PDFUploadProps) {
       }
 
       setUploadStatus("success");
-      onUploadSuccess();
+      try {
+        localStorage.setItem("pdf_uploaded", "1");
+        localStorage.setItem("pdf_file_name", file.name);
+      } catch (_) {}
+      onUploadSuccess(file.name);
     } catch (error) {
       console.error("Upload error:", error);
       setUploadStatus("error");
@@ -66,10 +72,12 @@ export default function PDFUpload({ apiKey, onUploadSuccess }: PDFUploadProps) {
     <div className="p-4 border border-border rounded-lg bg-card">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">Upload PDF</h3>
-        {uploadStatus === "success" && (
+        {(uploadStatus === "success" || alreadyUploaded) && (
           <div className="flex items-center text-green-500">
             <Check className="w-4 h-4 mr-1" />
-            <span className="text-sm">PDF uploaded successfully</span>
+            <span className="text-sm">
+              {fileName ? `${fileName} uploaded` : "PDF uploaded successfully"}
+            </span>
           </div>
         )}
         {uploadStatus === "error" && (

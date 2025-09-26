@@ -2262,6 +2262,7 @@ export default function ChatInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isPdfUploaded, setIsPdfUploaded] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | undefined>(undefined);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [isGeneratingMcq, setIsGeneratingMcq] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -2274,6 +2275,17 @@ export default function ChatInterface({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem("pdf_uploaded");
+      const name = localStorage.getItem("pdf_file_name") || undefined;
+      if (cached === "1") {
+        setIsPdfUploaded(true);
+        setUploadedFileName(name);
+      }
+    } catch (_) {}
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2401,7 +2413,9 @@ export default function ChatInterface({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/topic-question`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/topic-question`,
         {
           method: "POST",
           headers: {
@@ -2423,7 +2437,11 @@ export default function ChatInterface({
 
       const data = await response.json();
       const question: string = data.question || selectedTopic;
-      const choices: Array<{ label: string; text: string }> = Array.isArray(data.choices) ? data.choices : [];
+      const choices: Array<{ label: string; text: string }> = Array.isArray(
+        data.choices
+      )
+        ? data.choices
+        : [];
       const correct: string = data.correct || "";
       const rationale: string = data.rationale || "";
 
@@ -2608,7 +2626,12 @@ export default function ChatInterface({
             />
             <PDFUpload
               apiKey={apiKey}
-              onUploadSuccess={() => setIsPdfUploaded(true)}
+              onUploadSuccess={(name) => {
+                setIsPdfUploaded(true);
+                setUploadedFileName(name);
+              }}
+              alreadyUploaded={isPdfUploaded}
+              fileName={uploadedFileName}
             />
 
             <div className="p-3 border border-border rounded-md bg-card space-y-2">
@@ -2618,7 +2641,9 @@ export default function ChatInterface({
                 disabled={!selectedTopic || !isPdfUploaded || isGeneratingMcq}
                 className="w-full px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-md text-sm font-medium transition-colors"
               >
-                {isGeneratingMcq ? "Generating MCQ..." : "Generate MCQ for Topic"}
+                {isGeneratingMcq
+                  ? "Generating MCQ..."
+                  : "Generate MCQ for Topic"}
               </button>
               <p className="text-xs text-muted-foreground">
                 Requires a selected topic and an uploaded PDF.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatInterface from "@/components/ChatInterface";
 import ApiKeySetup from "@/components/ApiKeySetup";
 
@@ -6,14 +6,36 @@ export default function Home() {
   const [apiKey, setApiKey] = useState<string>("");
   const [isApiKeySet, setIsApiKeySet] = useState<boolean>(false);
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("openai_api_key");
+      if (stored && typeof stored === "string") {
+        setApiKey(stored);
+        setIsApiKeySet(true);
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, []);
+
   const handleApiKeySubmit = (key: string) => {
     setApiKey(key);
     setIsApiKeySet(true);
+    try {
+      localStorage.setItem("openai_api_key", key);
+    } catch (e) {
+      // ignore storage errors
+    }
   };
 
   const handleApiKeyReset = () => {
     setApiKey("");
     setIsApiKeySet(false);
+    try {
+      localStorage.removeItem("openai_api_key");
+    } catch (e) {
+      // ignore storage errors
+    }
   };
 
   return (

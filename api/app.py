@@ -22,8 +22,6 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_community.vectorstores import Qdrant
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
 from langgraph.graph import END, StateGraph
 from typing import TypedDict, Dict, Any
 
@@ -192,30 +190,47 @@ def retrieve_node(state: AgentState) -> AgentState:
     return {**state, "retrieved": [{"content": d.page_content} for d in docs]}
 
 
-def question_node(state: AgentState) -> AgentState:
-    llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
-    context = "\n\n".join([d["content"] for d in state.get("retrieved", [])])[:6000]
-    prompt = (
-        "You are a tutor creating a single multiple-choice question (MCQ) based strictly on the provided context.\n"
-        "- Topic: " + state["topic"] + "\n"
-        "- Create a short fictional scenario that tests understanding of the topic.\n"
-        "- Provide exactly one question, 4 answer choices labeled A-D, and indicate the correct letter.\n"
-        "- Return valid JSON with keys: question, choices (array of {label, text}), correct (label), rationale.\n"
-        "Context:\n" + context
-    )
-    resp = llm.invoke(prompt)
-    try:
-        data = json.loads(resp.content)
-    except Exception:
-        # Fallback lightweight parser
-        data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": ""}
-    return {**state, "question": data}
+class ChoiceModel(BaseModel):
+    label: str
+    text: str
 
 
-def build_graph():
+class MCQModel(BaseModel):
+    question: str
+    choices: List[ChoiceModel]
+    correct: str
+    rationale: str
+
+
+def make_question_node(model_name: str):
+    def question_node(state: AgentState) -> AgentState:
+        llm = ChatOpenAI(model=model_name, temperature=0)
+        structured_llm = llm.with_structured_output(MCQModel)
+        context = "\n\n".join([d["content"] for d in state.get("retrieved", [])])[:6000]
+        instructions = (
+            "You are a tutor creating a single multiple-choice question (MCQ) based strictly on the provided context.\n"
+            f"- Topic: {state['topic']}\n"
+            "- Avoid explicit or graphic content; use neutral, legal/educational framing.\n"
+            "- Create a short scenario that tests understanding of the topic.\n"
+            "- Provide exactly one question and 4 answer choices labeled A-D.\n"
+            "- Indicate the correct letter and provide a brief rationale.\n"
+            "- Output must conform exactly to the schema.\n"
+            "Context:\n" + context
+        )
+        try:
+            result: MCQModel = structured_llm.invoke(instructions)
+            data = result.model_dump()
+        except Exception:
+            data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": ""}
+        return {**state, "question": data}
+
+    return question_node
+
+
+def build_graph(model_name: str = "gpt-4.1-mini"):
     graph = StateGraph(AgentState)
     graph.add_node("retrieve", retrieve_node)
-    graph.add_node("generate_question", question_node)
+    graph.add_node("generate_question", make_question_node(model_name))
     graph.set_entry_point("retrieve")
     graph.add_edge("retrieve", "generate_question")
     graph.add_edge("generate_question", END)
@@ -256,16 +271,22 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=150)
         docs = [Document(page_content=c) for c in splitter.split_text("\n\n".join(text_chunks))]
         embeddings = OpenAIEmbeddings()
-        # Initialize an in-memory Qdrant instance (no external service required)
-        qdrant_client = QdrantClient(location=":memory:")
-        # Ensure a collection exists with cosine distance and the embedding size
-        # The OpenAI text-embedding-3-large default is 3072 dims; we can create lazily via from_documents
-        app.state.qa_store = Qdrant.from_documents(
-            documents=docs,
-            embedding=embeddings,
-            location=":memory:",
-            collection_name="pdf_chunks",
-        )
+        # Use remote Qdrant if QDRANT_URL is set; otherwise fall back to in-memory
+        qdrant_url = os.getenv("QDRANT_URL")
+        if qdrant_url:
+            app.state.qa_store = Qdrant.from_documents(
+                documents=docs,
+                embedding=embeddings,
+                url=qdrant_url,
+                collection_name="pdf_chunks",
+            )
+        else:
+            app.state.qa_store = Qdrant.from_documents(
+                documents=docs,
+                embedding=embeddings,
+                location=":memory:",
+                collection_name="pdf_chunks",
+            )
 
         # Extract hierarchical topics from each chunk and aggregate (optional; disabled)
         # client = OpenAI(api_key=api_key)
@@ -360,7 +381,7 @@ async def topic_question(req: TopicQuestionRequest):
         if app.state.qa_store is None:
             raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
         os.environ["OPENAI_API_KEY"] = req.api_key
-        graph = build_graph()
+        graph = build_graph(req.model or "gpt-4.1-mini")
         result = graph.invoke({"topic": req.topic, "retrieved": []})
         q = result.get("question", {})
         # Optionally truncate choices to the requested number
