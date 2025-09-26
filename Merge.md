@@ -1,16 +1,16 @@
 # Merge Instructions
 
-This repo follows a branch-based workflow. All work for this change was done on `feat/topic-selector-ui`.
+This repo follows a branch-based workflow. All work for this change was done on `feat/ui-topic-mcq`.
 
 ## Create PR on GitHub (UI Route)
 
 1. Push your branch (if not already pushed):
 
 ```bash
-git push -u origin feat/topic-selector-ui
+git push -u origin feat/ui-topic-mcq
 ```
 
-2. Open a Pull Request from `feat/topic-selector-ui` into `main` on GitHub.
+2. Open a Pull Request from `feat/ui-topic-mcq` into `main` on GitHub.
 3. Add reviewers and wait for approvals and CI to pass.
 4. Use “Squash and merge” or your preferred merge strategy.
 
@@ -19,8 +19,8 @@ git push -u origin feat/topic-selector-ui
 From the repo root:
 
 ```bash
-git push -u origin feat/topic-selector-ui
-gh pr create --fill --base main --head feat/topic-selector-ui
+git push -u origin feat/ui-topic-mcq
+gh pr create --fill --base main --head feat/ui-topic-mcq
 gh pr view --web   # optional, open in browser
 gh pr merge --merge   # or --squash / --rebase per your preference
 ```
@@ -30,13 +30,15 @@ gh pr merge --merge   # or --squash / --rebase per your preference
 ```bash
 git checkout main
 git pull origin main
-git branch -d feat/topic-selector-ui
+git branch -d feat/ui-topic-mcq
 ```
 
 ## Notes for Reviewers
 
-- Adds `TopicSelector` UI with search and single-select pill in `ChatInterface` settings.
-- Frontend-only change; no API integration yet.
+- Adds UI flow to generate MCQs from a selected topic using `/api/topic-question`.
+- Adds a button and renders the MCQ result in `frontend/components/ChatInterface.tsx`.
+- Persists OpenAI API key in `localStorage` and caches PDF upload state/filename (no auto reupload).
+- Backend supports `QDRANT_URL` for remote Qdrant with in-memory fallback.
 
 # Deployment Instructions
 

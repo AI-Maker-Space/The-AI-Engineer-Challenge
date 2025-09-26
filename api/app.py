@@ -181,27 +181,66 @@ async def extract_topics_for_chunks(chunks: List[str], client: OpenAI, concurren
 
 class AgentState(TypedDict):
     topic: str
+    queries: List[str]
     retrieved: List[Dict[str, Any]]
     question: Dict[str, Any]
 
 
 def retrieve_node(state: AgentState) -> AgentState:
+    """Retrieve relevant documents using expanded queries with MMR for diversity.
+
+    - If `queries` are provided in state, issue retrieval for each query and merge results.
+    - Otherwise, fall back to retrieving using the original `topic` only.
+    - Deduplicate by page content to reduce repetition.
+    """
     topic = state["topic"]
+    queries = state.get("queries") or []
     if app.state.qa_store is None:
         return {**state, "retrieved": []}
-    # Use MMR for diversity
-    retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 8, "search_type": "mmr", "fetch_k": 20, "lambda_mult": 0.7})
-    docs = retriever.get_relevant_documents(topic)
+
+    retriever = app.state.qa_store.as_retriever(
+        search_kwargs={"k": 6, "search_type": "mmr", "fetch_k": 24, "lambda_mult": 0.7}
+    )
+
+    all_docs: List[Any] = []
+    if queries:
+        for q in queries[:8]:  # cap fan-out
+            try:
+                q_docs = retriever.get_relevant_documents(q)
+                all_docs.extend(q_docs)
+            except Exception as e:
+                logger.warning("retrieve_query_failed query=%s error=%s", q[:120], str(e))
+    else:
+        try:
+            all_docs = retriever.get_relevant_documents(topic)
+        except Exception as e:
+            logger.warning("retrieve_topic_failed topic=%s error=%s", topic[:120], str(e))
+
+    # Deduplicate by normalized page content
+    seen: Set[str] = set()
+    dedup_docs: List[Any] = []
+    for d in all_docs:
+        content = (getattr(d, "page_content", None) or "").strip()
+        if not content:
+            continue
+        key = content.replace("\n", " ")
+        if key in seen:
+            continue
+        seen.add(key)
+        dedup_docs.append(d)
+
     try:
         logger.info(
-            "topic_retrieve docs=%s topic=%s sample=%s",
-            len(docs),
+            "topic_retrieve queries=%s docs=%s topic=%s sample=%s",
+            len(queries) or 0,
+            len(dedup_docs),
             topic[:120],
-            (docs[0].page_content[:120] if docs else ""),
+            (dedup_docs[0].page_content[:160] if dedup_docs else ""),
         )
     except Exception:
         pass
-    return {**state, "retrieved": [{"content": d.page_content} for d in docs]}
+
+    return {**state, "retrieved": [{"content": d.page_content} for d in dedup_docs]}
 
 
 class ChoiceModel(BaseModel):
@@ -216,12 +255,52 @@ class MCQModel(BaseModel):
     rationale: str
     evidence: str
     section: str
+class QueryExpansionModel(BaseModel):
+    queries: List[str]
+
+
+def expand_queries_node(model_name: str):
+    """Generate diverse, specific search queries from the topic.
+
+    The goal is to improve retrieval diversity by proposing multiple concrete
+    phrases, synonyms, statute references, named entities, and subtopics.
+    """
+    def node(state: AgentState) -> AgentState:
+        topic = state["topic"]
+        llm = ChatOpenAI(model=model_name, temperature=0.7)
+        structured_llm = llm.with_structured_output(QueryExpansionModel)
+        prompt = (
+            "You expand a study topic into diverse short search queries for a vector database.\n"
+            "Return a JSON object with a 'queries' array of 5-8 items.\n"
+            "Queries should be specific and varied: include synonyms, key phrases,\n"
+            "canonical terminology, relevant statute/section identifiers if applicable,\n"
+            "named entities, and related subtopics.\n"
+            "Keep each query under 12 words. Avoid redundancy.\n\n"
+            f"Topic: {topic}"
+        )
+        try:
+            result: QueryExpansionModel = structured_llm.invoke(prompt)
+            queries = [q.strip() for q in result.queries if isinstance(q, str) and q.strip()]
+        except Exception:
+            queries = [topic]
+
+        # Light shuffle to promote variety across runs
+        try:
+            import random
+            random.shuffle(queries)
+        except Exception:
+            pass
+
+        return {**state, "queries": queries}
+
+    return node
+
 
 
 def make_question_node(model_name: str):
     def question_node(state: AgentState) -> AgentState:
-        # Slight temperature to avoid identical generations
-        llm = ChatOpenAI(model=model_name, temperature=0.3)
+        # Slightly higher temperature to encourage surface variation while staying grounded
+        llm = ChatOpenAI(model=model_name, temperature=0.5)
         structured_llm = llm.with_structured_output(MCQModel)
         context = "\n\n".join([d["content"] for d in state.get("retrieved", [])])[:6000]
         instructions = (
@@ -232,7 +311,7 @@ def make_question_node(model_name: str):
             "- Provide exactly one question and 4 answer choices labeled A-D.\n"
             "- Indicate the correct letter and provide a brief rationale.\n"
             "- Also include an 'evidence' string quoting or closely paraphrasing the specific context segment supporting the correct answer.\n"
-            "- Vary the scenario details each time: change setting, actors, stakes, and phrasing so successive runs are noticeably different.\n"
+            "- Strongly vary scenario details each time: change setting, actors, stakes, time period, and phrasing so successive runs are noticeably different.\n"
             "- Prefer concrete, domain-specific details (e.g., procurement, licensing, reporting, penalties) drawn from context.\n"
             "- Use plausible distractors that are contextually grounded, not generic.\n"
             "- Also include a 'section' string indicating the exact statute/section number (e.g., 'Sec. 22.041(b)') where the evidence comes from if present; else return an empty string.\n"
@@ -251,9 +330,11 @@ def make_question_node(model_name: str):
 
 def build_graph(model_name: str = "gpt-4.1-mini"):
     graph = StateGraph(AgentState)
+    graph.add_node("expand_queries", expand_queries_node(model_name))
     graph.add_node("retrieve", retrieve_node)
     graph.add_node("generate_question", make_question_node(model_name))
-    graph.set_entry_point("retrieve")
+    graph.set_entry_point("expand_queries")
+    graph.add_edge("expand_queries", "retrieve")
     graph.add_edge("retrieve", "generate_question")
     graph.add_edge("generate_question", END)
     return graph.compile()
@@ -334,7 +415,7 @@ async def chat(request: ChatRequest):
             if qdrant_url:
                 try:
                     embeddings = OpenAIEmbeddings()
-                    app.state.qa_store = Qdrant.from_existing_collection(
+                    app.state.qa_store = Qdrant.from_existing_collection(  # type: ignore
                         embedding=embeddings,
                         url=qdrant_url,
                         collection_name="pdf_chunks",
@@ -420,7 +501,7 @@ async def topic_question(req: TopicQuestionRequest):
             if qdrant_url:
                 try:
                     embeddings = OpenAIEmbeddings()
-                    app.state.qa_store = Qdrant.from_existing_collection(
+                    app.state.qa_store = Qdrant.from_existing_collection(  # type: ignore
                         embedding=embeddings,
                         url=qdrant_url,
                         collection_name="pdf_chunks",
@@ -431,7 +512,7 @@ async def topic_question(req: TopicQuestionRequest):
         print("building graph")
         # Proceed even if qa_store could not be attached; graph will operate with empty retrieval
         graph = build_graph(req.model or "gpt-4.1-mini")
-        result = graph.invoke({"topic": req.topic, "retrieved": []})
+        result = graph.invoke({"topic": req.topic, "queries": [], "retrieved": []})
         q = result.get("question", {})
         # Optionally truncate choices to the requested number
         if isinstance(q.get("choices"), list) and req.num_choices > 0:

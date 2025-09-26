@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { User, Bot, CheckCircle2, Circle } from "lucide-react";
 import { Message, McqChoice } from "@/types";
 
@@ -49,12 +50,15 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                     const isChosen = selected === c.label;
                     const reveal = selected !== null;
                     const isCorrect = reveal && mcq.correct === c.label;
-                    const isIncorrect = reveal && isChosen && mcq.correct !== c.label;
+                    const isIncorrect =
+                      reveal && isChosen && mcq.correct !== c.label;
                     return (
                       <button
                         key={c.label}
                         type="button"
-                        onClick={() => setSelected((prev) => (prev ? prev : c.label))}
+                        onClick={() =>
+                          setSelected((prev) => (prev ? prev : c.label))
+                        }
                         disabled={selected !== null}
                         className={`w-full text-left px-3 py-2 rounded-md border transition-colors flex items-center gap-2 ${
                           isCorrect
@@ -63,7 +67,6 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                             ? "border-red-500 bg-red-50 dark:bg-red-900/20"
                             : "border-border hover:bg-accent"
                         }`}
-                      
                       >
                         {reveal ? (
                           isCorrect ? (
@@ -83,16 +86,27 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                 {selected !== null && (
                   <div className="mt-2 text-sm space-y-2">
                     <div>
-                      <span className="font-semibold">Correct answer:</span> {mcq.correct}
+                      <span className="font-semibold">Correct answer:</span>{" "}
+                      {mcq.correct}
                     </div>
+                    {mcq.section && (
+                      <div>
+                        <span className="font-semibold">Section:</span>{" "}
+                        {mcq.section}
+                      </div>
+                    )}
                     {mcq.rationale && (
                       <div>
-                        <span className="font-semibold">Rationale:</span> {mcq.rationale}
+                        <span className="font-semibold">Rationale:</span>{" "}
+                        {mcq.rationale}
                       </div>
                     )}
                     {mcq.evidence && (
                       <div className="border-l-2 border-border pl-3 italic text-muted-foreground">
-                        {mcq.evidence}
+                        <span className="font-semibold not-italic mr-1">
+                          Evidence:
+                        </span>
+                        <span>{mcq.evidence}</span>
                       </div>
                     )}
                   </div>
@@ -123,4 +137,3 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
     </div>
   );
 }
-

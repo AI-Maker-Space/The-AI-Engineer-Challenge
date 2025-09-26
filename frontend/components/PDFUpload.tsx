@@ -8,7 +8,12 @@ interface PDFUploadProps {
   fileName?: string;
 }
 
-export default function PDFUpload({ apiKey, onUploadSuccess, alreadyUploaded, fileName }: PDFUploadProps) {
+export default function PDFUpload({
+  apiKey,
+  onUploadSuccess,
+  alreadyUploaded,
+  fileName,
+}: PDFUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "success" | "error"

@@ -20,5 +20,5 @@ export interface McqPayload {
   rationale?: string;
   evidence?: string;
   userSelection?: string; // label selected by user
+  section?: string;
 }
-

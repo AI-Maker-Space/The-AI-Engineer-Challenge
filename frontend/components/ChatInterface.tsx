@@ -2444,6 +2444,7 @@ export default function ChatInterface({
         correct: data.correct || "",
         rationale: data.rationale || "",
         evidence: data.evidence || "",
+        section: data.section || "",
       };
 
       const formatted = [
