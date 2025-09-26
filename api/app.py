@@ -321,6 +321,26 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
+        # Ensure OpenAI API key is available for embedding queries if needed
+        if request.api_key:
+            os.environ["OPENAI_API_KEY"] = request.api_key
+
+        # If we don't have an in-memory vector db and no qa_store set yet, but Qdrant is configured,
+        # try to lazily attach to the existing collection so chat works after reloads.
+        if app.state.qa_store is None:
+            qdrant_url = os.getenv("QDRANT_URL")
+            if qdrant_url:
+                try:
+                    embeddings = OpenAIEmbeddings()
+                    app.state.qa_store = Qdrant.from_existing_collection(
+                        embedding=embeddings,
+                        url=qdrant_url,
+                        collection_name="pdf_chunks",
+                    )
+                    logger.info("chat_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
+                except Exception as e:
+                    logger.warning("chat_lazy_qdrant_attach_failed error=%s", str(e))
+
         # Ensure we have at least one retrieval source: in-memory vectors or Qdrant store
         if ((not app.state.vector_db or not app.state.vector_db.vectors)
             and app.state.qa_store is None):
