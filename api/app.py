@@ -200,6 +200,7 @@ class MCQModel(BaseModel):
     choices: List[ChoiceModel]
     correct: str
     rationale: str
+    evidence: str
 
 
 def make_question_node(model_name: str):
@@ -214,6 +215,7 @@ def make_question_node(model_name: str):
             "- Create a short scenario that tests understanding of the topic.\n"
             "- Provide exactly one question and 4 answer choices labeled A-D.\n"
             "- Indicate the correct letter and provide a brief rationale.\n"
+            "- Also include an 'evidence' string quoting or closely paraphrasing the specific context segment supporting the correct answer.\n"
             "- Output must conform exactly to the schema.\n"
             "Context:\n" + context
         )
@@ -221,7 +223,7 @@ def make_question_node(model_name: str):
             result: MCQModel = structured_llm.invoke(instructions)
             data = result.model_dump()
         except Exception:
-            data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": ""}
+            data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": "", "evidence": ""}
         return {**state, "question": data}
 
     return question_node

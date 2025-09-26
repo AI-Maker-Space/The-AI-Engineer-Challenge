@@ -5,5 +5,20 @@ export interface Message {
   timestamp: Date;
   isStreaming?: boolean;
   isError?: boolean;
+  mcq?: McqPayload;
+}
+
+export interface McqChoice {
+  label: string;
+  text: string;
+}
+
+export interface McqPayload {
+  question: string;
+  choices: McqChoice[];
+  correct: string; // label like 'A'
+  rationale?: string;
+  evidence?: string;
+  userSelection?: string; // label selected by user
 }
 

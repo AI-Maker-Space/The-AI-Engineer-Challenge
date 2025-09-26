@@ -3,7 +3,7 @@ import { Send, Settings, MessageSquare, User, Bot } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import PDFUpload from "./PDFUpload";
 import TopicSelector from "./TopicSelector";
-import { Message } from "@/types";
+import { Message, McqPayload } from "@/types";
 
 const topics = [
   "AI-generated child pornography",
@@ -2262,7 +2262,9 @@ export default function ChatInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isPdfUploaded, setIsPdfUploaded] = useState(false);
-  const [uploadedFileName, setUploadedFileName] = useState<string | undefined>(undefined);
+  const [uploadedFileName, setUploadedFileName] = useState<string | undefined>(
+    undefined
+  );
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [isGeneratingMcq, setIsGeneratingMcq] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -2436,28 +2438,23 @@ export default function ChatInterface({
       }
 
       const data = await response.json();
-      const question: string = data.question || selectedTopic;
-      const choices: Array<{ label: string; text: string }> = Array.isArray(
-        data.choices
-      )
-        ? data.choices
-        : [];
-      const correct: string = data.correct || "";
-      const rationale: string = data.rationale || "";
+      const mcq: McqPayload = {
+        question: data.question || selectedTopic || "",
+        choices: Array.isArray(data.choices) ? data.choices : [],
+        correct: data.correct || "",
+        rationale: data.rationale || "",
+        evidence: data.evidence || "",
+      };
 
       const formatted = [
-        `Question: ${question}`,
-        ...choices.map((c) => `${c.label}) ${c.text}`),
-        correct ? `Correct: ${correct}` : "",
-        rationale ? `Rationale: ${rationale}` : "",
-      ]
-        .filter(Boolean)
-        .join("\n");
+        `Question: ${mcq.question}`,
+        ...mcq.choices.map((c) => `${c.label}) ${c.text}`),
+      ].join("\n");
 
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantMessageId
-            ? { ...m, content: formatted, isStreaming: false }
+            ? { ...m, content: formatted, mcq, isStreaming: false }
             : m
         )
       );
