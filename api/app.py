@@ -7,12 +7,12 @@ from pydantic import BaseModel
 # Import OpenAI client for interacting with OpenAI's API
 from openai import OpenAI
 import os
-from typing import Optional, List
+from typing import Optional, List, Set
 import PyPDF2
 import io
 from aimakerspace.vectordatabase import VectorDatabase
-from aimakerspace.openai_utils.chatmodel import ChatOpenAI
-import asyncio
+import re
+from collections import Counter
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -29,6 +29,9 @@ app.add_middleware(
 
 # Global vector database instance and embedding model
 vector_db = None
+
+# Global in-memory set to store unique topics extracted from the latest uploaded PDF
+topics_set: Set[str] = set()
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
@@ -50,6 +53,64 @@ def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
     
     return chunks
 
+
+def extract_topics_from_chunk(chunk: str, max_topics_per_chunk: int = 5) -> List[str]:
+    """Extract likely topics from a chunk of text using a simple hierarchical approach.
+
+    This uses a lightweight heuristic with no external dependencies:
+    - Tokenize words, remove common stopwords and very short tokens
+    - Score bigrams higher than unigrams to capture short phrases
+    - Return top N scored terms as topics
+    """
+
+    # A compact English stopword list suitable for topic extraction without heavy deps
+    STOPWORDS = {
+        "the", "and", "for", "but", "not", "you", "your", "with", "from", "that",
+        "this", "was", "were", "have", "has", "had", "can", "could", "should", "would",
+        "into", "onto", "about", "above", "below", "under", "over", "than", "then",
+        "there", "their", "they", "them", "his", "her", "its", "our", "ours", "who",
+        "whom", "which", "what", "when", "where", "why", "how", "is", "am", "are",
+        "be", "been", "being", "do", "does", "did", "of", "in", "on", "at", "to",
+        "as", "by", "an", "a", "or", "if", "it", "we", "I", "me", "my", "mine",
+        "yours", "theirs", "he", "she", "also", "may", "might", "via", "per"
+    }
+
+    # Normalize and tokenize: words of length >= 3, keep hyphenated words
+    tokens = re.findall(r"[A-Za-z][A-Za-z\-']{2,}", chunk.lower())
+    content_tokens = [t for t in tokens if t not in STOPWORDS]
+    if not content_tokens:
+        return []
+
+    # Unigram counts
+    unigram_counts = Counter(content_tokens)
+
+    # Bigram counts (score bigrams higher to promote short phrases)
+    bigrams = [f"{a} {b}" for a, b in zip(content_tokens, content_tokens[1:])]
+    bigram_counts = Counter(bigrams)
+
+    # Combine scores, weighting bigrams over unigrams
+    scores = {}
+    for term, count in unigram_counts.items():
+        scores[term] = scores.get(term, 0) + count
+    for term, count in bigram_counts.items():
+        scores[term] = scores.get(term, 0) + (count * 2)
+
+    # Sort by score, then length (prefer concise terms if scores tie)
+    ranked = sorted(scores.items(), key=lambda kv: (-kv[1], len(kv[0])))
+
+    topics: List[str] = []
+    used: Set[str] = set()
+    for term, _ in ranked:
+        # Basic de-duplication: avoid selecting a unigram when its bigram containing it was chosen
+        if any(term in t.split(" ") for t in used) and " " not in term:
+            continue
+        topics.append(term)
+        used.add(term)
+        if len(topics) >= max_topics_per_chunk:
+            break
+
+    return topics
+
 @app.post("/api/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
     if not api_key:
@@ -65,15 +126,25 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
         if not text_chunks:
             raise HTTPException(status_code=400, detail="No text could be extracted from the PDF")
         
+        # Extract topics per chunk and aggregate into an in-memory set
+        topics_set.clear()
+        for chunk in text_chunks:
+            chunk_topics = extract_topics_from_chunk(chunk, max_topics_per_chunk=5)
+            topics_set.update(chunk_topics)
+        
         # Initialize vector database with the chunks
         global vector_db
         os.environ["OPENAI_API_KEY"] = api_key
         vector_db = VectorDatabase()
         await vector_db.abuild_from_list(text_chunks)
         
-        return {"message": "PDF processed successfully", "chunk_count": len(text_chunks)}
+        return {
+            "message": "PDF processed successfully",
+            "chunk_count": len(text_chunks),
+            "topics": sorted(list(topics_set))
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
@@ -124,7 +195,7 @@ Context from the PDF:
     
     except Exception as e:
         # Handle any errors that occur during processing
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 # Define a health check endpoint to verify API status
 @app.get("/api/health")
