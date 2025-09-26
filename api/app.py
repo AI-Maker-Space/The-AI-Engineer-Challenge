@@ -21,7 +21,9 @@ import uuid
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import Qdrant
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
 from langgraph.graph import END, StateGraph
 from typing import TypedDict, Dict, Any
 
@@ -254,7 +256,16 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=150)
         docs = [Document(page_content=c) for c in splitter.split_text("\n\n".join(text_chunks))]
         embeddings = OpenAIEmbeddings()
-        app.state.qa_store = FAISS.from_documents(docs, embeddings)
+        # Initialize an in-memory Qdrant instance (no external service required)
+        qdrant_client = QdrantClient(location=":memory:")
+        # Ensure a collection exists with cosine distance and the embedding size
+        # The OpenAI text-embedding-3-large default is 3072 dims; we can create lazily via from_documents
+        app.state.qa_store = Qdrant.from_documents(
+            documents=docs,
+            embedding=embeddings,
+            location=":memory:",
+            collection_name="pdf_chunks",
+        )
 
         # Extract hierarchical topics from each chunk and aggregate (optional; disabled)
         # client = OpenAI(api_key=api_key)

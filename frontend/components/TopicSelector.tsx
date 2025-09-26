@@ -91,7 +91,9 @@ export default function TopicSelector({
         {open && (
           <div className="absolute z-10 mt-2 w-full rounded-md border border-border bg-popover shadow-lg max-h-64 overflow-auto">
             {filtered.length === 0 ? (
-              <div className="p-3 text-sm text-muted-foreground">No topics found.</div>
+              <div className="p-3 text-sm text-muted-foreground">
+                No topics found.
+              </div>
             ) : (
               <ul ref={listRef} role="listbox" className="py-1">
                 {filtered.map((topic, idx) => {

@@ -2527,7 +2527,9 @@ export default function ChatInterface({
               <h3 className="text-sm font-medium">Conversation history</h3>
               <div className="rounded-md border border-border bg-card max-h-64 overflow-auto">
                 {messages.length === 0 ? (
-                  <div className="p-3 text-xs text-muted-foreground">No messages yet.</div>
+                  <div className="p-3 text-xs text-muted-foreground">
+                    No messages yet.
+                  </div>
                 ) : (
                   <ul className="divide-y divide-border text-sm">
                     {messages.slice(-10).map((m) => (
