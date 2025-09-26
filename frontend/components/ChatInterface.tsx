@@ -2436,87 +2436,90 @@ export default function ChatInterface({
         </div>
       )}
 
-      {/* Quick Actions: Upload + Topic Search */}
-      <div className="sticky top-0 z-10 p-4 bg-gradient-to-b from-background to-muted/40 border-b border-border backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PDFUpload
-            apiKey={apiKey}
-            onUploadSuccess={() => setIsPdfUploaded(true)}
-          />
-
-          <TopicSelector
-            topics={topics}
-            selectedTopic={selectedTopic}
-            onSelect={setSelectedTopic}
-          />
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-muted-foreground">
-              <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">
-                Upload a PDF to start
-              </h3>
-              <p className="text-sm">
-                {isPdfUploaded
-                  ? "PDF uploaded! Choose a topic and start asking questions."
-                  : "Use the upload box above, then select a topic and ask away."}
-              </p>
-            </div>
+      {/* Main Content: Chat left, Sidebar right */}
+      <div className="flex-1 flex min-h-0">
+        {/* Chat Pane */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-muted-foreground">
+                  <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-medium mb-2">Upload a PDF to start</h3>
+                  <p className="text-sm">
+                    {isPdfUploaded
+                      ? "PDF uploaded! Choose a topic and start asking questions."
+                      : "Use the panel on the right to upload a PDF and pick a topic."}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((message) => (
+                  <MessageBubble key={message.id} message={message} />
+                ))}
+                <div ref={messagesEndRef} />
+              </>
+            )}
           </div>
-        ) : (
-          <>
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-            <div ref={messagesEndRef} />
-          </>
-        )}
-      </div>
 
-      {/* Input Form */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border">
-        <div className="flex space-x-2">
-          <div className="flex-1 relative">
-            <textarea
-              ref={textareaRef}
-              value={userMessage}
-              onChange={(e) => {
-                setUserMessage(e.target.value);
-                handleTextareaResize();
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message... (Shift+Enter for new line)"
-              disabled={isLoading}
-              rows={1}
-              className="w-full px-4 py-3 pr-12 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring focus:border-transparent outline-none resize-none transition-colors"
-              style={{ minHeight: "48px", maxHeight: "120px" }}
+          {/* Input Form */}
+          <form onSubmit={handleSubmit} className="p-4 border-t border-border">
+            <div className="flex space-x-2">
+              <div className="flex-1 relative">
+                <textarea
+                  ref={textareaRef}
+                  value={userMessage}
+                  onChange={(e) => {
+                    setUserMessage(e.target.value);
+                    handleTextareaResize();
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type your message... (Shift+Enter for new line)"
+                  disabled={isLoading}
+                  rows={1}
+                  className="w-full px-4 py-3 pr-12 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring focus:border-transparent outline-none resize-none transition-colors"
+                  style={{ minHeight: "48px", maxHeight: "120px" }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!userMessage.trim() || isLoading}
+                className="px-4 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-colors flex items-center space-x-2"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+              <span>Press Enter to send, Shift+Enter for new line</span>
+              {isLoading && (
+                <div className="flex items-center space-x-2">
+                  <div className="typing-indicator"></div>
+                  <span>AI is typing...</span>
+                </div>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* Sidebar Controls */}
+        <aside className="w-full max-w-md border-l border-border p-4 bg-muted/50 hidden md:block">
+          <div className="space-y-4 sticky top-4">
+            <TopicSelector
+              topics={topics}
+              selectedTopic={selectedTopic}
+              onSelect={setSelectedTopic}
+            />
+            <PDFUpload
+              apiKey={apiKey}
+              onUploadSuccess={() => setIsPdfUploaded(true)}
             />
           </div>
-
-          <button
-            type="submit"
-            disabled={!userMessage.trim() || isLoading}
-            className="px-4 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-colors flex items-center space-x-2"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-          <span>Press Enter to send, Shift+Enter for new line</span>
-          {isLoading && (
-            <div className="flex items-center space-x-2">
-              <div className="typing-indicator"></div>
-              <span>AI is typing...</span>
-            </div>
-          )}
-        </div>
-      </form>
+        </aside>
+      </div>
     </div>
   );
 }
