@@ -215,10 +215,10 @@ def question_node(state: AgentState) -> AgentState:
 def build_graph():
     graph = StateGraph(AgentState)
     graph.add_node("retrieve", retrieve_node)
-    graph.add_node("question", question_node)
+    graph.add_node("generate_question", question_node)
     graph.set_entry_point("retrieve")
-    graph.add_edge("retrieve", "question")
-    graph.add_edge("question", END)
+    graph.add_edge("retrieve", "generate_question")
+    graph.add_edge("generate_question", END)
     return graph.compile()
 
 @app.post("/api/upload-pdf")
