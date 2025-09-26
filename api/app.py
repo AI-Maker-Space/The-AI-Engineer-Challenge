@@ -24,12 +24,16 @@ from langchain.docstore.document import Document
 from langchain_community.vectorstores import Qdrant
 from langgraph.graph import END, StateGraph
 from typing import TypedDict, Dict, Any
+from dotenv import load_dotenv
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 logger = logging.getLogger("api")
+
+# Load environment variables from a .env file if present
+load_dotenv()
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
