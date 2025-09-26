@@ -113,7 +113,7 @@ export default function ApiKeySetup({ onApiKeySubmit }: ApiKeySetupProps) {
 
           <div className="mt-6 text-center text-xs text-muted-foreground">
             <p className="mt-1">
-              Don't have an API key?{" "}
+              Don&apos;t have an API key?{" "}
               <a
                 href="https://platform.openai.com/api-keys"
                 target="_blank"

@@ -182,19 +182,19 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         )
         
         # Extract hierarchical topics from each chunk and aggregate
-        client = OpenAI(api_key=api_key)
-        topics_list = await extract_topics_for_chunks(text_chunks, client)
-        app.state.topics_set = set(topics_list)
-        logger.info(
-            "upload_pdf_extracted_topics request_id=%s topics=%s",
-            request.state.request_id,
-            len(topics_list),
-        )
+        # client = OpenAI(api_key=api_key)
+        # topics_list = await extract_topics_for_chunks(text_chunks, client)
+        # app.state.topics_set = set(topics_list)
+        # logger.info(
+        #     "upload_pdf_extracted_topics request_id=%s topics=%s",
+        #     request.state.request_id,
+        #     len(topics_list),
+        # )
         
         return {
             "message": "PDF processed successfully",
             "chunk_count": len(text_chunks),
-            "topics": topics_list,
+            # "topics": topics_list,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e

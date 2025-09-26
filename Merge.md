@@ -1,16 +1,16 @@
 # Merge Instructions
 
-This repo follows a branch-based workflow. All work for this change was done on `feat/pdf-topics-root-venv`.
+This repo follows a branch-based workflow. All work for this change was done on `feat/topic-selector-ui`.
 
 ## Create PR on GitHub (UI Route)
 
 1. Push your branch (if not already pushed):
 
 ```bash
-git push -u origin feat/pdf-topics-root-venv
+git push -u origin feat/topic-selector-ui
 ```
 
-2. Open a Pull Request from `feat/pdf-topics-root-venv` into `main` on GitHub.
+2. Open a Pull Request from `feat/topic-selector-ui` into `main` on GitHub.
 3. Add reviewers and wait for approvals and CI to pass.
 4. Use “Squash and merge” or your preferred merge strategy.
 
@@ -19,8 +19,8 @@ git push -u origin feat/pdf-topics-root-venv
 From the repo root:
 
 ```bash
-git push -u origin feat/pdf-topics-root-venv
-gh pr create --fill --base main --head feat/pdf-topics-root-venv
+git push -u origin feat/topic-selector-ui
+gh pr create --fill --base main --head feat/topic-selector-ui
 gh pr view --web   # optional, open in browser
 gh pr merge --merge   # or --squash / --rebase per your preference
 ```
@@ -30,13 +30,13 @@ gh pr merge --merge   # or --squash / --rebase per your preference
 ```bash
 git checkout main
 git pull origin main
-git branch -d feat/pdf-topics-root-venv
+git branch -d feat/topic-selector-ui
 ```
 
 ## Notes for Reviewers
 
-- API `POST /api/upload-pdf` now also returns `topics: string[]` extracted from PDF chunks via OpenAI.
-- Docs updated to standardize on root-level `.venv` and `uv` for installs and running.
+- Adds `TopicSelector` UI with search and single-select pill in `ChatInterface` settings.
+- Frontend-only change; no API integration yet.
 
 # Deployment Instructions
 
