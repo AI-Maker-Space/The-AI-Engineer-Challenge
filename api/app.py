@@ -10,7 +10,6 @@ import os
 from typing import Optional, List, Set
 import PyPDF2
 import io
-from aimakerspace.vectordatabase import VectorDatabase
 import asyncio
 import json
 import logging
@@ -84,11 +83,9 @@ async def add_request_id_and_log(request: Request, call_next):
         )
         raise
 
-# App state for vector database instance and in-memory topics set
-# Using app.state avoids module-level globals and is concurrency-safe for a single-process app
-app.state.vector_db = None
+# App state for vector store and topics
 app.state.topics_set = set()
-app.state.qa_store = None  # LangChain vector store for agent
+app.state.qa_store = None  # Qdrant-backed LangChain vector store for agent
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
@@ -282,17 +279,8 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         if not text_chunks:
             raise HTTPException(status_code=400, detail="No text could be extracted from the PDF")
         
-        # Initialize vector database with the chunks
+        # Build LangChain vector store for agent (Qdrant)
         os.environ["OPENAI_API_KEY"] = api_key
-        app.state.vector_db = VectorDatabase()
-        await app.state.vector_db.abuild_from_list(text_chunks)
-        logger.info(
-            "upload_pdf_built_vector_db request_id=%s vectors=%s",
-            request.state.request_id,
-            len(getattr(app.state.vector_db, "vectors", [])),
-        )
-        
-        # Build LangChain vector store for agent
         splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=150)
         docs = [Document(page_content=c) for c in splitter.split_text("\n\n".join(text_chunks))]
         embeddings = OpenAIEmbeddings()
@@ -357,20 +345,13 @@ async def chat(request: ChatRequest):
 
         # Proceed even if in-memory vectors are absent; we'll try Qdrant or use empty context
 
-        # Get relevant chunks from whichever store is available
+        # Get relevant chunks from Qdrant if available
         relevant_chunks: List[str] = []
-        if app.state.vector_db and app.state.vector_db.vectors:
-            relevant_chunks = app.state.vector_db.search_by_text(
-                request.user_message,
-                k=3,
-                return_as_text=True,
-            )
-            logger.info("chat_retrieved_chunks source=memory k=%s retrieved=%s", 3, len(relevant_chunks))
-        elif app.state.qa_store is not None:
+        if app.state.qa_store is not None:
             retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 6, "search_type": "mmr", "fetch_k": 20, "lambda_mult": 0.7})
             docs = retriever.get_relevant_documents(request.user_message)
             relevant_chunks = [d.page_content for d in docs]
-            logger.info("chat_retrieved_chunks source=qdrant k=%s retrieved=%s", 3, len(relevant_chunks))
+            logger.info("chat_retrieved_chunks source=qdrant k=%s retrieved=%s", 6, len(relevant_chunks))
         logger.info("chat_retrieved_chunks relevant_chunks=%s", relevant_chunks)
         # Create the system message with context
         system_message = f"""You are a helpful AI assistant that answers questions based ONLY on the provided context. 
@@ -447,7 +428,7 @@ async def topic_question(req: TopicQuestionRequest):
                     logger.info("topic_question_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
                 except Exception as e:
                     logger.warning("topic_question_lazy_qdrant_attach_failed error=%s", str(e))
-
+        print("building graph")
         # Proceed even if qa_store could not be attached; graph will operate with empty retrieval
         graph = build_graph(req.model or "gpt-4.1-mini")
         result = graph.invoke({"topic": req.topic, "retrieved": []})
