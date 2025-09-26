@@ -381,11 +381,9 @@ def make_question_node(model_name: str):
         llm = ChatOpenAI(
             model=model_name,
             temperature=temperature,
-            model_kwargs={
-                "frequency_penalty": round(freq_penalty, 2),
-                "presence_penalty": round(pres_penalty, 2),
-                "top_p": 1.0,
-            },
+            frequency_penalty=round(freq_penalty, 2),
+            presence_penalty=round(pres_penalty, 2),
+            top_p=1.0,
         )
         structured_llm = llm.with_structured_output(MCQModel)
         context_items = state.get("retrieved", [])
