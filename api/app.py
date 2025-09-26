@@ -34,6 +34,9 @@ logger = logging.getLogger("api")
 
 # Load environment variables from a .env file if present
 load_dotenv()
+logger.info("Environment variables loaded")
+
+logger.info("QDRANT_URL: %s", os.getenv("QDRANT_URL"))
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -205,6 +208,7 @@ class MCQModel(BaseModel):
     correct: str
     rationale: str
     evidence: str
+    section: str
 
 
 def make_question_node(model_name: str):
@@ -220,6 +224,7 @@ def make_question_node(model_name: str):
             "- Provide exactly one question and 4 answer choices labeled A-D.\n"
             "- Indicate the correct letter and provide a brief rationale.\n"
             "- Also include an 'evidence' string quoting or closely paraphrasing the specific context segment supporting the correct answer.\n"
+            "- Also include a 'section' string indicating the exact statute/section number (e.g., 'Sec. 22.041(b)') where the evidence comes from if present; else return an empty string.\n"
             "- Output must conform exactly to the schema.\n"
             "Context:\n" + context
         )
@@ -227,7 +232,7 @@ def make_question_node(model_name: str):
             result: MCQModel = structured_llm.invoke(instructions)
             data = result.model_dump()
         except Exception:
-            data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": "", "evidence": ""}
+            data = {"question": state["topic"], "choices": [], "correct": "A", "rationale": "", "evidence": "", "section": ""}
         return {**state, "question": data}
 
     return question_node
@@ -316,16 +321,25 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        if not app.state.vector_db or not app.state.vector_db.vectors:
+        # Ensure we have at least one retrieval source: in-memory vectors or Qdrant store
+        if ((not app.state.vector_db or not app.state.vector_db.vectors)
+            and app.state.qa_store is None):
             raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
 
-        # Get relevant chunks from the vector database
-        relevant_chunks = app.state.vector_db.search_by_text(
-            request.user_message,
-            k=3,
-            return_as_text=True
-        )
-        logger.info("chat_retrieved_chunks k=%s retrieved=%s", 3, len(relevant_chunks))
+        # Get relevant chunks from whichever store is available
+        relevant_chunks: List[str] = []
+        if app.state.vector_db and app.state.vector_db.vectors:
+            relevant_chunks = app.state.vector_db.search_by_text(
+                request.user_message,
+                k=3,
+                return_as_text=True,
+            )
+            logger.info("chat_retrieved_chunks source=memory k=%s retrieved=%s", 3, len(relevant_chunks))
+        elif app.state.qa_store is not None:
+            retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 3})
+            docs = retriever.get_relevant_documents(request.user_message)
+            relevant_chunks = [d.page_content for d in docs]
+            logger.info("chat_retrieved_chunks source=qdrant k=%s retrieved=%s", 3, len(relevant_chunks))
 
         # Create the system message with context
         system_message = f"""You are a helpful AI assistant that answers questions based ONLY on the provided context. 
