@@ -76,10 +76,16 @@ app.state.topics_set = set()
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
 class ChatRequest(BaseModel):
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
     api_key: str          # OpenAI API key for authentication
+    history: Optional[List[ChatMessage]] = None  # Prior conversation turns
 
 def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
     """Extract text from PDF and split it into chunks."""
@@ -225,15 +231,28 @@ Context from the PDF:
         # Initialize OpenAI client with the provided API key
         client = OpenAI(api_key=request.api_key)
         
+        # Build messages including optional history
+        messages: List[dict] = [
+            {"role": "system", "content": system_message},
+        ]
+
+        # Append prior turns if provided (only roles user/assistant/system)
+        if request.history:
+            for m in request.history[-20:]:
+                role = m.role if m.role in {"user", "assistant", "system"} else "user"
+                content = m.content or ""
+                if content.strip():
+                    messages.append({"role": role, "content": content})
+
+        # Append the new user message
+        messages.append({"role": "user", "content": request.user_message})
+
         # Create an async generator function for streaming responses
         async def generate():
             # Create a streaming chat completion request
             stream = client.chat.completions.create(
                 model=request.model,
-                messages=[
-                    {"role": "system", "content": system_message},
-                    {"role": "user", "content": request.user_message}
-                ],
+                messages=messages,
                 stream=True  # Enable streaming response
             )
             

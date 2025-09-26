@@ -2315,6 +2315,9 @@ export default function ChatInterface({
             user_message: userMessage,
             model,
             api_key: apiKey,
+            history: messages
+              .filter((m) => !m.isStreaming && !m.isError)
+              .map((m) => ({ role: m.role, content: m.content })),
           }),
         }
       );
@@ -2446,7 +2449,9 @@ export default function ChatInterface({
               <div className="flex items-center justify-center h-full">
                 <div className="text-center text-muted-foreground">
                   <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium mb-2">Upload a PDF to start</h3>
+                  <h3 className="text-lg font-medium mb-2">
+                    Upload a PDF to start
+                  </h3>
                   <p className="text-sm">
                     {isPdfUploaded
                       ? "PDF uploaded! Choose a topic and start asking questions."
@@ -2517,6 +2522,28 @@ export default function ChatInterface({
               apiKey={apiKey}
               onUploadSuccess={() => setIsPdfUploaded(true)}
             />
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Conversation history</h3>
+              <div className="rounded-md border border-border bg-card max-h-64 overflow-auto">
+                {messages.length === 0 ? (
+                  <div className="p-3 text-xs text-muted-foreground">No messages yet.</div>
+                ) : (
+                  <ul className="divide-y divide-border text-sm">
+                    {messages.slice(-10).map((m) => (
+                      <li key={m.id} className="px-3 py-2">
+                        <span className="uppercase text-[10px] tracking-wide text-muted-foreground mr-2">
+                          {m.role}
+                        </span>
+                        <span className="truncate inline-block max-w-[15rem] align-middle">
+                          {m.content}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
           </div>
         </aside>
       </div>
