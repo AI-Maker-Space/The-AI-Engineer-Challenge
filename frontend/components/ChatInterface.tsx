@@ -2263,6 +2263,7 @@ export default function ChatInterface({
   const [showSettings, setShowSettings] = useState(false);
   const [isPdfUploaded, setIsPdfUploaded] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [isGeneratingMcq, setIsGeneratingMcq] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -2372,6 +2373,93 @@ export default function ChatInterface({
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateMcq = async () => {
+    if (!selectedTopic || !isPdfUploaded || isGeneratingMcq) return;
+    setIsGeneratingMcq(true);
+
+    const assistantMessageId = (Date.now() + 2).toString();
+    const pendingAssistant: Message = {
+      id: assistantMessageId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+      isStreaming: true,
+    };
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: (Date.now() + 1).toString(),
+        role: "user",
+        content: `Generate an MCQ for topic: ${selectedTopic}`,
+        timestamp: new Date(),
+      },
+      pendingAssistant,
+    ]);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/topic-question`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topic: selectedTopic,
+            api_key: apiKey,
+            num_choices: 4,
+            model,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({} as any));
+        throw new Error(err.detail || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      const question: string = data.question || selectedTopic;
+      const choices: Array<{ label: string; text: string }> = Array.isArray(data.choices) ? data.choices : [];
+      const correct: string = data.correct || "";
+      const rationale: string = data.rationale || "";
+
+      const formatted = [
+        `Question: ${question}`,
+        ...choices.map((c) => `${c.label}) ${c.text}`),
+        correct ? `Correct: ${correct}` : "",
+        rationale ? `Rationale: ${rationale}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMessageId
+            ? { ...m, content: formatted, isStreaming: false }
+            : m
+        )
+      );
+    } catch (error) {
+      console.error("MCQ generation error:", error);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMessageId
+            ? {
+                ...m,
+                content:
+                  "Sorry, there was an error generating the MCQ. Please try again.",
+                isStreaming: false,
+                isError: true,
+              }
+            : m
+        )
+      );
+    } finally {
+      setIsGeneratingMcq(false);
     }
   };
 
@@ -2522,6 +2610,20 @@ export default function ChatInterface({
               apiKey={apiKey}
               onUploadSuccess={() => setIsPdfUploaded(true)}
             />
+
+            <div className="p-3 border border-border rounded-md bg-card space-y-2">
+              <button
+                type="button"
+                onClick={handleGenerateMcq}
+                disabled={!selectedTopic || !isPdfUploaded || isGeneratingMcq}
+                className="w-full px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-md text-sm font-medium transition-colors"
+              >
+                {isGeneratingMcq ? "Generating MCQ..." : "Generate MCQ for Topic"}
+              </button>
+              <p className="text-xs text-muted-foreground">
+                Requires a selected topic and an uploaded PDF.
+              </p>
+            </div>
 
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Conversation history</h3>
