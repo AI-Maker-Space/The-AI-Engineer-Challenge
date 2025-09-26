@@ -195,6 +195,15 @@ def retrieve_node(state: AgentState) -> AgentState:
     # Use MMR for diversity
     retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 8, "search_type": "mmr", "fetch_k": 20, "lambda_mult": 0.7})
     docs = retriever.get_relevant_documents(topic)
+    try:
+        logger.info(
+            "topic_retrieve docs=%s topic=%s sample=%s",
+            len(docs),
+            topic[:120],
+            (docs[0].page_content[:120] if docs else ""),
+        )
+    except Exception:
+        pass
     return {**state, "retrieved": [{"content": d.page_content} for d in docs]}
 
 
@@ -226,6 +235,9 @@ def make_question_node(model_name: str):
             "- Provide exactly one question and 4 answer choices labeled A-D.\n"
             "- Indicate the correct letter and provide a brief rationale.\n"
             "- Also include an 'evidence' string quoting or closely paraphrasing the specific context segment supporting the correct answer.\n"
+            "- Vary the scenario details each time: change setting, actors, stakes, and phrasing so successive runs are noticeably different.\n"
+            "- Prefer concrete, domain-specific details (e.g., procurement, licensing, reporting, penalties) drawn from context.\n"
+            "- Use plausible distractors that are contextually grounded, not generic.\n"
             "- Also include a 'section' string indicating the exact statute/section number (e.g., 'Sec. 22.041(b)') where the evidence comes from if present; else return an empty string.\n"
             "- Output must conform exactly to the schema.\n"
             "Context:\n" + context
@@ -359,7 +371,7 @@ async def chat(request: ChatRequest):
             docs = retriever.get_relevant_documents(request.user_message)
             relevant_chunks = [d.page_content for d in docs]
             logger.info("chat_retrieved_chunks source=qdrant k=%s retrieved=%s", 3, len(relevant_chunks))
-
+        logger.info("chat_retrieved_chunks relevant_chunks=%s", relevant_chunks)
         # Create the system message with context
         system_message = f"""You are a helpful AI assistant that answers questions based ONLY on the provided context. 
 If the question cannot be answered using the context, say that you cannot answer the question with the available information.
