@@ -10,6 +10,7 @@ dependencies = [
     "openai",
     "pydantic>=2.11.4",
     "uvicorn>=0.34.2",
+    "pypdf2>=3.0.0",
 ]
 
 [tool.ruff]

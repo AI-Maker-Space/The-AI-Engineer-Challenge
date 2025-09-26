@@ -84,6 +84,29 @@ Got everything in place? Let's move on!
 </details>
 
 <details>
+  <summary>🧰 Root Python Environment with uv</summary>
+
+To keep things clean across `api/` and any future Python code, we use a single root virtual environment managed by uv.
+
+1. Install uv if you don't have it:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+2. From the repo root, create and activate the venv, then install deps:
+```bash
+uv venv .venv
+source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+uv pip install -e .[dev]
+```
+3. Run the API:
+```bash
+cd api
+python app.py
+```
+
+</details>
+
+<details>
   <summary>🔥Setting Up for Vibe Coding Success </summary>
 
 While it is a bit counter-intuitive to set things up before jumping into vibe-coding - it's important to remember that there exists a gradient betweeen AI-Assisted Development and Vibe-Coding. We're only reaching *slightly* into AI-Assisted Development for this challenge, but it's worth it!

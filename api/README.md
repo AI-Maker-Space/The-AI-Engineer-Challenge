@@ -4,26 +4,23 @@ This is a FastAPI-based backend service that provides a streaming chat interface
 
 ## Prerequisites
 
-- Python 3.8 or higher
-- pip (Python package manager)
+- Python 3.13 (managed via uv)
+- uv (Python package and venv manager)
 - An OpenAI API key
 
 ## Setup
 
-1. Create a virtual environment (recommended):
+1. From the project ROOT (not in `api/`), create and activate a venv with uv:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
-```
-
-2. Install the required dependencies:
-```bash
-pip install fastapi uvicorn openai pydantic
+cd ..  # ensure you are at repo root
+uv venv .venv
+source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+uv pip install -e .[dev]
 ```
 
 ## Running the Server
 
-1. Make sure you're in the `api` directory:
+1. Make sure your root venv is active and then run from the `api` directory:
 ```bash
 cd api
 ```
@@ -36,6 +33,21 @@ python app.py
 The server will start on `http://localhost:8000`
 
 ## API Endpoints
+
+### Upload PDF Endpoint
+- **URL**: `/api/upload-pdf`
+- **Method**: POST (multipart/form-data)
+- **Form Fields**:
+  - `file`: PDF file
+  - `api_key`: OpenAI API key
+- **Response**:
+```json
+{
+  "message": "PDF processed successfully",
+  "chunk_count": 12,
+  "topics": ["vector databases", "tokenization", "RAG", "embeddings"]
+}
+```
 
 ### Chat Endpoint
 - **URL**: `/api/chat`

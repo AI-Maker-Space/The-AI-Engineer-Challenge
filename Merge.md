@@ -122,55 +122,38 @@ gh pr merge
 
 Vercel will automatically deploy changes when merged to main branch for each project.
 
-## Merging this Feature Branch back to main
+---
 
-This repo prefers branch development. You are currently on `feature/pdf-topics-extraction`.
+## Merging Feature Branch back to main
 
-### Option 1: GitHub Pull Request (Web UI)
+This repo prefers branch-based development. When you're ready to merge:
 
-1. Push your branch if you haven't already:
+### Option A: GitHub Pull Request (recommended)
 
+1. Push your branch:
 ```bash
-git push -u origin feature/pdf-topics-extraction
+git push -u origin <your-branch>
+```
+2. Open a PR on GitHub from `<your-branch>` into `main`.
+3. Request review, wait for checks, and merge via the UI.
+
+### Option B: GitHub CLI
+
+1. Create the PR:
+```bash
+gh pr create --base main --head <your-branch> \
+  --title "<feature>: description" \
+  --body "Implements <feature>. Includes tests/docs."
+```
+2. Merge when approved:
+```bash
+gh pr merge --squash --delete-branch
 ```
 
-2. Open a Pull Request targeting `main` on GitHub.
-   - Title: "feat(api): PDF topics extraction"
-   - Description: Summarize the API change: add per-chunk topic extraction, return `topics` from `/api/upload-pdf`.
+### After Merge
 
-3. Request review and address any comments.
-
-4. Merge the PR using "Squash and merge" or your team's preferred strategy.
-
-5. (Optional) Delete the remote branch from the PR page after merge.
-
-### Option 2: GitHub CLI
-
-1. Ensure your branch is pushed:
-
+- Pull latest main locally:
 ```bash
-git push -u origin feature/pdf-topics-extraction
+git checkout main && git pull
 ```
-
-2. Create the PR:
-
-```bash
-gh pr create \
-  --base main \
-  --head feature/pdf-topics-extraction \
-  --title "feat(api): PDF topics extraction" \
-  --body "Add per-chunk topic extraction to /api/upload-pdf, return unique topics."
-```
-
-3. Merge the PR (after checks pass and reviews complete):
-
-```bash
-gh pr merge --merge   # or --squash / --rebase, per your policy
-```
-
-4. (Optional) Delete the local and remote branch:
-
-```bash
-git branch -d feature/pdf-topics-extraction
-git push origin --delete feature/pdf-topics-extraction
-```
+- Vercel will redeploy if connected.

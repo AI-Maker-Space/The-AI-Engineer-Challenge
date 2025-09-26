@@ -11,8 +11,7 @@ from typing import Optional, List, Set
 import PyPDF2
 import io
 from aimakerspace.vectordatabase import VectorDatabase
-import re
-from collections import Counter
+import json
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -27,11 +26,9 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers in requests
 )
 
-# Global vector database instance and embedding model
+# Global vector database instance and in-memory topics store
 vector_db = None
-
-# Global in-memory set to store unique topics extracted from the latest uploaded PDF
-topics_set: Set[str] = set()
+extracted_topics: Set[str] = set()
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
@@ -53,63 +50,57 @@ def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
     
     return chunks
 
+async def extract_topics_for_chunk(text: str, client: OpenAI, model: str = "gpt-4.1-mini") -> List[str]:
+    """Use the LLM to extract a concise list of topics from a chunk of text.
 
-def extract_topics_from_chunk(chunk: str, max_topics_per_chunk: int = 5) -> List[str]:
-    """Extract likely topics from a chunk of text using a simple hierarchical approach.
-
-    This uses a lightweight heuristic with no external dependencies:
-    - Tokenize words, remove common stopwords and very short tokens
-    - Score bigrams higher than unigrams to capture short phrases
-    - Return top N scored terms as topics
+    Returns a list of topic strings. If extraction fails, returns an empty list.
     """
+    try:
+        system_message = (
+            "You extract concise, high-signal topics."
+            " Return ONLY a JSON array of 1-5 short topic strings."
+            " Topics should be general (e.g., 'vector databases', 'tokenization') not quotes."
+        )
+        user_message = (
+            "Extract up to 5 hierarchical topics that summarize the text."
+            " Return only a JSON array of strings, no extra text.\n\nText:\n" + text[:4000]
+        )
 
-    # A compact English stopword list suitable for topic extraction without heavy deps
-    STOPWORDS = {
-        "the", "and", "for", "but", "not", "you", "your", "with", "from", "that",
-        "this", "was", "were", "have", "has", "had", "can", "could", "should", "would",
-        "into", "onto", "about", "above", "below", "under", "over", "than", "then",
-        "there", "their", "they", "them", "his", "her", "its", "our", "ours", "who",
-        "whom", "which", "what", "when", "where", "why", "how", "is", "am", "are",
-        "be", "been", "being", "do", "does", "did", "of", "in", "on", "at", "to",
-        "as", "by", "an", "a", "or", "if", "it", "we", "I", "me", "my", "mine",
-        "yours", "theirs", "he", "she", "also", "may", "might", "via", "per"
-    }
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
+            ],
+            stream=False,
+        )
 
-    # Normalize and tokenize: words of length >= 3, keep hyphenated words
-    tokens = re.findall(r"[A-Za-z][A-Za-z\-']{2,}", chunk.lower())
-    content_tokens = [t for t in tokens if t not in STOPWORDS]
-    if not content_tokens:
+        content = response.choices[0].message.content if response.choices else "[]"
+        # Guard against non-JSON responses
+        content = content.strip()
+        if not content.startswith("["):
+            # Try to salvage by finding the first JSON array in the string
+            start_idx = content.find("[")
+            end_idx = content.rfind("]")
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                content = content[start_idx : end_idx + 1]
+            else:
+                return []
+
+        topics = json.loads(content)
+        if isinstance(topics, list):
+            # Normalize and filter
+            normalized: List[str] = []
+            for t in topics:
+                if not isinstance(t, str):
+                    continue
+                topic = t.strip()
+                if topic:
+                    normalized.append(topic)
+            return normalized
         return []
-
-    # Unigram counts
-    unigram_counts = Counter(content_tokens)
-
-    # Bigram counts (score bigrams higher to promote short phrases)
-    bigrams = [f"{a} {b}" for a, b in zip(content_tokens, content_tokens[1:])]
-    bigram_counts = Counter(bigrams)
-
-    # Combine scores, weighting bigrams over unigrams
-    scores = {}
-    for term, count in unigram_counts.items():
-        scores[term] = scores.get(term, 0) + count
-    for term, count in bigram_counts.items():
-        scores[term] = scores.get(term, 0) + (count * 2)
-
-    # Sort by score, then length (prefer concise terms if scores tie)
-    ranked = sorted(scores.items(), key=lambda kv: (-kv[1], len(kv[0])))
-
-    topics: List[str] = []
-    used: Set[str] = set()
-    for term, _ in ranked:
-        # Basic de-duplication: avoid selecting a unigram when its bigram containing it was chosen
-        if any(term in t.split(" ") for t in used) and " " not in term:
-            continue
-        topics.append(term)
-        used.add(term)
-        if len(topics) >= max_topics_per_chunk:
-            break
-
-    return topics
+    except Exception:
+        return []
 
 @app.post("/api/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
@@ -126,22 +117,31 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
         if not text_chunks:
             raise HTTPException(status_code=400, detail="No text could be extracted from the PDF")
         
-        # Extract topics per chunk and aggregate into an in-memory set
-        topics_set.clear()
-        for chunk in text_chunks:
-            chunk_topics = extract_topics_from_chunk(chunk, max_topics_per_chunk=5)
-            topics_set.update(chunk_topics)
-        
         # Initialize vector database with the chunks
-        global vector_db
+        global vector_db, extracted_topics
         os.environ["OPENAI_API_KEY"] = api_key
         vector_db = VectorDatabase()
         await vector_db.abuild_from_list(text_chunks)
+        # Reset topics for this upload
+        extracted_topics = set()
+
+        # Initialize OpenAI client for topic extraction
+        client = OpenAI(api_key=api_key)
+
+        # Extract topics per chunk (sequential to keep rate low)
+        for chunk in text_chunks:
+            topics = await extract_topics_for_chunk(chunk, client)
+            # Deduplicate case-insensitively while preserving original
+            lowercase_seen = {t.lower() for t in extracted_topics}
+            for t in topics:
+                if t.lower() not in lowercase_seen:
+                    extracted_topics.add(t)
+                    lowercase_seen.add(t.lower())
         
         return {
             "message": "PDF processed successfully",
             "chunk_count": len(text_chunks),
-            "topics": sorted(list(topics_set))
+            "topics": sorted(extracted_topics),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
