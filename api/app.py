@@ -418,9 +418,27 @@ async def health_check():
 @app.post("/api/topic-question")
 async def topic_question(req: TopicQuestionRequest):
     try:
+        # Ensure OpenAI key is set for embeddings
+        if req.api_key:
+            os.environ["OPENAI_API_KEY"] = req.api_key
+
+        # Lazily attach to an existing Qdrant collection if qa_store is not yet set
+        if app.state.qa_store is None:
+            qdrant_url = os.getenv("QDRANT_URL")
+            if qdrant_url:
+                try:
+                    embeddings = OpenAIEmbeddings()
+                    app.state.qa_store = Qdrant.from_existing_collection(
+                        embedding=embeddings,
+                        url=qdrant_url,
+                        collection_name="pdf_chunks",
+                    )
+                    logger.info("topic_question_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
+                except Exception as e:
+                    logger.warning("topic_question_lazy_qdrant_attach_failed error=%s", str(e))
+
         if app.state.qa_store is None:
             raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
-        os.environ["OPENAI_API_KEY"] = req.api_key
         graph = build_graph(req.model or "gpt-4.1-mini")
         result = graph.invoke({"topic": req.topic, "retrieved": []})
         q = result.get("question", {})
