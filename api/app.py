@@ -36,7 +36,13 @@ logger = logging.getLogger("api")
 load_dotenv()
 logger.info("Environment variables loaded")
 
+qdrant_url = os.getenv("QDRANT_URL")
+qdrant_api_key = os.getenv("QDRANT_API_KEY")
+
+client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+
 logger.info("QDRANT_URL: %s", os.getenv("QDRANT_URL"))
+logger.info("QDRANT_API_KEY: %s", os.getenv("QDRANT_API_KEY"))
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -340,6 +346,7 @@ def expand_queries_node(model_name: str):
         try:
             result: QueryExpansionModel = structured_llm.invoke(prompt)
             queries = [q.strip() for q in result.queries if isinstance(q, str) and q.strip()]
+            print("expand_queries_node queries",queries)
         except Exception:
             queries = [topic]
 
@@ -470,7 +477,6 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
             d.metadata = {**(getattr(d, "metadata", {}) or {}), "chunk_index": i}
         embeddings = OpenAIEmbeddings()
         # Use remote Qdrant if QDRANT_URL is set; otherwise fall back to in-memory
-        qdrant_url = os.getenv("QDRANT_URL")
         if qdrant_url:
             app.state.qa_store = Qdrant.from_documents(
                 documents=docs,
@@ -514,11 +520,9 @@ async def chat(request: ChatRequest):
         # If we don't have an in-memory vector db and no qa_store set yet, but Qdrant is configured,
         # try to lazily attach to the existing collection so chat works after reloads.
         if app.state.qa_store is None:
-            qdrant_url = os.getenv("QDRANT_URL")
             if qdrant_url:
                 try:
                     embeddings = OpenAIEmbeddings()
-                    client = QdrantClient(url=qdrant_url)
                     app.state.qa_store = Qdrant(
                         client=client,
                         collection_name="pdf_chunks",
@@ -601,11 +605,9 @@ async def topic_question(req: TopicQuestionRequest):
 
         # Lazily attach to an existing Qdrant collection if qa_store is not yet set
         if app.state.qa_store is None:
-            qdrant_url = os.getenv("QDRANT_URL")
             if qdrant_url:
                 try:
                     embeddings = OpenAIEmbeddings()
-                    client = QdrantClient(url=qdrant_url)
                     app.state.qa_store = Qdrant(
                         client=client,
                         collection_name="pdf_chunks",
