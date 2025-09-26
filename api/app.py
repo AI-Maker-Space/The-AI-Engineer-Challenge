@@ -1,5 +1,5 @@
 # Import required FastAPI components for building the API
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 # Import Pydantic for data validation and settings management
@@ -13,6 +13,15 @@ import io
 from aimakerspace.vectordatabase import VectorDatabase
 import asyncio
 import json
+import logging
+import time
+import uuid
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+logger = logging.getLogger("api")
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -26,6 +35,39 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allows all headers in requests
 )
+
+
+@app.middleware("http")
+async def add_request_id_and_log(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    start = time.time()
+    # Attach to state for downstream use
+    request.state.request_id = request_id
+    logger.info(
+        "request_start method=%s path=%s request_id=%s",
+        request.method,
+        request.url.path,
+        request_id,
+    )
+    try:
+        response = await call_next(request)
+        duration_ms = int((time.time() - start) * 1000)
+        logger.info(
+            "request_end status=%s duration_ms=%s request_id=%s",
+            getattr(response, "status_code", "n/a"),
+            duration_ms,
+            request_id,
+        )
+        return response
+    except Exception as e:
+        duration_ms = int((time.time() - start) * 1000)
+        logger.exception(
+            "request_error duration_ms=%s request_id=%s error=%s",
+            duration_ms,
+            request_id,
+            str(e),
+        )
+        raise
 
 # App state for vector database instance and in-memory topics set
 # Using app.state avoids module-level globals and is concurrency-safe for a single-process app
@@ -109,16 +151,22 @@ async def extract_topics_for_chunks(chunks: List[str], client: OpenAI, concurren
     return sorted(unique_topics)
 
 @app.post("/api/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
+async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: str = None):
     if not api_key:
         raise HTTPException(status_code=400, detail="API key is required")
     
     try:
         # Read the PDF file
+        logger.info("upload_pdf_read_file request_id=%s filename=%s", request.state.request_id, file.filename)
         contents = await file.read()
         
         # Extract text from PDF
         text_chunks = extract_text_from_pdf(contents)
+        logger.info(
+            "upload_pdf_extracted_chunks request_id=%s chunks=%s",
+            request.state.request_id,
+            len(text_chunks),
+        )
         
         if not text_chunks:
             raise HTTPException(status_code=400, detail="No text could be extracted from the PDF")
@@ -127,11 +175,21 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = None):
         os.environ["OPENAI_API_KEY"] = api_key
         app.state.vector_db = VectorDatabase()
         await app.state.vector_db.abuild_from_list(text_chunks)
+        logger.info(
+            "upload_pdf_built_vector_db request_id=%s vectors=%s",
+            request.state.request_id,
+            len(getattr(app.state.vector_db, "vectors", [])),
+        )
         
         # Extract hierarchical topics from each chunk and aggregate
         client = OpenAI(api_key=api_key)
         topics_list = await extract_topics_for_chunks(text_chunks, client)
         app.state.topics_set = set(topics_list)
+        logger.info(
+            "upload_pdf_extracted_topics request_id=%s topics=%s",
+            request.state.request_id,
+            len(topics_list),
+        )
         
         return {
             "message": "PDF processed successfully",
@@ -154,8 +212,7 @@ async def chat(request: ChatRequest):
             k=3,
             return_as_text=True
         )
-
-        print(relevant_chunks)
+        logger.info("chat_retrieved_chunks k=%s retrieved=%s", 3, len(relevant_chunks))
 
         # Create the system message with context
         system_message = f"""You are a helpful AI assistant that answers questions based ONLY on the provided context. 
