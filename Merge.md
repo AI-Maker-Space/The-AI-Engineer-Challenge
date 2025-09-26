@@ -121,3 +121,56 @@ gh pr merge
 ```
 
 Vercel will automatically deploy changes when merged to main branch for each project.
+
+## Merging this Feature Branch back to main
+
+This repo prefers branch development. You are currently on `feature/pdf-topics-extraction`.
+
+### Option 1: GitHub Pull Request (Web UI)
+
+1. Push your branch if you haven't already:
+
+```bash
+git push -u origin feature/pdf-topics-extraction
+```
+
+2. Open a Pull Request targeting `main` on GitHub.
+   - Title: "feat(api): PDF topics extraction"
+   - Description: Summarize the API change: add per-chunk topic extraction, return `topics` from `/api/upload-pdf`.
+
+3. Request review and address any comments.
+
+4. Merge the PR using "Squash and merge" or your team's preferred strategy.
+
+5. (Optional) Delete the remote branch from the PR page after merge.
+
+### Option 2: GitHub CLI
+
+1. Ensure your branch is pushed:
+
+```bash
+git push -u origin feature/pdf-topics-extraction
+```
+
+2. Create the PR:
+
+```bash
+gh pr create \
+  --base main \
+  --head feature/pdf-topics-extraction \
+  --title "feat(api): PDF topics extraction" \
+  --body "Add per-chunk topic extraction to /api/upload-pdf, return unique topics."
+```
+
+3. Merge the PR (after checks pass and reviews complete):
+
+```bash
+gh pr merge --merge   # or --squash / --rebase, per your policy
+```
+
+4. (Optional) Delete the local and remote branch:
+
+```bash
+git branch -d feature/pdf-topics-extraction
+git push origin --delete feature/pdf-topics-extraction
+```
