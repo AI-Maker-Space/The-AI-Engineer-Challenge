@@ -12,6 +12,8 @@ dependencies = [
     "uvicorn>=0.34.2",
     "pypdf2>=3.0.0",
     "numpy>=1.26",
+    "python-dotenv>=1.0.1",
+     "python-multipart>=0.0.18",
 ]
 
 [tool.ruff]
