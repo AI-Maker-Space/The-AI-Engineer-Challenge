@@ -2433,7 +2433,12 @@ export default function ChatInterface({
               <option value="gpt-3.5-turbo">GPT-3.5-turbo</option>
             </select>
           </div>
+        </div>
+      )}
 
+      {/* Quick Actions: Upload + Topic Search */}
+      <div className="p-4 bg-muted/50 border-b border-border">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <PDFUpload
             apiKey={apiKey}
             onUploadSuccess={() => setIsPdfUploaded(true)}
@@ -2445,7 +2450,7 @@ export default function ChatInterface({
             onSelect={setSelectedTopic}
           />
         </div>
-      )}
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -2453,13 +2458,11 @@ export default function ChatInterface({
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-muted-foreground">
               <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">
-                Upload a PDF to start
-              </h3>
+              <h3 className="text-lg font-medium mb-2">Upload a PDF to start</h3>
               <p className="text-sm">
                 {isPdfUploaded
-                  ? "PDF uploaded! Start asking questions about the document."
-                  : "Click the settings icon to upload a PDF and start chatting."}
+                  ? "PDF uploaded! Choose a topic and start asking questions."
+                  : "Use the upload box above, then select a topic and ask away."}
               </p>
             </div>
           </div>
