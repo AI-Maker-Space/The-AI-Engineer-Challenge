@@ -2495,7 +2495,7 @@ export default function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-border overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-border overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center space-x-3">
