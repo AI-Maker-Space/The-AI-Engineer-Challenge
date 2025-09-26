@@ -1,6 +1,6 @@
 # Merge Instructions
 
-This repo follows a branch-based workflow. All work for this change was done on `feat/vertical-scroll-chat-assistant`.
+This repo follows a branch-based workflow. All work for this UI fix was done on `fix/chat-question-overwrite`.
 Previous rollback context remains available on `rollback/ca7e9c0` (reset to commit `ca7e9c03403e3053ede6a2d14b00531facf95d98`).
 
 ## Create PR on GitHub (UI Route)
@@ -8,10 +8,10 @@ Previous rollback context remains available on `rollback/ca7e9c0` (reset to comm
 1. Push your branch (if not already pushed):
 
 ```bash
-git push -u origin feat/vertical-scroll-chat-assistant
+git push -u origin fix/chat-question-overwrite
 ```
 
-2. Open a Pull Request from `feat/vertical-scroll-chat-assistant` into `main` on GitHub.
+2. Open a Pull Request from `fix/chat-question-overwrite` into `main` on GitHub.
 3. Add reviewers and wait for approvals and CI to pass.
 4. Use “Squash and merge” or your preferred merge strategy.
 
@@ -20,8 +20,8 @@ git push -u origin feat/vertical-scroll-chat-assistant
 From the repo root:
 
 ```bash
-git push -u origin feat/vertical-scroll-chat-assistant
-gh pr create --fill --base main --head feat/vertical-scroll-chat-assistant
+git push -u origin fix/chat-question-overwrite
+gh pr create --fill --base main --head fix/chat-question-overwrite
 gh pr view --web   # optional, open in browser
 gh pr merge --merge   # or --squash / --rebase per your preference
 ```
@@ -31,7 +31,7 @@ gh pr merge --merge   # or --squash / --rebase per your preference
 ```bash
 git checkout main
 git pull origin main
-git branch -d feat/vertical-scroll-chat-assistant
+git branch -d fix/chat-question-overwrite
 ```
 
 ## Notes for Reviewers

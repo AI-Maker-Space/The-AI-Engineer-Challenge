@@ -2247,6 +2247,20 @@ const topics = [
   "youth and educational institutions",
 ];
 
+// Robust unique ID generator to avoid collisions between rapid user/assistant messages
+const generateId = (() => {
+  let counter = 0;
+  return () => {
+    counter += 1;
+    try {
+      if (typeof window !== "undefined" && window.crypto && "randomUUID" in window.crypto) {
+        return window.crypto.randomUUID();
+      }
+    } catch (_) {}
+    return `${Date.now()}-${counter}-${Math.random().toString(36).slice(2, 10)}`;
+  };
+})();
+
 interface ChatInterfaceProps {
   apiKey: string;
   onApiKeyReset: () => void;
@@ -2295,7 +2309,7 @@ export default function ChatInterface({
     if (!userMessage.trim() || isLoading || !isPdfUploaded) return;
 
     const newUserMessage: Message = {
-      id: Date.now().toString(),
+      id: generateId(),
       role: "user",
       content: userMessage,
       timestamp: new Date(),
@@ -2307,7 +2321,7 @@ export default function ChatInterface({
 
     // Create assistant message with streaming content
     const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: generateId(),
       role: "assistant",
       content: "",
       timestamp: new Date(),
@@ -2394,7 +2408,7 @@ export default function ChatInterface({
     if (!selectedTopic || !isPdfUploaded || isGeneratingMcq) return;
     setIsGeneratingMcq(true);
 
-    const assistantMessageId = (Date.now() + 2).toString();
+    const assistantMessageId = generateId();
     const pendingAssistant: Message = {
       id: assistantMessageId,
       role: "assistant",
@@ -2405,7 +2419,7 @@ export default function ChatInterface({
     setMessages((prev) => [
       ...prev,
       {
-        id: (Date.now() + 1).toString(),
+        id: generateId(),
         role: "user",
         content: `Generate an MCQ for topic: ${selectedTopic}`,
         timestamp: new Date(),
