@@ -21,6 +21,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_community.vectorstores import Qdrant
+from qdrant_client import QdrantClient
 from langgraph.graph import END, StateGraph
 from typing import TypedDict, Dict, Any
 from dotenv import load_dotenv
@@ -106,6 +107,12 @@ class TopicQuestionRequest(BaseModel):
     api_key: str
     num_choices: int = 4
     model: Optional[str] = "gpt-4.1-mini"
+    # Controls for diversification
+    seed: Optional[int] = None
+    diversity: float = 0.5  # 0..1 influences randomness and variation
+    num_contexts: int = 4   # how many retrieved chunks to feed generator
+    query_fanout: int = 5   # how many expanded queries to use
+    variation_id: Optional[int] = None  # influences scenario style/phrasing
 
 def extract_text_from_pdf(pdf_file: bytes) -> List[str]:
     """Extract text from PDF and split it into chunks."""
@@ -184,6 +191,11 @@ class AgentState(TypedDict):
     queries: List[str]
     retrieved: List[Dict[str, Any]]
     question: Dict[str, Any]
+    seed: Optional[int]
+    diversity: float
+    num_contexts: int
+    query_fanout: int
+    variation_id: Optional[int]
 
 
 def retrieve_node(state: AgentState) -> AgentState:
@@ -195,16 +207,42 @@ def retrieve_node(state: AgentState) -> AgentState:
     """
     topic = state["topic"]
     queries = state.get("queries") or []
+    query_fanout = max(1, int(state.get("query_fanout") or 5))
+    seed = state.get("seed")
     if app.state.qa_store is None:
         return {**state, "retrieved": []}
 
+    diversity = float(state.get("diversity") or 0.5)
+    k = 6 if diversity < 0.5 else 8
+    fetch_k = 24 if diversity < 0.5 else 36
+    lambda_mult = 0.6 + 0.3 * min(1.0, max(0.0, diversity))
     retriever = app.state.qa_store.as_retriever(
-        search_kwargs={"k": 6, "search_type": "mmr", "fetch_k": 24, "lambda_mult": 0.7}
+        search_kwargs={"k": k, "search_type": "mmr", "fetch_k": fetch_k, "lambda_mult": lambda_mult}
     )
 
     all_docs: List[Any] = []
     if queries:
-        for q in queries[:8]:  # cap fan-out
+        # Use a seeded RNG to select a subset of queries for diversity
+        try:
+            import random
+            rng = random.Random(seed)
+            selected_queries = queries[:]
+            rng.shuffle(selected_queries)
+            selected_queries = selected_queries[: min(query_fanout, len(selected_queries))]
+        except Exception:
+            selected_queries = queries[: min(query_fanout, len(queries))]
+
+        # Log the selected queries used for retrieval
+        try:
+            logger.info(
+                "research_selected_queries seed=%s selected=%s",
+                seed,
+                selected_queries,
+            )
+        except Exception:
+            pass
+
+        for q in selected_queries:
             try:
                 q_docs = retriever.get_relevant_documents(q)
                 all_docs.extend(q_docs)
@@ -229,18 +267,38 @@ def retrieve_node(state: AgentState) -> AgentState:
         seen.add(key)
         dedup_docs.append(d)
 
+    # Sample contexts using seeded RNG for variation across runs
+    num_contexts = max(1, int(state.get("num_contexts") or 4))
     try:
+        import random
+        rng = random.Random(seed)
+        sampled_docs = dedup_docs[:]
+        rng.shuffle(sampled_docs)
+        sampled_docs = sampled_docs[: min(num_contexts, len(sampled_docs))]
+    except Exception:
+        sampled_docs = dedup_docs[: min(num_contexts, len(dedup_docs))]
+
+    # Log sampled docs metadata and preview
+    try:
+        for i, d in enumerate(sampled_docs[:10]):
+            meta = getattr(d, "metadata", {}) or {}
+            logger.info(
+                "research_doc idx=%s meta=%s preview=%s",
+                i,
+                meta,
+                (d.page_content[:200] if getattr(d, "page_content", None) else ""),
+            )
         logger.info(
-            "topic_retrieve queries=%s docs=%s topic=%s sample=%s",
+            "topic_retrieve queries=%s docs_total=%s docs_used=%s topic=%s",
             len(queries) or 0,
             len(dedup_docs),
+            len(sampled_docs),
             topic[:120],
-            (dedup_docs[0].page_content[:160] if dedup_docs else ""),
         )
     except Exception:
         pass
 
-    return {**state, "retrieved": [{"content": d.page_content} for d in dedup_docs]}
+    return {**state, "retrieved": [{"content": d.page_content, "meta": (getattr(d, "metadata", {}) or {})} for d in sampled_docs]}
 
 
 class ChoiceModel(BaseModel):
@@ -284,10 +342,25 @@ def expand_queries_node(model_name: str):
         except Exception:
             queries = [topic]
 
-        # Light shuffle to promote variety across runs
+        # Seeded shuffle and trimming based on query_fanout
+        seed = state.get("seed")
+        query_fanout = max(1, int(state.get("query_fanout") or 5))
         try:
             import random
-            random.shuffle(queries)
+            rng = random.Random(seed)
+            rng.shuffle(queries)
+            queries = queries[: min(query_fanout * 2, len(queries))]  # keep some extras for retrieval stage
+        except Exception:
+            queries = queries[: min(query_fanout * 2, len(queries))]
+
+        # Log expanded queries for observability
+        try:
+            logger.info(
+                "research_expanded_queries topic=%s count=%s queries=%s",
+                topic[:120],
+                len(queries),
+                queries,
+            )
         except Exception:
             pass
 
@@ -299,10 +372,37 @@ def expand_queries_node(model_name: str):
 
 def make_question_node(model_name: str):
     def question_node(state: AgentState) -> AgentState:
-        # Slightly higher temperature to encourage surface variation while staying grounded
-        llm = ChatOpenAI(model=model_name, temperature=0.5)
+        # Temperature scales with diversity
+        diversity = float(state.get("diversity") or 0.5)
+        temperature = max(0.2, min(0.2 + diversity * 0.8, 0.9))
+        # Encourage paraphrasing and reduce repetition with penalties
+        freq_penalty = 0.0 + 0.6 * diversity
+        pres_penalty = 0.0 + 0.4 * diversity
+        llm = ChatOpenAI(
+            model=model_name,
+            temperature=temperature,
+            model_kwargs={
+                "frequency_penalty": round(freq_penalty, 2),
+                "presence_penalty": round(pres_penalty, 2),
+                "top_p": 1.0,
+            },
+        )
         structured_llm = llm.with_structured_output(MCQModel)
-        context = "\n\n".join([d["content"] for d in state.get("retrieved", [])])[:6000]
+        context_items = state.get("retrieved", [])
+        context = "\n\n".join([d["content"] for d in context_items])[:6000]
+        variation_id = state.get("variation_id")
+        # Log generation parameters and a summary of contexts
+        try:
+            logger.info(
+                "question_gen diversity=%s temp=%s penalties=%s contexts=%s variation_id=%s",
+                diversity,
+                temperature,
+                {"frequency_penalty": round(freq_penalty, 2), "presence_penalty": round(pres_penalty, 2)},
+                len(context_items),
+                variation_id,
+            )
+        except Exception:
+            pass
         instructions = (
             "You are a tutor creating a single multiple-choice question (MCQ) based strictly on the provided context.\n"
             f"- Topic: {state['topic']}\n"
@@ -312,6 +412,7 @@ def make_question_node(model_name: str):
             "- Indicate the correct letter and provide a brief rationale.\n"
             "- Also include an 'evidence' string quoting or closely paraphrasing the specific context segment supporting the correct answer.\n"
             "- Strongly vary scenario details each time: change setting, actors, stakes, time period, and phrasing so successive runs are noticeably different.\n"
+            f"- Variation ID: {variation_id}. Use this to diversify scenario style and wording deterministically.\n"
             "- Prefer concrete, domain-specific details (e.g., procurement, licensing, reporting, penalties) drawn from context.\n"
             "- Use plausible distractors that are contextually grounded, not generic.\n"
             "- Also include a 'section' string indicating the exact statute/section number (e.g., 'Sec. 22.041(b)') where the evidence comes from if present; else return an empty string.\n"
@@ -363,7 +464,11 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         # Build LangChain vector store for agent (Qdrant)
         os.environ["OPENAI_API_KEY"] = api_key
         splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=150)
-        docs = [Document(page_content=c) for c in splitter.split_text("\n\n".join(text_chunks))]
+        # Preserve filename and chunk index for observability
+        base_docs = [Document(page_content="\n\n".join(text_chunks), metadata={"filename": file.filename})]
+        docs = splitter.split_documents(base_docs)
+        for i, d in enumerate(docs):
+            d.metadata = {**(getattr(d, "metadata", {}) or {}), "chunk_index": i}
         embeddings = OpenAIEmbeddings()
         # Use remote Qdrant if QDRANT_URL is set; otherwise fall back to in-memory
         qdrant_url = os.getenv("QDRANT_URL")
@@ -394,8 +499,7 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         
         return {
             "message": "PDF processed successfully",
-            "chunk_count": len(text_chunks),
-            # "topics": topics_list,
+            "chunk_count": len(docs),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -415,10 +519,11 @@ async def chat(request: ChatRequest):
             if qdrant_url:
                 try:
                     embeddings = OpenAIEmbeddings()
-                    app.state.qa_store = Qdrant.from_existing_collection(  # type: ignore
-                        embedding=embeddings,
-                        url=qdrant_url,
+                    client = QdrantClient(url=qdrant_url)
+                    app.state.qa_store = Qdrant(
+                        client=client,
                         collection_name="pdf_chunks",
+                        embeddings=embeddings,
                     )
                     logger.info("chat_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
                 except Exception as e:
@@ -501,10 +606,11 @@ async def topic_question(req: TopicQuestionRequest):
             if qdrant_url:
                 try:
                     embeddings = OpenAIEmbeddings()
-                    app.state.qa_store = Qdrant.from_existing_collection(  # type: ignore
-                        embedding=embeddings,
-                        url=qdrant_url,
+                    client = QdrantClient(url=qdrant_url)
+                    app.state.qa_store = Qdrant(
+                        client=client,
                         collection_name="pdf_chunks",
+                        embeddings=embeddings,
                     )
                     logger.info("topic_question_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
                 except Exception as e:
@@ -512,7 +618,22 @@ async def topic_question(req: TopicQuestionRequest):
         print("building graph")
         # Proceed even if qa_store could not be attached; graph will operate with empty retrieval
         graph = build_graph(req.model or "gpt-4.1-mini")
-        result = graph.invoke({"topic": req.topic, "queries": [], "retrieved": []})
+        # Compute a variation id if not provided
+        import random
+        computed_variation = req.variation_id if req.variation_id is not None else (req.seed if req.seed is not None else random.randint(1, 10_000_000))
+        result = graph.invoke({
+            "topic": req.topic,
+            "queries": [],
+            "retrieved": [],
+            "seed": computed_variation,
+            "diversity": req.diversity,
+            "num_contexts": req.num_contexts,
+            "query_fanout": req.query_fanout,
+            "variation_id": computed_variation,
+        })
+        # Do not generate if no context was retrieved
+        if not result.get("retrieved"):
+            raise HTTPException(status_code=400, detail="No relevant context found for the topic. Upload a PDF or configure QDRANT_URL.")
         q = result.get("question", {})
         # Optionally truncate choices to the requested number
         if isinstance(q.get("choices"), list) and req.num_choices > 0:
