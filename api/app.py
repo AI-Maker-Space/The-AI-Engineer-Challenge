@@ -192,7 +192,8 @@ def retrieve_node(state: AgentState) -> AgentState:
     topic = state["topic"]
     if app.state.qa_store is None:
         return {**state, "retrieved": []}
-    retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 6})
+    # Use MMR for diversity
+    retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 8, "search_type": "mmr", "fetch_k": 20, "lambda_mult": 0.7})
     docs = retriever.get_relevant_documents(topic)
     return {**state, "retrieved": [{"content": d.page_content} for d in docs]}
 
@@ -213,7 +214,8 @@ class MCQModel(BaseModel):
 
 def make_question_node(model_name: str):
     def question_node(state: AgentState) -> AgentState:
-        llm = ChatOpenAI(model=model_name, temperature=0)
+        # Slight temperature to avoid identical generations
+        llm = ChatOpenAI(model=model_name, temperature=0.3)
         structured_llm = llm.with_structured_output(MCQModel)
         context = "\n\n".join([d["content"] for d in state.get("retrieved", [])])[:6000]
         instructions = (
@@ -353,7 +355,7 @@ async def chat(request: ChatRequest):
             )
             logger.info("chat_retrieved_chunks source=memory k=%s retrieved=%s", 3, len(relevant_chunks))
         elif app.state.qa_store is not None:
-            retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 3})
+            retriever = app.state.qa_store.as_retriever(search_kwargs={"k": 6, "search_type": "mmr", "fetch_k": 20, "lambda_mult": 0.7})
             docs = retriever.get_relevant_documents(request.user_message)
             relevant_chunks = [d.page_content for d in docs]
             logger.info("chat_retrieved_chunks source=qdrant k=%s retrieved=%s", 3, len(relevant_chunks))
