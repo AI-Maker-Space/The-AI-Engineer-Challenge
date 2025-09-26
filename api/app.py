@@ -341,10 +341,7 @@ async def chat(request: ChatRequest):
                 except Exception as e:
                     logger.warning("chat_lazy_qdrant_attach_failed error=%s", str(e))
 
-        # Ensure we have at least one retrieval source: in-memory vectors or Qdrant store
-        if ((not app.state.vector_db or not app.state.vector_db.vectors)
-            and app.state.qa_store is None):
-            raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
+        # Proceed even if in-memory vectors are absent; we'll try Qdrant or use empty context
 
         # Get relevant chunks from whichever store is available
         relevant_chunks: List[str] = []
@@ -437,8 +434,7 @@ async def topic_question(req: TopicQuestionRequest):
                 except Exception as e:
                     logger.warning("topic_question_lazy_qdrant_attach_failed error=%s", str(e))
 
-        if app.state.qa_store is None:
-            raise HTTPException(status_code=400, detail="No PDF has been uploaded yet. Please upload a PDF first.")
+        # Proceed even if qa_store could not be attached; graph will operate with empty retrieval
         graph = build_graph(req.model or "gpt-4.1-mini")
         result = graph.invoke({"topic": req.topic, "retrieved": []})
         q = result.get("question", {})
