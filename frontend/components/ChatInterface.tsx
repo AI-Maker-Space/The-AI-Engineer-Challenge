@@ -2437,7 +2437,7 @@ export default function ChatInterface({
       )}
 
       {/* Quick Actions: Upload + Topic Search */}
-      <div className="p-4 bg-muted/50 border-b border-border">
+      <div className="sticky top-0 z-10 p-4 bg-gradient-to-b from-background to-muted/40 border-b border-border backdrop-blur supports-[backdrop-filter]:bg-background/70">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <PDFUpload
             apiKey={apiKey}
@@ -2458,7 +2458,9 @@ export default function ChatInterface({
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-muted-foreground">
               <Bot className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">Upload a PDF to start</h3>
+              <h3 className="text-lg font-medium mb-2">
+                Upload a PDF to start
+              </h3>
               <p className="text-sm">
                 {isPdfUploaded
                   ? "PDF uploaded! Choose a topic and start asking questions."
