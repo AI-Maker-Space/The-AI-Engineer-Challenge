@@ -2253,11 +2253,17 @@ const generateId = (() => {
   return () => {
     counter += 1;
     try {
-      if (typeof window !== "undefined" && window.crypto && "randomUUID" in window.crypto) {
+      if (
+        typeof window !== "undefined" &&
+        window.crypto &&
+        "randomUUID" in window.crypto
+      ) {
         return window.crypto.randomUUID();
       }
     } catch (_) {}
-    return `${Date.now()}-${counter}-${Math.random().toString(36).slice(2, 10)}`;
+    return `${Date.now()}-${counter}-${Math.random()
+      .toString(36)
+      .slice(2, 10)}`;
   };
 })();
 
