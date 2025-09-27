@@ -38,8 +38,7 @@ logger.info("Environment variables loaded")
 
 qdrant_url = os.getenv("QDRANT_URL")
 qdrant_api_key = os.getenv("QDRANT_API_KEY")
-
-qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+qdrant_collection_name = os.getenv("QDRANT_COLLECTION_NAME", "pdf_chunks")
 
 # Avoid logging sensitive values directly; only indicate presence
 logger.info("QDRANT_URL present: %s", bool(os.getenv("QDRANT_URL")))
@@ -476,21 +475,26 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
         docs = splitter.split_documents(base_docs)
         for i, d in enumerate(docs):
             d.metadata = {**(getattr(d, "metadata", {}) or {}), "chunk_index": i}
-        embeddings = OpenAIEmbeddings()
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         # Use remote Qdrant if QDRANT_URL is set; otherwise fall back to in-memory
         if qdrant_url:
-            app.state.qa_store = Qdrant.from_documents(
-                documents=docs,
-                embedding=embeddings,
-                client=qdrant_client,  # use authenticated client to avoid 403
-                collection_name="pdf_chunks",
-            )
+            try:
+                app.state.qa_store = Qdrant.from_documents(
+                    documents=docs,
+                    embedding=embeddings,
+                    url=qdrant_url,
+                    api_key=qdrant_api_key,
+                    collection_name=qdrant_collection_name,
+                )
+            except Exception as e:
+                logger.exception("upload_pdf_qdrant_from_documents_failed request_id=%s error=%s", request.state.request_id, str(e))
+                raise
         else:
             app.state.qa_store = Qdrant.from_documents(
                 documents=docs,
                 embedding=embeddings,
                 location=":memory:",
-                collection_name="pdf_chunks",
+                collection_name=qdrant_collection_name,
             )
 
         # Extract hierarchical topics from each chunk and aggregate (optional; disabled)
@@ -523,10 +527,11 @@ async def chat(request: ChatRequest):
         if app.state.qa_store is None:
             if qdrant_url:
                 try:
-                    embeddings = OpenAIEmbeddings()
+                    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+                    qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
                     app.state.qa_store = Qdrant(
                         client=qdrant_client,
-                        collection_name="pdf_chunks",
+                        collection_name=qdrant_collection_name,
                         embeddings=embeddings,
                     )
                     logger.info("chat_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
@@ -608,10 +613,11 @@ async def topic_question(req: TopicQuestionRequest):
         if app.state.qa_store is None:
             if qdrant_url:
                 try:
-                    embeddings = OpenAIEmbeddings()
+                    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+                    qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
                     app.state.qa_store = Qdrant(
                         client=qdrant_client,
-                        collection_name="pdf_chunks",
+                        collection_name=qdrant_collection_name,
                         embeddings=embeddings,
                     )
                     logger.info("topic_question_lazy_qdrant_attach url=%s collection=pdf_chunks", qdrant_url)
