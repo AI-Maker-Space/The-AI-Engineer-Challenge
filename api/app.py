@@ -39,10 +39,11 @@ logger.info("Environment variables loaded")
 qdrant_url = os.getenv("QDRANT_URL")
 qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
-client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
 
-logger.info("QDRANT_URL: %s", os.getenv("QDRANT_URL"))
-logger.info("QDRANT_API_KEY: %s", os.getenv("QDRANT_API_KEY"))
+# Avoid logging sensitive values directly; only indicate presence
+logger.info("QDRANT_URL present: %s", bool(os.getenv("QDRANT_URL")))
+logger.info("QDRANT_API_KEY present: %s", bool(os.getenv("QDRANT_API_KEY")))
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -481,7 +482,7 @@ async def upload_pdf(request: Request, file: UploadFile = File(...), api_key: st
             app.state.qa_store = Qdrant.from_documents(
                 documents=docs,
                 embedding=embeddings,
-                url=qdrant_url,
+                client=qdrant_client,  # use authenticated client to avoid 403
                 collection_name="pdf_chunks",
             )
         else:
@@ -524,7 +525,7 @@ async def chat(request: ChatRequest):
                 try:
                     embeddings = OpenAIEmbeddings()
                     app.state.qa_store = Qdrant(
-                        client=client,
+                        client=qdrant_client,
                         collection_name="pdf_chunks",
                         embeddings=embeddings,
                     )
@@ -551,7 +552,7 @@ Context from the PDF:
 {' '.join(relevant_chunks)}"""
 
         # Initialize OpenAI client with the provided API key
-        client = OpenAI(api_key=request.api_key)
+        openai_client = OpenAI(api_key=request.api_key)
         
         # Build messages including optional history
         messages: List[dict] = [
@@ -572,7 +573,7 @@ Context from the PDF:
         # Create an async generator function for streaming responses
         async def generate():
             # Create a streaming chat completion request
-            stream = client.chat.completions.create(
+            stream = openai_client.chat.completions.create(
                 model=request.model,
                 messages=messages,
                 stream=True  # Enable streaming response
@@ -609,7 +610,7 @@ async def topic_question(req: TopicQuestionRequest):
                 try:
                     embeddings = OpenAIEmbeddings()
                     app.state.qa_store = Qdrant(
-                        client=client,
+                        client=qdrant_client,
                         collection_name="pdf_chunks",
                         embeddings=embeddings,
                     )
