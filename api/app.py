@@ -4,13 +4,14 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 # Import Pydantic for data validation and settings management
 from pydantic import BaseModel
-# Import OpenAI client for interacting with OpenAI's API
-from openai import OpenAI
+# Import boto3 for AWS Bedrock
+import boto3
+import json
 import os
 from typing import Optional
 
 # Initialize FastAPI application with a title
-app = FastAPI(title="OpenAI Chat API")
+app = FastAPI(title="AWS Bedrock Anthropic Chat API")
 
 # Configure CORS (Cross-Origin Resource Sharing) middleware
 # This allows the API to be accessed from different domains/origins
@@ -25,38 +26,52 @@ app.add_middleware(
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
 class ChatRequest(BaseModel):
-    developer_message: str  # Message from the developer/system
+    developer_message: str  # System message for the AI
     user_message: str      # Message from the user
-    model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
-    api_key: str          # OpenAI API key for authentication
+    model: Optional[str] = "us.anthropic.claude-3-5-sonnet-20241022-v2:0"  # Default Anthropic model
+    aws_region: Optional[str] = "us-east-1"  # AWS region for Bedrock
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        # Initialize OpenAI client with the provided API key
-        client = OpenAI(api_key=request.api_key)
-        
+        # Initialize Bedrock runtime client
+        # Uses AWS credentials from environment or IAM role
+        bedrock_runtime = boto3.client(
+            service_name="bedrock-runtime",
+            region_name=request.aws_region
+        )
+
         # Create an async generator function for streaming responses
         async def generate():
-            # Create a streaming chat completion request
-            stream = client.chat.completions.create(
-                model=request.model,
-                messages=[
-                    {"role": "developer", "content": request.developer_message},
+            # Prepare the request body for Anthropic Claude via Bedrock
+            body = json.dumps({
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 4096,
+                "system": request.developer_message,
+                "messages": [
                     {"role": "user", "content": request.user_message}
-                ],
-                stream=True  # Enable streaming response
+                ]
+            })
+
+            # Invoke model with streaming
+            response = bedrock_runtime.invoke_model_with_response_stream(
+                modelId=request.model,
+                contentType="application/json",
+                accept="application/json",
+                body=body
             )
-            
-            # Yield each chunk of the response as it becomes available
-            for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    yield chunk.choices[0].delta.content
+
+            # Process the streaming response
+            for event in response.get("body"):
+                chunk = json.loads(event["chunk"]["bytes"])
+                if chunk["type"] == "content_block_delta":
+                    if "delta" in chunk and "text" in chunk["delta"]:
+                        yield chunk["delta"]["text"]
 
         # Return a streaming response to the client
         return StreamingResponse(generate(), media_type="text/plain")
-    
+
     except Exception as e:
         # Handle any errors that occur during processing
         raise HTTPException(status_code=500, detail=str(e))

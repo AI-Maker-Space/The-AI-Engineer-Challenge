@@ -1,186 +1,183 @@
-<p align = "center" draggable=”false” ><img src="https://github.com/AI-Maker-Space/LLM-Dev-101/assets/37101144/d1343317-fa2f-41e1-8af1-1dbb18399719" 
-     width="200px"
-     height="auto"/>
-</p>
+# Anthropic Chat - AWS Bedrock
 
+A full-stack chat application powered by **Anthropic Claude models** on **AWS Bedrock**, built with Python/FastAPI backend and React/Vite frontend.
 
-## <h1 align="center" id="heading"> 👋 Welcome to the AI Engineer Challenge</h1>
+## Tech Stack
 
-## 🤖 Your First Vibe Coding LLM Application
+| Component | Technology |
+|-----------|------------|
+| Backend | Python 3.13, FastAPI, Uvicorn |
+| Frontend | React 18, TypeScript, Vite |
+| AI Provider | AWS Bedrock (Anthropic Claude) |
+| Authentication | AWS IAM / AWS Profiles |
 
-> If you are a novice, and need a bit more help to get your dev environment off the ground, check out this [Setup Guide](docs/GIT_SETUP.md). This guide will walk you through the 'git' setup you need to get started.
+## Prerequisites
 
-> For additional context on LLM development environments and API key setup, you can also check out our [Interactive Dev Environment for LLM Development](https://github.com/AI-Maker-Space/Interactive-Dev-Environment-for-AI-Engineers).
+- Python 3.11+ (3.13 recommended)
+- Node.js 18+
+- AWS CLI configured with appropriate credentials
+- Access to AWS Bedrock with Anthropic Claude models enabled
 
-In this repository, we'll walk you through the steps to create a LLM (Large Language Model) powered application with a vibe-coded frontend!
+## AWS Configuration
 
-Are you ready? Let's get started!
+### Option 1: AWS Profile (Recommended)
 
-<details>
-  <summary>🖥️ Accessing "gpt-4.1-mini" (ChatGPT) like a developer</summary>
+Set up your AWS profile in `~/.aws/credentials` and `~/.aws/config`, then run the backend with:
 
-1. Head to [this notebook](https://colab.research.google.com/drive/1sT7rzY_Lb1_wS0ELI1JJfff0NUEcSD72?usp=sharing) and follow along with the instructions!
+```bash
+AWS_PROFILE=your-profile-name uvicorn app:app --reload --port 8000
+```
 
-2. Complete the notebook and try out your own system/assistant messages!
+### Option 2: Environment Variables
 
-That's it! Head to the next step and start building your application!
+```bash
+export AWS_ACCESS_KEY_ID=your_access_key
+export AWS_SECRET_ACCESS_KEY=your_secret_key
+export AWS_DEFAULT_REGION=us-east-1
+```
 
-</details>
+### Option 3: IAM Role
 
+When running on AWS infrastructure (EC2, ECS, Lambda), use IAM roles for automatic credential management.
 
-<details>
-  <summary>🏗️ Forking & Cloning This Repository</summary>
+### Enabling Claude Models in Bedrock
 
-Before you begin, make sure you have:
+1. Go to [AWS Bedrock Console](https://console.aws.amazon.com/bedrock)
+2. Navigate to **Model access** in the left sidebar
+3. Click **Manage model access**
+4. Enable the Anthropic Claude models you need
+5. Wait for access to be granted (usually immediate)
 
-1. 👤 A GitHub account (you'll need to replace `YOUR_GITHUB_USERNAME` with your actual username)
-2. 🔧 Git installed on your local machine
-3. 💻 A code editor (like Cursor, VS Code, etc.)
-4. ⌨️ Terminal access (Mac/Linux) or Command Prompt/PowerShell (Windows)
-5. 🔑 A GitHub Personal Access Token (for authentication)
+## Installation
 
-Got everything in place? Let's move on!
+### Backend Setup
 
-1. Fork [this](https://github.com/AI-Maker-Space/The-AI-Engineer-Challenge) repo!
+```bash
+cd api
 
-     ![image](https://i.imgur.com/bhjySNh.png)
+# Using uv (recommended)
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
 
-1. Clone your newly created repo.
+# Or using pip
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-     ``` bash
-     # First, navigate to where you want the project folder to be created
-     cd PATH_TO_DESIRED_PARENT_DIRECTORY
+### Frontend Setup
 
-     # Then clone (this will create a new folder called The-AI-Engineer-Challenge)
-     git clone git@github.com:<YOUR GITHUB USERNAME>/The-AI-Engineer-Challenge.git
-     ```
+```bash
+cd frontend
+npm install
+```
 
-     > Note: This command uses SSH. If you haven't set up SSH with GitHub, the command will fail. In that case, use HTTPS by replacing `git@github.com:` with `https://github.com/` - you'll then be prompted for your GitHub username and personal access token.
+## Running the Application
 
-2. Verify your git setup:
+### Start Backend
 
-     ```bash
-     # Check that your remote is set up correctly
-     git remote -v
+```bash
+cd api
+source .venv/bin/activate
+AWS_PROFILE=your-aws-profile uvicorn app:app --reload --port 8000
+```
 
-     # Check the status of your repository
-     git status
+### Start Frontend
 
-     # See which branch you're on
-     git branch
-     ```
+```bash
+cd frontend
+npm run dev
+```
 
-     <!-- > Need more help with git? Check out our [Detailed Git Setup Guide](docs/GIT_SETUP.md) for a comprehensive walkthrough of git configuration and best practices. -->
+The application will be available at:
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000
 
-3. Open the freshly cloned repository inside Cursor!
+## API Endpoints
 
-     ```bash
-     cd The-AI-Engineering-Challenge
-     cursor .
-     ```
+### POST /api/chat
 
-4. Check out the existing backend code found in `/api/app.py`
-
-</details>
-
-<details>
-  <summary>🔥Setting Up for Vibe Coding Success </summary>
-
-While it is a bit counter-intuitive to set things up before jumping into vibe-coding - it's important to remember that there exists a gradient betweeen AI-Assisted Development and Vibe-Coding. We're only reaching *slightly* into AI-Assisted Development for this challenge, but it's worth it!
-
-1. Check out the rules in `.cursor/rules/` and add theme-ing information like colour schemes in `frontend-rule.mdc`! You can be as expressive as you'd like in these rules!
-2. We're going to index some docs to make our application more likely to succeed. To do this - we're going to start with `CTRL+SHIFT+P` (or `CMD+SHIFT+P` on Mac) and we're going to type "custom doc" into the search bar. 
-
-     ![image](https://i.imgur.com/ILx3hZu.png)
-3. We're then going to copy and paste `https://nextjs.org/docs` into the prompt.
-
-     ![image](https://i.imgur.com/psBjpQd.png)
-
-4. We're then going to use the default configs to add these docs to our available and indexed documents.
-
-     ![image](https://i.imgur.com/LULLeaF.png)
-
-5. After that - you will do the same with Vercel's documentation. After which you should see:
-
-     ![image](https://i.imgur.com/hjyXhhC.png) 
-
-</details>
-
-<details>
-  <summary>😎 Vibe Coding a Front End for the FastAPI Backend</summary>
-
-1. Use `Command-L` or `CTRL-L` to open the Cursor chat console. 
-
-2. Set the chat settings to the following:
-
-     ![image](https://i.imgur.com/LSgRSgF.png)
-
-3. Ask Cursor to create a frontend for your application. Iterate as much as you like!
-
-4. Run the frontend using the instructions Cursor provided. 
-
-> NOTE: If you run into any errors, copy and paste them back into the Cursor chat window - and ask Cursor to fix them!
-
-> NOTE: You have been provided with a backend in the `/api` folder - please ensure your Front End integrates with it!
-
-</details>
-
-<details>
-  <summary>🚀 Deploying Your First LLM-powered Application with Vercel</summary>
-
-1. Ensure you have signed into [Vercel](https://vercel.com/) with your GitHub account.
-
-2. Ensure you have `npm` (this may have been installed in the previous vibe-coding step!) - if you need help with that, ask Cursor!
-
-3. Run the command:
-
-     ```bash
-     npm install -g vercel
-     ```
-
-4. Run the command:
-
-     ```bash
-     vercel
-     ```
-
-5. Follow the in-terminal instructions. (Below is an example of what you will see!)
-
-     ![image](https://i.imgur.com/D1iKGCq.png)
-
-6. Once the build is completed - head to the provided link and try out your app!
-
-> NOTE: Remember, if you run into any errors - ask Cursor to help you fix them!
-
-</details>
-
-### Vercel Link to Share
-
-You'll want to make sure you share you *domains* hyperlink to ensure people can access your app!
-
-![image](https://i.imgur.com/mpXIgIz.png)
-
-> NOTE: Test this is the public link by trying to open your newly deployed site in an Incognito browser tab!
-
-### 🎉 Congratulations! 
-
-You just deployed your first LLM-powered application! 🚀🚀🚀 Get on linkedin and post your results and experience! Make sure to tag us at @AIMakerspace!
-
-Here's a template to get your post started!
+Stream a chat response from Claude.
+
+**Request Body:**
+```json
+{
+  "developer_message": "You are a helpful assistant",
+  "user_message": "Hello, how are you?",
+  "model": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+  "aws_region": "us-east-1"
+}
+```
+
+**Response:** Server-Sent Events (SSE) stream of text chunks
+
+### GET /api/health
+
+Health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
+
+## Available Models
+
+| Model ID | Display Name | Description |
+|----------|--------------|-------------|
+| `us.anthropic.claude-3-5-sonnet-20241022-v2:0` | Claude 3.5 Sonnet v2 | Latest, most capable |
+| `us.anthropic.claude-3-5-haiku-20241022-v1:0` | Claude 3.5 Haiku | Fast and efficient |
+| `us.anthropic.claude-3-opus-20240229-v1:0` | Claude 3 Opus | Most powerful reasoning |
+| `us.anthropic.claude-3-sonnet-20240229-v1:0` | Claude 3 Sonnet | Balanced performance |
+| `us.anthropic.claude-3-haiku-20240307-v1:0` | Claude 3 Haiku | Fastest responses |
+
+## Supported AWS Regions
+
+- `us-east-1` (N. Virginia)
+- `us-west-2` (Oregon)
+- `eu-west-1` (Ireland)
+- `ap-northeast-1` (Tokyo)
+
+> Note: Model availability varies by region. Check the [AWS Bedrock documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/models-regions.html) for current availability.
+
+## Project Structure
 
 ```
-🚀🎉 Exciting News! 🎉🚀
-
-🏗️ Today, I'm thrilled to announce that I've successfully built and shipped my first-ever LLM using the powerful combination of , and the OpenAI API! 🖥️
-
-Check it out 👇
-[LINK TO APP]
-
-A big shoutout to the @AI Makerspace for all making this possible. Couldn't have done it without the incredible community there. 🤗🙏
-
-Looking forward to building with the community! 🙌✨ Here's to many more creations ahead! 🥂🎉
-
-Who else is diving into the world of AI? Let's connect! 🌐💡
-
-#FirstLLMApp 
+The-AI-Engineer-Challenge/
+├── api/
+│   ├── app.py              # FastAPI application
+│   └── requirements.txt    # Python dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx         # Main React component
+│   │   ├── main.tsx        # React entry point
+│   │   └── index.css       # Global styles
+│   ├── vite.config.ts      # Vite configuration with API proxy
+│   └── package.json        # Node.js dependencies
+├── README.md               # This file
+└── MIGRATION.md            # Migration guide from OpenAI/Vercel
 ```
+
+## Troubleshooting
+
+### "Unable to locate credentials"
+
+Ensure your AWS credentials are properly configured:
+```bash
+aws sts get-caller-identity --profile your-profile-name
+```
+
+### "Access denied" for Bedrock models
+
+1. Verify you have enabled the model in AWS Bedrock console
+2. Check your IAM permissions include `bedrock:InvokeModelWithResponseStream`
+
+### Frontend can't connect to backend
+
+Ensure the backend is running on port 8000. The Vite dev server proxies `/api/*` requests to `http://localhost:8000`.
+
+## License
+
+MIT
