@@ -18,9 +18,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-
 def mock_coach_reply(user_message: str) -> str:
     """Return a friendly coaching response without calling external APIs."""
     starter_lines = [
@@ -61,6 +58,7 @@ def chat(request: ChatRequest):
 
     try:
         user_message = request.message
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
             messages=[
