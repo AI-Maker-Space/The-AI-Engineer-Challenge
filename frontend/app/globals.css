@@ -1,0 +1,148 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: radial-gradient(circle at center, #151b33 0%, #090d1b 55%, #030711 100%);
+  color: #eef2ff;
+}
+
+.screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.ball {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.88;
+  box-shadow:
+    0 0 18px rgba(255, 255, 255, 0.23),
+    0 0 42px currentColor;
+}
+
+.overlay {
+  position: absolute;
+  left: 1.2rem;
+  top: 1.2rem;
+  z-index: 10;
+  background: rgba(5, 9, 20, 0.52);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  backdrop-filter: blur(6px);
+}
+
+.overlay h1 {
+  margin: 0 0 0.2rem 0;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.overlay p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+}
+
+.chatPanel {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  width: min(420px, calc(100vw - 2.4rem));
+  z-index: 10;
+  background: rgba(5, 9, 20, 0.74);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  padding: 0.9rem;
+  backdrop-filter: blur(8px);
+}
+
+.chatPanel h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.chatHint {
+  margin: 0.4rem 0 0.85rem 0;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+}
+
+.chatForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.chatForm label {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+
+.chatForm textarea {
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid #475569;
+  background: rgba(15, 23, 42, 0.93);
+  color: #f8fafc;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+}
+
+.chatForm textarea:focus {
+  outline: 2px solid #38bdf8;
+  outline-offset: 1px;
+}
+
+.chatForm button {
+  align-self: flex-start;
+  border: none;
+  border-radius: 9px;
+  background: #38bdf8;
+  color: #082f49;
+  padding: 0.45rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chatForm button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.replyBox {
+  margin-top: 0.8rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
+  padding-top: 0.7rem;
+}
+
+.replyBox strong {
+  font-size: 0.84rem;
+  color: #e2e8f0;
+}
+
+.replyBox p {
+  margin: 0.35rem 0 0 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: #f1f5f9;
+}
+
+.errorText {
+  color: #fca5a5 !important;
+}
