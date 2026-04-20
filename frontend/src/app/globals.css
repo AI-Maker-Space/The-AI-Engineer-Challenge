@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global tweaks */
+:root {
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+input, textarea { outline: none; }
+
