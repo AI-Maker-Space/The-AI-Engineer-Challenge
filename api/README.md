@@ -1,52 +1,39 @@
 # OpenAI Chat API Backend
 
-This is a FastAPI-based backend service that provides a chat interface using OpenAI's API. The service acts as a supportive mental coach, helping users with stress, motivation, habits, and confidence.
+This is a FastAPI-based backend service that provides a streaming chat interface using OpenAI's API.
 
 ## Prerequisites
 
-- [`uv`](https://github.com/astral-sh/uv) package manager (`pip install uv`)
-- `uv` will provision Python 3.12 automatically for this project, so no separate interpreter installation is required
-- An OpenAI API key available as the `OPENAI_API_KEY` environment variable when you run the server
+- Python 3.8 or higher
+- pip (Python package manager)
+- An OpenAI API key
 
 ## Setup
 
-All commands below assume you are running them from the repository root.
-
-1. Install dependencies into a local virtual environment managed by `uv`:
-
+1. Create a virtual environment (recommended):
 ```bash
-uv sync
+python -m venv venv
+source venv/bin/activate  # On Windows, use: venv\Scripts\activate
 ```
 
-2. (Optional) Activate the virtual environment if you prefer to run commands manually:
-
+2. Install the required dependencies:
 ```bash
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install fastapi uvicorn openai pydantic
 ```
-
-`uv` will create the `.venv` directory automatically on first sync and download Python 3.12 if it's not already available.
 
 ## Running the Server
 
-Start the FastAPI app with the dependencies managed by `uv`:
-
+1. Make sure you're in the `api` directory:
 ```bash
-uv run uvicorn api.index:app --reload
+cd api
 ```
 
-This runs the app with `uvicorn` on `http://localhost:8000` with auto-reload enabled for development. The server will automatically restart when you make changes to the code.
-
-**Note:** Make sure the `OPENAI_API_KEY` environment variable is set in your shell before launching the server. You can set it with:
-
+2. Start the server:
 ```bash
-export OPENAI_API_KEY=sk-your-key-here
+python app.py
 ```
 
-If you encounter an "Address already in use" error, you may need to kill existing processes on port 8000:
-
-```bash
-lsof -ti:8000 | xargs kill -9
-```
+The server will start on `http://localhost:8000`
 
 ## API Endpoints
 
@@ -56,22 +43,13 @@ lsof -ti:8000 | xargs kill -9
 - **Request Body**:
 ```json
 {
-    "message": "string"
+    "developer_message": "string",
+    "user_message": "string",
+    "model": "gpt-4.1-mini",  // optional
+    "api_key": "your-openai-api-key"
 }
 ```
-- **Response**: JSON object with the AI's reply:
-```json
-{
-    "reply": "string"
-}
-```
-
-The chat endpoint uses OpenAI's GPT-5 model with a supportive mental coach system prompt to provide helpful responses.
-
-### Root Endpoint
-- **URL**: `/`
-- **Method**: GET
-- **Response**: `{"status": "ok"}`
+- **Response**: Streaming text response
 
 ### Health Check
 - **URL**: `/api/health`
@@ -86,7 +64,7 @@ Once the server is running, you can access the interactive API documentation at:
 
 ## CORS Configuration
 
-The API is configured to accept requests from any origin (`*`). This can be modified in the `index.py` file if you need to restrict access to specific domains.
+The API is configured to accept requests from any origin (`*`). This can be modified in the `app.py` file if you need to restrict access to specific domains.
 
 ## Error Handling
 
@@ -95,28 +73,4 @@ The API includes basic error handling for:
 - OpenAI API errors
 - General server errors
 
-All errors will return a 500 status code with an error message.
-
-## Testing the API
-
-Once your server is running, you can test the chat endpoint using curl:
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello"}'
-```
-
-You should receive a JSON response with the AI's reply:
-
-```json
-{
-  "reply": "Hi! It's good to hear from you. What's on your mind today?..."
-}
-```
-
-You can also test the health check endpoint:
-
-```bash
-curl http://127.0.0.1:8000/api/health
-```
+All errors will return a 500 status code with an error message. 
