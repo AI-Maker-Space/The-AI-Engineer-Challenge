@@ -11,4 +11,5 @@ dependencies = [
     "pydantic>=2.11.4",
     "uvicorn>=0.34.2",
     "python-multipart>=0.0.18",
+    "python-dotenv>=1.0.0",
 ]
