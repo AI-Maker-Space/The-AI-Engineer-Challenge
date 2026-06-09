@@ -19,8 +19,13 @@ app.add_middleware(
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+class HistoryMessage(BaseModel):
+    role: str
+    content: str
+
 class ChatRequest(BaseModel):
     message: str
+    history: list[HistoryMessage] = []
 
 @app.get("/")
 def root():
@@ -32,13 +37,14 @@ def chat(request: ChatRequest):
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
     
     try:
-        user_message = request.message
+        messages = [{"role": "system", "content": "You are a supportive mental coach."}]
+        for h in request.history:
+            messages.append({"role": h.role, "content": h.content})
+        messages.append({"role": "user", "content": request.message})
+
         response = client.chat.completions.create(
-            model="gpt-5",
-            messages=[
-                {"role": "system", "content": "You are a supportive mental coach."},
-                {"role": "user", "content": user_message}
-            ]
+            model="gpt-4.1-mini",
+            messages=messages
         )
         return {"reply": response.choices[0].message.content}
     except Exception as e:
