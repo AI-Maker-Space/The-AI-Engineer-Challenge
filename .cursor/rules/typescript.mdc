@@ -1,0 +1,6 @@
+---
+description: TypeScript rules
+alwaysApply: true
+---
+
+Use strict TypeScript.

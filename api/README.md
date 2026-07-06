@@ -42,6 +42,22 @@ This runs the app with `uvicorn` on `http://localhost:8000` with auto-reload ena
 export OPENAI_API_KEY=sk-your-key-here
 ```
 
+### Optional usage limits (recommended for public deployments)
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `OPENAI_MODEL` | `gpt-5` | Model id — set server-side only (e.g. `gpt-4.1-mini` in production) |
+| `OPENAI_MAX_TOKENS` | `800` | Max tokens per completion |
+| `OPENAI_MAX_MESSAGE_CHARS` | `2000` | Max characters per user message |
+
+Example for a cost-conscious public demo on Vercel:
+
+```bash
+OPENAI_MODEL=gpt-4.1-mini
+OPENAI_MAX_TOKENS=500
+OPENAI_MAX_MESSAGE_CHARS=2000
+```
+
 If you encounter an "Address already in use" error, you may need to kill existing processes on port 8000:
 
 ```bash
@@ -66,7 +82,7 @@ lsof -ti:8000 | xargs kill -9
 }
 ```
 
-The chat endpoint uses OpenAI's GPT-5 model with a supportive mental coach system prompt to provide helpful responses.
+The chat endpoint uses an OpenAI model configured via `OPENAI_MODEL` (default `gpt-5`) with a supportive mental coach system prompt. Output length and input size are capped via `OPENAI_MAX_TOKENS` and `OPENAI_MAX_MESSAGE_CHARS`.
 
 ### Root Endpoint
 - **URL**: `/`

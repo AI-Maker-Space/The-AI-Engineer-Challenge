@@ -1,0 +1,35 @@
+---
+description: Vercel platform and AI SDK
+alwaysApply: true
+---
+
+This project is deployed on Vercel.
+
+When writing code:
+
+- Follow Vercel best practices.
+- Prefer the App Router.
+- Use Edge Runtime only when appropriate.
+- Use Route Handlers for APIs.
+- Use environment variables for secrets.
+- Optimize for serverless execution.
+- Prefer streaming responses where applicable.
+- Follow official Vercel AI SDK patterns when building AI features.
+- When uncertain, consult the official Vercel documentation before implementing.
+
+Official documentation:
+
+General:
+https://vercel.com/docs
+
+Next.js:
+https://nextjs.org/docs
+
+AI SDK:
+https://ai-sdk.dev/docs
+
+AI SDK Examples:
+https://github.com/vercel/ai
+
+Templates:
+https://vercel.com/templates

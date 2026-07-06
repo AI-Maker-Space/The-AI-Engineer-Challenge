@@ -1,0 +1,23 @@
+---
+description: AI engineering project rules
+alwaysApply: true
+---
+
+This project is for an AI engineering challenge.
+
+Prefer clean, production-style code.
+
+Use environment variables for secrets.
+
+Never hardcode API keys.
+
+Use clear separation between:
+- UI components
+- API routes
+- service logic
+- model/provider logic
+- prompt templates
+
+Add helpful comments only where the logic is non-obvious.
+
+When generating code, include basic error handling.

@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light theme (default) */
+:root {
+  --background: #f5f8fc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-elevated: #eef2f7;
+  --border: #dbe3ee;
+  --muted: #64748b;
+  --accent: #0d9488;
+  --accent-hover: #0f766e;
+  --user-bubble: #0369a1;
+  --user-bubble-foreground: #f8fafc;
+  --assistant-bubble: #eef2f7;
+  --error: #dc2626;
+}
+
+/* Dark theme */
+.dark {
+  --background: #0c1222;
+  --foreground: #e8edf5;
+  --surface: #151d2e;
+  --surface-elevated: #1c2740;
+  --border: #2a3650;
+  --muted: #8b9ab8;
+  --accent: #3dd6c3;
+  --accent-hover: #2eb8a8;
+  --user-bubble: #1d4f6f;
+  --user-bubble-foreground: #e8edf5;
+  --assistant-bubble: #1a2438;
+  --error: #f87171;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-user-bubble: var(--user-bubble);
+  --color-user-bubble-foreground: var(--user-bubble-foreground);
+  --color-assistant-bubble: var(--assistant-bubble);
+  --color-error: var(--error);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Subtle gradient backdrop for depth */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(13, 148, 136, 0.1), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(3, 105, 161, 0.08), transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.dark body::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(61, 214, 195, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(29, 79, 111, 0.15), transparent);
+}
+
+@keyframes pulse-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.typing-dot {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}

@@ -1,0 +1,7 @@
+---
+description: Next.js project rules
+alwaysApply: true
+---
+
+Before implementing unfamiliar Next.js APIs, check the official docs at:
+https://nextjs.org/docs
