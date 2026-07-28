@@ -1,3 +1,74 @@
-### Front End
+# NEURAL_COACH // Matrix Terminal Frontend
 
-Please populate this README with instructions on how to run the application!
+A Next.js frontend that looks and feels like a Matrix-style terminal, talking to the FastAPI coach backend in `/api`.
+
+Green-on-black CRT vibes. Digital rain. Blinking cursor. You get the idea.
+
+## Prerequisites
+
+- Node.js 18+ (Homebrew: `brew install node`)
+- The FastAPI backend running locally (see root README / `api/README.md`)
+- An OpenAI API key — either as `OPENAI_API_KEY` on the backend, or pasted into the terminal **CONFIG** panel (password field)
+
+## Setup
+
+From the `frontend/` directory:
+
+```bash
+cd frontend
+npm install
+```
+
+Optional: point the UI at a custom backend URL (defaults to `http://localhost:8000`):
+
+```bash
+cp .env.local.example .env.local
+# edit NEXT_PUBLIC_API_URL if needed
+```
+
+## Run locally
+
+**Terminal 1 — backend** (from the repo root):
+
+```bash
+export OPENAI_API_KEY=sk-your-key-here
+uv run uvicorn api.index:app --reload
+```
+
+**Terminal 2 — frontend**:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000) and jack in.
+
+### Useful scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server with hot reload on port 3000 |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint |
+
+## How it talks to the backend
+
+The terminal POSTs to `{NEXT_PUBLIC_API_URL}/api/chat` with:
+
+```json
+{ "message": "your text", "api_key": "optional override" }
+```
+
+and expects:
+
+```json
+{ "reply": "coach response" }
+```
+
+Hit **CONFIG** in the title bar to paste an API key (masked as a password). Leave it blank to use the server env var.
+
+## Deploying on Vercel
+
+This repo's `vercel.json` builds the Next.js app and the Python API together. Set `OPENAI_API_KEY` in your Vercel project environment variables, then deploy from the repo root with `vercel`.

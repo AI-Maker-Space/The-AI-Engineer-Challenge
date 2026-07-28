@@ -1,0 +1,379 @@
+.terminal {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(920px, calc(100vw - 2rem));
+  max-height: min(820px, calc(100vh - 2rem));
+  min-height: min(560px, calc(100vh - 2rem));
+  background: rgba(2, 12, 4, 0.92);
+  border: 1px solid var(--matrix-border);
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 65, 0.08),
+    0 0 40px rgba(0, 255, 65, 0.12),
+    inset 0 0 60px rgba(0, 40, 10, 0.35);
+  animation: terminalEnter 0.7s ease-out both;
+}
+
+@keyframes terminalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.titleBar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--matrix-border);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 40, 12, 0.9),
+    rgba(0, 18, 6, 0.95)
+  );
+}
+
+.traffic {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.dotRed,
+.dotAmber,
+.dotGreen {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  opacity: 0.85;
+}
+
+.dotRed {
+  background: #ff4d4d;
+}
+
+.dotAmber {
+  background: #d4a017;
+}
+
+.dotGreen {
+  background: var(--matrix-green);
+  box-shadow: 0 0 8px var(--matrix-green);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.brand {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.1rem, 2.5vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: var(--matrix-green);
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.45);
+}
+
+.configToggle {
+  background: transparent;
+  border: 1px solid var(--matrix-border);
+  color: var(--matrix-dim);
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.configToggle:hover {
+  color: var(--matrix-green);
+  border-color: var(--matrix-green);
+}
+
+.configPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--matrix-border);
+  background: rgba(0, 20, 6, 0.95);
+  animation: panelDrop 0.25s ease-out;
+}
+
+@keyframes panelDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.configLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--matrix-dim);
+}
+
+.configInput {
+  width: 100%;
+  background: #000;
+  border: 1px solid var(--matrix-border);
+  color: var(--matrix-green);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.65rem;
+  outline: none;
+}
+
+.configInput:focus {
+  border-color: var(--matrix-green);
+  box-shadow: 0 0 0 1px rgba(0, 255, 65, 0.25);
+}
+
+.configInput::placeholder {
+  color: rgba(0, 255, 65, 0.35);
+}
+
+.configHint {
+  font-size: 0.7rem;
+  color: var(--matrix-dim);
+  line-height: 1.4;
+}
+
+.screen {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--matrix-green) #001405;
+}
+
+.scanlines {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.18) 3px
+  );
+  opacity: 0.35;
+  z-index: 0;
+}
+
+.line {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  margin: 0;
+  line-height: 1.55;
+  font-size: clamp(0.85rem, 1.6vw, 0.98rem);
+  animation: lineIn 0.28s ease-out both;
+  width: 100%;
+}
+
+@keyframes lineIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.prefix {
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.system {
+  color: var(--matrix-dim);
+}
+
+.user {
+  color: #9dffb0;
+}
+
+.coach {
+  color: var(--matrix-green);
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.thinking {
+  letter-spacing: 0.08em;
+}
+
+.dots::after {
+  content: "";
+  animation: dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+}
+
+.prompt {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border-top: 1px solid var(--matrix-border);
+  background: rgba(0, 10, 3, 0.98);
+}
+
+.promptLabel {
+  color: var(--matrix-green);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.promptInput {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--matrix-green);
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  caret-color: var(--matrix-green);
+}
+
+.promptInput::placeholder {
+  color: rgba(0, 255, 65, 0.35);
+}
+
+.promptInput:disabled {
+  opacity: 0.55;
+}
+
+.cursor {
+  width: 0.55rem;
+  height: 1.05rem;
+  background: var(--matrix-green);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.send {
+  background: transparent;
+  border: 1px solid var(--matrix-border);
+  color: var(--matrix-green);
+  font: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  padding: 0.4rem 0.65rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.send:hover:not(:disabled) {
+  background: rgba(0, 255, 65, 0.12);
+}
+
+.send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .terminal {
+    width: calc(100vw - 1rem);
+    min-height: calc(100vh - 1rem);
+    max-height: calc(100vh - 1rem);
+  }
+
+  .titleBar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0.45rem;
+  }
+
+  .traffic {
+    display: none;
+  }
+
+  .brand {
+    letter-spacing: 0.18em;
+  }
+
+  .prompt {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .promptLabel {
+    grid-column: 1;
+  }
+
+  .promptInput {
+    grid-column: 2;
+  }
+
+  .cursor {
+    display: none;
+  }
+
+  .send {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .line {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}
