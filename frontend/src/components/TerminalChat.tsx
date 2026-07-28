@@ -23,9 +23,12 @@ const BOOT_LINES = [
   "RAIN ON THE GLASS. SPEAK WHEN READY.",
 ];
 
-/** Backend base URL — empty means same-origin (Vercel) or local override. */
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
+/**
+ * Backend base URL.
+ * - Local: set NEXT_PUBLIC_API_URL=http://localhost:8000 in frontend/.env.local
+ * - Vercel: leave unset so requests hit same-origin /api/chat (routed to FastAPI)
+ */
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
