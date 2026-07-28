@@ -1,14 +1,23 @@
 # NEURAL_COACH // Blade Runner Console
 
-A Next.js frontend dressed like a rainy neo-noir night — amber neon, cyan uplink glow, film grain — talking to the FastAPI coach backend in `/api`.
+Welcome to a rainy neon night in Los Angeles.
 
-Less green code rain. More Los Angeles after dark.
+This Next.js frontend wraps the supportive mental coach API in a **Blade Runner**-inspired console: amber signage, cyan uplink glow, slanted city rain, film grain, and a live chat panel that still talks straight to FastAPI.
+
+Brand first. Atmosphere second. Coach replies when you transmit.
+
+## What's on screen
+
+- Full-bleed neon rain over a dark night sky (not a flat black void)
+- `NEURAL_COACH` as the hero signal in the console chrome
+- Password-masked **CONFIG** panel for an optional OpenAI API key
+- Chat uplink to `POST /api/chat`
 
 ## Prerequisites
 
-- Node.js 18+ (Homebrew: `brew install node`)
-- The FastAPI backend running locally (see root README / `api/README.md`)
-- An OpenAI API key — either as `OPENAI_API_KEY` on the backend, or pasted into the console **CONFIG** panel (password field)
+- Node.js 18+ (`brew install node` works great)
+- The FastAPI backend from this repo (`api/README.md`)
+- An OpenAI API key — set as `OPENAI_API_KEY` on the backend, **or** paste it into the console CONFIG panel
 
 ## Setup
 
@@ -28,7 +37,9 @@ cp .env.local.example .env.local
 
 ## Run locally
 
-**Terminal 1 — backend** (from the repo root):
+Keep two terminals open — one for the night city, one for the uplink.
+
+**Terminal 1 — backend** (repo root):
 
 ```bash
 export OPENAI_API_KEY=sk-your-key-here
@@ -42,9 +53,9 @@ cd frontend
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) and step into the rain.
+Open [http://localhost:3000](http://localhost:3000), watch the rain, and hit **TRANSMIT**.
 
-### Useful scripts
+### Scripts
 
 | Command | What it does |
 | --- | --- |
@@ -53,22 +64,29 @@ Then open [http://localhost:3000](http://localhost:3000) and step into the rain.
 | `npm start` | Serve the production build |
 | `npm run lint` | ESLint |
 
-## How it talks to the backend
+> If Next complains that port 3000 is already in use, stop the old process (`kill <PID>`) and run `npm run dev` again so you land on **3000**, not 3001.
 
-The console POSTs to `{NEXT_PUBLIC_API_URL}/api/chat` with:
+## How the console talks to the backend
+
+The UI POSTs to `{NEXT_PUBLIC_API_URL}/api/chat` with:
 
 ```json
-{ "message": "your text", "api_key": "optional override" }
+{
+  "message": "your text",
+  "api_key": "optional override"
+}
 ```
 
 and expects:
 
 ```json
-{ "reply": "coach response" }
+{
+  "reply": "coach response"
+}
 ```
 
-Hit **CONFIG** in the title bar to paste an API key (masked as a password). Leave it blank to use the server env var.
+Open **CONFIG** in the title bar to paste an API key (password field). Leave it blank to use the server's `OPENAI_API_KEY` env var.
 
 ## Deploying on Vercel
 
-This repo's `vercel.json` builds the Next.js app and the Python API together. Set `OPENAI_API_KEY` in your Vercel project environment variables, then deploy from the repo root with `vercel`.
+Root `vercel.json` builds this Next.js app alongside the Python API. Set `OPENAI_API_KEY` in your Vercel project env, then deploy from the repo root with `vercel`.
