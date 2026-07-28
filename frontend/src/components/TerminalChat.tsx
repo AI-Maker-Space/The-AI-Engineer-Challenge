@@ -18,10 +18,9 @@ type Line = {
 };
 
 const BOOT_LINES = [
-  "INITIALIZING NEURAL_COACH v1.0 ...",
-  "LINKING TO SUPPORTIVE MENTAL COACH KERNEL ...",
-  "ENCRYPTION: ENABLED // CHANNEL: SECURE",
-  "READY. TYPE A MESSAGE AND PRESS ENTER.",
+  "LOS ANGELES · NIGHT SECTOR 4 · CHANNEL OPEN",
+  "SUPPORTIVE COACH KERNEL ONLINE",
+  "RAIN ON THE GLASS. SPEAK WHEN READY.",
 ];
 
 /** Backend base URL — empty means same-origin (Vercel) or local override. */
@@ -33,11 +32,10 @@ function makeId() {
 }
 
 /**
- * Matrix-styled chat terminal wired to the FastAPI `/api/chat` endpoint.
+ * Blade Runner–styled chat console wired to FastAPI `/api/chat`.
  * API key uses a password input per frontend security rules.
  */
 export default function TerminalChat() {
-  // Seed boot copy immediately so the prompt is never stuck on "booting..."
   const [lines, setLines] = useState<Line[]>(() =>
     BOOT_LINES.map((text) => ({ id: makeId(), role: "system" as const, text })),
   );
@@ -48,12 +46,10 @@ export default function TerminalChat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focus the prompt once the terminal mounts
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Keep the transcript pinned to the latest message
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -89,16 +85,16 @@ export default function TerminalChat() {
         const detail =
           typeof data.detail === "string"
             ? data.detail
-            : `REQUEST FAILED // STATUS ${response.status}`;
+            : `SIGNAL FAILED // STATUS ${response.status}`;
         appendLine("error", detail);
         return;
       }
 
-      appendLine("coach", data.reply ?? "(empty response from coach kernel)");
+      appendLine("coach", data.reply ?? "(empty reply from the night channel)");
     } catch {
       appendLine(
         "error",
-        `CONNECTION LOST // IS THE BACKEND RUNNING AT ${API_BASE}?`,
+        `UPLINK LOST // IS THE BACKEND RUNNING AT ${API_BASE}?`,
       );
     } finally {
       setIsLoading(false);
@@ -119,28 +115,35 @@ export default function TerminalChat() {
   };
 
   return (
-    <section className={styles.terminal} aria-label="Matrix chat terminal">
+    <section className={styles.console} aria-label="Blade Runner chat console">
+      <div className={styles.neonEdge} aria-hidden="true" />
+
       <header className={styles.titleBar}>
-        <div className={styles.traffic}>
-          <span className={styles.dotRed} />
-          <span className={styles.dotAmber} />
-          <span className={styles.dotGreen} />
+        <div className={styles.meta}>
+          <span className={styles.pulse} />
+          <span className={styles.metaText}>LIVE UPLINK</span>
         </div>
-        <h1 className={styles.brand}>NEURAL_COACH</h1>
+        <div className={styles.brandBlock}>
+          <p className={styles.kanji} aria-hidden="true">
+            神経
+          </p>
+          <h1 className={styles.brand}>NEURAL_COACH</h1>
+          <p className={styles.tagline}>off-world support · rainy city night</p>
+        </div>
         <button
           type="button"
           className={styles.configToggle}
           onClick={() => setShowConfig((open) => !open)}
           aria-expanded={showConfig}
         >
-          {showConfig ? "[ CLOSE_CONFIG ]" : "[ CONFIG ]"}
+          {showConfig ? "CLOSE" : "CONFIG"}
         </button>
       </header>
 
       {showConfig && (
         <div className={styles.configPanel}>
           <label className={styles.configLabel} htmlFor="api-key">
-            OPENAI_API_KEY (optional override — stored only in this browser session)
+            OPENAI_API_KEY (optional — password field, session only)
           </label>
           <input
             id="api-key"
@@ -160,7 +163,7 @@ export default function TerminalChat() {
       )}
 
       <div className={styles.screen} ref={scrollRef}>
-        <div className={styles.scanlines} aria-hidden="true" />
+        <div className={styles.grain} aria-hidden="true" />
         {lines.map((line) => (
           <p key={line.id} className={`${styles.line} ${styles[line.role]}`}>
             <span className={styles.prefix}>{prefixFor(line.role)}</span>
@@ -171,36 +174,35 @@ export default function TerminalChat() {
           <p className={`${styles.line} ${styles.coach}`}>
             <span className={styles.prefix}>{prefixFor("coach")}</span>
             <span className={styles.thinking}>
-              thinking<span className={styles.dots} />
+              listening through the rain<span className={styles.dots} />
             </span>
           </p>
         )}
       </div>
 
       <form className={styles.prompt} onSubmit={onSubmit}>
-        <label className={styles.promptLabel} htmlFor="matrix-input">
-          root@matrix:~$
+        <label className={styles.promptLabel} htmlFor="noir-input">
+          DECKARD&gt;
         </label>
         <input
-          id="matrix-input"
+          id="noir-input"
           ref={inputRef}
           className={styles.promptInput}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           disabled={isLoading}
-          placeholder={isLoading ? "awaiting reply..." : "enter message"}
+          placeholder={isLoading ? "awaiting reply..." : "speak into the night"}
           autoComplete="off"
           spellCheck={false}
           aria-label="Chat message"
         />
-        <span className={styles.cursor} aria-hidden="true" />
         <button
           type="submit"
           className={styles.send}
           disabled={isLoading || !input.trim()}
         >
-          SEND_
+          TRANSMIT
         </button>
       </form>
     </section>
@@ -210,12 +212,12 @@ export default function TerminalChat() {
 function prefixFor(role: Role): string {
   switch (role) {
     case "system":
-      return "> SYS //";
+      return "SYS ·";
     case "user":
-      return "> YOU //";
+      return "YOU ·";
     case "coach":
-      return "> COACH //";
+      return "COACH ·";
     case "error":
-      return "> ERR //";
+      return "ERR ·";
   }
 }

@@ -4,10 +4,17 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(ellipse at center, rgba(0, 40, 12, 0.45), transparent 65%),
-    #000;
+  background: #07040f;
   overflow: hidden;
+}
+
+.vignette {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
 }
 
 .main {

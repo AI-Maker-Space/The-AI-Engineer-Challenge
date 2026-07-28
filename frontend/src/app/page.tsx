@@ -1,15 +1,16 @@
-import MatrixRain from "@/components/MatrixRain";
+import NeonRain from "@/components/NeonRain";
 import TerminalChat from "@/components/TerminalChat";
 import styles from "./page.module.css";
 
 /**
- * Single-composition landing: digital rain atmosphere + terminal as the product.
- * Brand (NEURAL_COACH) lives in the terminal chrome as the hero signal.
+ * Single composition: rainy neon city as atmosphere, NEURAL_COACH console as the product.
+ * Brand sits as the hero signal inside the console chrome.
  */
 export default function Home() {
   return (
     <div className={styles.page}>
-      <MatrixRain />
+      <NeonRain />
+      <div className={styles.vignette} aria-hidden="true" />
       <main className={styles.main}>
         <TerminalChat />
       </main>

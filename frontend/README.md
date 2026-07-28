@@ -1,14 +1,14 @@
-# NEURAL_COACH // Matrix Terminal Frontend
+# NEURAL_COACH // Blade Runner Console
 
-A Next.js frontend that looks and feels like a Matrix-style terminal, talking to the FastAPI coach backend in `/api`.
+A Next.js frontend dressed like a rainy neo-noir night — amber neon, cyan uplink glow, film grain — talking to the FastAPI coach backend in `/api`.
 
-Green-on-black CRT vibes. Digital rain. Blinking cursor. You get the idea.
+Less green code rain. More Los Angeles after dark.
 
 ## Prerequisites
 
 - Node.js 18+ (Homebrew: `brew install node`)
 - The FastAPI backend running locally (see root README / `api/README.md`)
-- An OpenAI API key — either as `OPENAI_API_KEY` on the backend, or pasted into the terminal **CONFIG** panel (password field)
+- An OpenAI API key — either as `OPENAI_API_KEY` on the backend, or pasted into the console **CONFIG** panel (password field)
 
 ## Setup
 
@@ -42,7 +42,7 @@ cd frontend
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) and jack in.
+Then open [http://localhost:3000](http://localhost:3000) and step into the rain.
 
 ### Useful scripts
 
@@ -55,7 +55,7 @@ Then open [http://localhost:3000](http://localhost:3000) and jack in.
 
 ## How it talks to the backend
 
-The terminal POSTs to `{NEXT_PUBLIC_API_URL}/api/chat` with:
+The console POSTs to `{NEXT_PUBLIC_API_URL}/api/chat` with:
 
 ```json
 { "message": "your text", "api_key": "optional override" }

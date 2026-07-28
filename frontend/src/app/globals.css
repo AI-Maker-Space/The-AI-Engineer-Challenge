@@ -1,10 +1,12 @@
 :root {
-  --background: #000000;
-  --foreground: #00ff41;
-  --matrix-green: #00ff41;
-  --matrix-dim: #3dff7a;
-  --matrix-border: rgba(0, 255, 65, 0.35);
-  --matrix-bg: #010805;
+  --background: #07040f;
+  --foreground: #f2dcbe;
+  --noir-amber: #ff9a3c;
+  --noir-cyan: #3de7ff;
+  --noir-magenta: #ff2d95;
+  --noir-text: #f2dcbe;
+  --noir-muted: #b89a86;
+  --noir-border: rgba(255, 154, 60, 0.28);
 }
 
 html {
@@ -23,7 +25,7 @@ body {
   flex-direction: column;
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-matrix), "Courier New", monospace;
+  font-family: var(--font-body), "Courier New", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
