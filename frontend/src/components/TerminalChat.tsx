@@ -37,39 +37,20 @@ function makeId() {
  * API key uses a password input per frontend security rules.
  */
 export default function TerminalChat() {
-  const [lines, setLines] = useState<Line[]>([]);
+  // Seed boot copy immediately so the prompt is never stuck on "booting..."
+  const [lines, setLines] = useState<Line[]>(() =>
+    BOOT_LINES.map((text) => ({ id: makeId(), role: "system" as const, text })),
+  );
   const [input, setInput] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [showConfig, setShowConfig] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [booting, setBooting] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Boot sequence — staggered system lines for terminal presence
+  // Focus the prompt once the terminal mounts
   useEffect(() => {
-    let cancelled = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    BOOT_LINES.forEach((text, index) => {
-      const timer = setTimeout(() => {
-        if (cancelled) return;
-        setLines((prev) => [
-          ...prev,
-          { id: makeId(), role: "system", text },
-        ]);
-        if (index === BOOT_LINES.length - 1) {
-          setBooting(false);
-          inputRef.current?.focus();
-        }
-      }, 350 * (index + 1));
-      timers.push(timer);
-    });
-
-    return () => {
-      cancelled = true;
-      timers.forEach(clearTimeout);
-    };
+    inputRef.current?.focus();
   }, []);
 
   // Keep the transcript pinned to the latest message
@@ -84,7 +65,7 @@ export default function TerminalChat() {
 
   const sendMessage = async () => {
     const message = input.trim();
-    if (!message || isLoading || booting) return;
+    if (!message || isLoading) return;
 
     setInput("");
     appendLine("user", message);
@@ -207,8 +188,8 @@ export default function TerminalChat() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
-          disabled={booting || isLoading}
-          placeholder={booting ? "booting..." : "enter message"}
+          disabled={isLoading}
+          placeholder={isLoading ? "awaiting reply..." : "enter message"}
           autoComplete="off"
           spellCheck={false}
           aria-label="Chat message"
@@ -217,7 +198,7 @@ export default function TerminalChat() {
         <button
           type="submit"
           className={styles.send}
-          disabled={booting || isLoading || !input.trim()}
+          disabled={isLoading || !input.trim()}
         >
           SEND_
         </button>
