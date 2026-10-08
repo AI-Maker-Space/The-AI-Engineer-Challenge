@@ -8,7 +8,7 @@ This is a FastAPI-based backend service that provides a chat interface using Ope
 - `uv` will provision Python 3.12 automatically for this project, so no separate interpreter installation is required
 - An OpenAI API key available as the `OPENAI_API_KEY` environment variable when you run the server
 
-## Setup
+## Setup to run the backend API locally
 
 All commands below assume you are running them from the repository root.
 
@@ -120,3 +120,45 @@ You can also test the health check endpoint:
 ```bash
 curl http://127.0.0.1:8000/api/health
 ```
+
+
+## Deploying the Backend to Vercel (Production)
+
+The backend is already wired for Vercel using the `vercel.json` file in the repository root. To deploy it:
+
+1. **Deploy from your IDE**:
+   - Install the Vercel CLI if you have not already:
+     ```bash
+     npm install -g vercel
+     ```
+   - From the repository root, run:
+     ```bash
+     vercel
+     ```
+   - Follow the prompts to link the project and create the first deployment.
+
+Once configured, every push to the selected branch will trigger a new deployment of the backend API.
+
+## Configuring `OPENAI_API_KEY` in Production (Vercel)
+
+In production, the backend reads the OpenAI API key from the `OPENAI_API_KEY` environment variable. To configure this on Vercel, you can use either the dashboard or the CLI:
+
+**Option A: Using Vercel CLI (Command Line)**
+
+Set the environment variable directly from the command line:
+
+```bash
+# Set for production environment
+vercel env add OPENAI_API_KEY production
+```
+**Option B: Using Vercel Dashboard**
+
+1. Open your project in the Vercel dashboard.
+2. Go to **Settings → Environment Variables**.
+3. Click **Add New** and configure:
+   - **Name**: `OPENAI_API_KEY`
+   - **Value**: your actual OpenAI API key (e.g., `sk-...`)
+   - **Environment**: typically **Production**, **Preview**, and **Development**.
+4. Save the variable and **redeploy** the project so the new value is available to the backend functions.
+
+**Important:** Without this variable set in Vercel, the `/api/chat` endpoint will return a 500 error indicating that `OPENAI_API_KEY` is not configured.

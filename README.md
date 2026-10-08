@@ -148,6 +148,12 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 
 6. Once the build is completed - head to the provided link and try out your app!
 
+7. Configure **production environment variables** in your Vercel project:
+   - In **Settings → Environment Variables**, add:
+     - `OPENAI_API_KEY` with your OpenAI key (used by the FastAPI backend).
+     - `VITE_API_BASE_URL` pointing to your deployed backend URL (used by the frontend).
+   - Redeploy the project so these values are picked up.
+
 > NOTE: Remember, if you run into any errors - ask Cursor to help you fix them!
 
 ### Vercel Link to Share

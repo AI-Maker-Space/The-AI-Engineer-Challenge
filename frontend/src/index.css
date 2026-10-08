@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global layout styles keep the background polished and legible */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  @apply bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 text-slate-900 antialiased;
+  background-attachment: fixed;
+}
+
+/* Dark mode styles */
+.dark body {
+  @apply bg-slate-950 text-slate-100;
+  background: #0f172a;
+}
+
+/* Light mode background with subtle gradient overlay */
+.light-background {
+  background: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #f1f5f9 25%,
+    #e0e7ff 50%,
+    #eef2ff 75%,
+    #f0f9ff 100%
+  );
+  background-attachment: fixed;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+
