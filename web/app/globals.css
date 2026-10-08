@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --card-bg: rgba(15, 23, 42, 0.82);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-text: #f8fafc;
+  --card-muted: #94a3b8;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Full-page static artwork from `public/weather/*.jpg` — no CSS animation */
+.weather-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.weather-bg__image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Dark read-through so UI cards stay legible on bright scenes (e.g. sunny, snow). */
+.weather-bg__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.38);
+}
+
+/* ---- Chat shell: center → docked bottom ---- */
+.chat-shell {
+  position: fixed;
+  left: 50%;
+  top: 44%;
+  bottom: auto;
+  z-index: 40;
+  width: min(92vw, 28rem);
+  transform: translate(-50%, -50%);
+  transition:
+    top 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+    bottom 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+    width 0.7s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.chat-shell--docked {
+  top: auto;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: min(94vw, 42rem);
+  transform: translateX(-50%);
+}
+
+/* Compact bar when chat is minimized — less vertical obstruction over widgets */
+.chat-shell--minimized {
+  width: min(94vw, 42rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-shell {
+    transition: none;
+  }
+}
