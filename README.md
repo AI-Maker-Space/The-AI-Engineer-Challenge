@@ -8,24 +8,11 @@
 
 ## 🤖 Your First Vibe Coding LLM Application
 
-> If you are a novice, and need a bit more help to get your dev environment off the ground, check out this [Setup Guide](docs/GIT_SETUP.md). This guide will walk you through the 'git' setup you need to get started.
-
-> For additional context on LLM development environments and API key setup, you can also check out our [Interactive Dev Environment for LLM Development](https://github.com/AI-Maker-Space/Interactive-Dev-Environment-for-AI-Engineers).
+> New to coding? Start with our [Interactive Dev Environment for LLM Development](https://github.com/AI-Maker-Space/Interactive-Dev-Environment-for-AI-Engineers) guide. It will walk you through setting up the tools and API keys you'll need for the course.
 
 In this repository, we'll walk you through the steps to create a LLM (Large Language Model) powered application with a vibe-coded frontend!
 
 Are you ready? Let's get started!
-
-<details>
-  <summary>🖥️ Accessing "gpt-4.1-mini" (ChatGPT) like a developer</summary>
-
-1. Head to [this notebook](https://colab.research.google.com/drive/1sT7rzY_Lb1_wS0ELI1JJfff0NUEcSD72?usp=sharing) and follow along with the instructions!
-
-2. Complete the notebook and try out your own system/assistant messages!
-
-That's it! Head to the next step and start building your application!
-
-</details>
 
 
 <details>
@@ -35,7 +22,7 @@ Before you begin, make sure you have:
 
 1. 👤 A GitHub account (you'll need to replace `YOUR_GITHUB_USERNAME` with your actual username)
 2. 🔧 Git installed on your local machine
-3. 💻 A code editor (like Cursor, VS Code, etc.)
+3. 💻 A code editor (like VS Code, Cursor, etc.)
 4. ⌨️ Terminal access (Mac/Linux) or Command Prompt/PowerShell (Windows)
 5. 🔑 A GitHub Personal Access Token (for authentication)
 
@@ -173,197 +160,23 @@ You'll want to make sure you share you *domains* hyperlink to ensure people can 
 
 </details>
 
-<details>
-     <summary>🧪 Vibe Check Your LLM App</summary>
-
-### 🤔 What is a Vibe Check?
-
-Now that you’ve built and deployed your first LLM-powered application, it’s time to evaluate it.
-
-In this section, you’ll run a **“vibe check”** — a lightweight, practical way to test how well your application performs across common tasks.
-
-Think of it as a **first pass to catch obvious issues** before deeper evaluation.
-
-> 💡 You will complete this directly in this README. 
-
----
-
-## 🏗️ Activity #1: General Capability Vibe Check
-
-Run the following prompts through your app.
-
-For each prompt Identify what capability is being tested (e.g., *summarization ability, reasoning, creativity*)
-
----
-
-**1. Prompt:**  
-Explain the concept of object-oriented programming in simple terms to a complete beginner.  
-**Aspect Tested:**  <!-- Write your answer here -->
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-**2. Prompt:**  
-Read the following paragraph and provide a concise summary of the key points…  
-**Aspect Tested:**  
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-**3. Prompt:**  
-Write a short, imaginative story (100–150 words) about a robot finding friendship in an unexpected place.  
-**Aspect Tested:**  <!-- Write your answer here -->
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-**4. Prompt:**  
-If a store sells apples in packs of 4 and oranges in packs of 3, how many packs of each do I need to buy to get exactly 12 apples and 9 oranges?  
-**Aspect Tested:**  <!-- Write your answer here -->
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-**5. Prompt:**  
-Rewrite the following paragraph in a professional, formal tone…  
-**Aspect Tested:**  <!-- Write your answer here -->
-
-**Response:**  
-<!-- Add your app's response here -->
-
----
-
-### ❓Question #1
-
-Do the answers appear to be correct and useful?
-
-**Your Answer:**  
-<!-- Write your answer here -->
-
----
-
-## 🏗️ Activity #2: Personal Use Vibe Check
-
-Now test your app with **real-world prompts that are relevant to your use case**.
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-### ❓Question #2
-
-Are the vibes of your assistant aligned with your expectations? Why or why not?
-
-**Your Answer:**  
-<!-- Write your answer here -->
-
----
-
-## 🏗️ Activity #3: Capability Gaps Vibe Check
-
-Now test your app with prompts that require **capabilities it may not have yet**, such as:
-- Real-time data
-- Memory
-- External tools
-
-Examples:
-- “What does my schedule look like tomorrow?”
-- “What time should I leave for the airport?”
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-**Prompt:**  
-<!-- Your prompt -->
-
-**Result:**  
-<!-- App response -->
-
----
-
-### ❓Question #3
-
-What are some limitations of your application?
-
-**Your Answer:**  
-<!-- Write your answer here -->
-
----
-
-## 🚀 (Optional) Improve Your App
-
-Based on your vibe check, try improving your application:
-- Adjust your prompt
-- Change the model
-- Add features
-
-Then rerun your vibe check and document:
-
----
-
-**Adjustments Made:**  
-<!-- Describe what you changed -->
-
-**Results:**  
-<!-- What improved? What didn’t? -->
-
 ---
 
 ## 📦 Submission Instructions
 
-1. Complete this section directly in your README
-2. Commit and push your changes to GitHub
-3. Share your **repo link + deployed Vercel app**
-
-
-
-
-
-
-
+1. 🏗️ Build: Commit and push your changes to your remote on GitHub
+2. 🚢 Ship: Deploy your app to Vercel
+3. 🚀 Share: Submit your completed challenge through the [Typeform submission link](https://maven.com/aimakerspace/admin/courses/ai-eng-bootcamp/syllabus/modules/TYPEFORM_LINK).
 
 </details>
 
 ### 🎉 Congratulations! 
 
-You just deployed your first LLM-powered application! 🚀🚀🚀 Get on linkedin and post your results and experience! Make sure to tag us at @AIMakerspace!
+You just 🏗️ built, 🚢 shipped, and 🚀 shared your first LLM-powered application! 🚀🚀🚀 
+
+**But why stop there?**
+
+Get on linkedin and post your results and experience! Make sure to tag us at @AIMakerspace!
 
 Here's a template to get your post started!
 
