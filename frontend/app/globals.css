@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-dark-900 text-white;
+  }
+}
+
+@layer components {
+  .chat-message {
+    @apply p-4 rounded-lg max-w-4xl mx-auto;
+  }
+  
+  .user-message {
+    @apply bg-primary-600 text-white ml-auto;
+  }
+  
+  .assistant-message {
+    @apply bg-dark-700 text-gray-100 mr-auto;
+  }
+  
+  .typing-indicator {
+    @apply flex space-x-1 items-center text-gray-400;
+  }
+  
+  .typing-dot {
+    @apply w-2 h-2 bg-primary-400 rounded-full animate-bounce;
+  }
+}
