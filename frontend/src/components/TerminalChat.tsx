@@ -1,0 +1,226 @@
+"use client";
+
+import {
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import styles from "./TerminalChat.module.css";
+
+type Role = "system" | "user" | "coach" | "error";
+
+type Line = {
+  id: string;
+  role: Role;
+  text: string;
+};
+
+const BOOT_LINES = [
+  "LOS ANGELES · NIGHT SECTOR 4 · CHANNEL OPEN",
+  "SUPPORTIVE COACH KERNEL ONLINE",
+  "RAIN ON THE GLASS. SPEAK WHEN READY.",
+];
+
+/**
+ * Backend base URL.
+ * - Local: set NEXT_PUBLIC_API_URL=http://localhost:8000 in frontend/.env.local
+ * - Vercel: leave unset so requests hit same-origin /api/chat (routed to FastAPI)
+ */
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+
+function makeId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/**
+ * Blade Runner–styled chat console wired to FastAPI `/api/chat`.
+ * API key uses a password input per frontend security rules.
+ */
+export default function TerminalChat() {
+  const [lines, setLines] = useState<Line[]>(() =>
+    BOOT_LINES.map((text) => ({ id: makeId(), role: "system" as const, text })),
+  );
+  const [input, setInput] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [showConfig, setShowConfig] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [lines, isLoading]);
+
+  const appendLine = (role: Role, text: string) => {
+    setLines((prev) => [...prev, { id: makeId(), role, text }]);
+  };
+
+  const sendMessage = async () => {
+    const message = input.trim();
+    if (!message || isLoading) return;
+
+    setInput("");
+    appendLine("user", message);
+    setIsLoading(true);
+
+    try {
+      const body: { message: string; api_key?: string } = { message };
+      if (apiKey.trim()) {
+        body.api_key = apiKey.trim();
+      }
+
+      const response = await fetch(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const detail =
+          typeof data.detail === "string"
+            ? data.detail
+            : `SIGNAL FAILED // STATUS ${response.status}`;
+        appendLine("error", detail);
+        return;
+      }
+
+      appendLine("coach", data.reply ?? "(empty reply from the night channel)");
+    } catch {
+      appendLine(
+        "error",
+        `UPLINK LOST // IS THE BACKEND RUNNING AT ${API_BASE}?`,
+      );
+    } finally {
+      setIsLoading(false);
+      inputRef.current?.focus();
+    }
+  };
+
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    void sendMessage();
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      void sendMessage();
+    }
+  };
+
+  return (
+    <section className={styles.console} aria-label="Blade Runner chat console">
+      <div className={styles.neonEdge} aria-hidden="true" />
+
+      <header className={styles.titleBar}>
+        <div className={styles.meta}>
+          <span className={styles.pulse} />
+          <span className={styles.metaText}>LIVE UPLINK</span>
+        </div>
+        <div className={styles.brandBlock}>
+          <p className={styles.kanji} aria-hidden="true">
+            神経
+          </p>
+          <h1 className={styles.brand}>NEURAL_COACH</h1>
+          <p className={styles.tagline}>off-world support · rainy city night</p>
+        </div>
+        <button
+          type="button"
+          className={styles.configToggle}
+          onClick={() => setShowConfig((open) => !open)}
+          aria-expanded={showConfig}
+        >
+          {showConfig ? "CLOSE" : "CONFIG"}
+        </button>
+      </header>
+
+      {showConfig && (
+        <div className={styles.configPanel}>
+          <label className={styles.configLabel} htmlFor="api-key">
+            OPENAI_API_KEY (optional — password field, session only)
+          </label>
+          <input
+            id="api-key"
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            className={styles.configInput}
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="sk-••••••••"
+          />
+          <p className={styles.configHint}>
+            Leave blank to use the server&apos;s OPENAI_API_KEY env var.
+            Endpoint: {API_BASE}/api/chat
+          </p>
+        </div>
+      )}
+
+      <div className={styles.screen} ref={scrollRef}>
+        <div className={styles.grain} aria-hidden="true" />
+        {lines.map((line) => (
+          <p key={line.id} className={`${styles.line} ${styles[line.role]}`}>
+            <span className={styles.prefix}>{prefixFor(line.role)}</span>
+            <span className={styles.text}>{line.text}</span>
+          </p>
+        ))}
+        {isLoading && (
+          <p className={`${styles.line} ${styles.coach}`}>
+            <span className={styles.prefix}>{prefixFor("coach")}</span>
+            <span className={styles.thinking}>
+              listening through the rain<span className={styles.dots} />
+            </span>
+          </p>
+        )}
+      </div>
+
+      <form className={styles.prompt} onSubmit={onSubmit}>
+        <label className={styles.promptLabel} htmlFor="noir-input">
+          DECKARD&gt;
+        </label>
+        <input
+          id="noir-input"
+          ref={inputRef}
+          className={styles.promptInput}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={onKeyDown}
+          disabled={isLoading}
+          placeholder={isLoading ? "awaiting reply..." : "speak into the night"}
+          autoComplete="off"
+          spellCheck={false}
+          aria-label="Chat message"
+        />
+        <button
+          type="submit"
+          className={styles.send}
+          disabled={isLoading || !input.trim()}
+        >
+          TRANSMIT
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function prefixFor(role: Role): string {
+  switch (role) {
+    case "system":
+      return "SYS ·";
+    case "user":
+      return "YOU ·";
+    case "coach":
+      return "COACH ·";
+    case "error":
+      return "ERR ·";
+  }
+}
