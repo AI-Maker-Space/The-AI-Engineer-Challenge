@@ -125,6 +125,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+frontend/.env.local
 .venv
 env/
 venv/
@@ -163,3 +165,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .vercel
+node_modules/
+.next/
+frontend/node_modules/
+frontend/.next/

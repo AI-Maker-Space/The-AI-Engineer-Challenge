@@ -1,7 +1,5 @@
 ---
-description: When designing a frontend or frontend components.
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ### Rules for Frontend
 
