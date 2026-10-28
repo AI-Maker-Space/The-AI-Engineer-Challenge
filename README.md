@@ -59,7 +59,7 @@ Got everything in place? Let's move on!
 
      <!-- > Need more help with git? Check out our [Detailed Git Setup Guide](docs/GIT_SETUP.md) for a comprehensive walkthrough of git configuration and best practices. -->
 
-4. Open the freshly cloned repository in your coding environment of choice: Cursor, VS Code, Claude Code, GitHub Copilot, or another AI coding harness.
+4. Open the freshly cloned repository in your coding environment of choice: Cursor, VS Code, Claude Code, GitHub Copilot, or any other AI coding harness.
 
      ```bash
      cd The-AI-Engineer-Challenge
@@ -109,7 +109,7 @@ Got everything in place? Let's move on!
 While it is a bit counter-intuitive to set things up before jumping into vibe-coding, it is important to remember that there exists a gradient between AI-Assisted Development and Vibe-Coding. We're only reaching *slightly* into AI-Assisted Development for this challenge, but it's worth it!
 
 1. Review `AGENTS.md` first. It is the single source of truth for AI coding assistant behavior in this repo.
-2. This project supports multiple coding harnesses, including Cursor, Claude Code, GitHub Copilot in VS Code, or another AI coding assistant/harness.
+2. This project supports multiple coding harnesses, including Cursor, Claude Code, GitHub Copilot in VS Code, or any other AI coding assistant/harness.
 3. If your coding tool supports project rules, custom instructions, or docs indexing, point it at the shared instructions and official docs:
 
      ```text
@@ -159,7 +159,7 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 
 1. Ensure you have signed in to [Vercel](https://vercel.com/) with your GitHub account.
 
-2. Ensure you have `npm` (this may have been installed in the previous vibe-coding step!) - if you need help with that, ask your favorite coding assistant!
+2. Ensure you have `npm` (this may have been installed if you followed the instructions from setting up your IDE from LLM development linked at the beginning of this step-by-step guide.) - if you need help with that, ask your favorite coding assistant!
 
 3. Run the command:
 
