@@ -6,7 +6,7 @@ The service acts as a supportive mental coach, helping users with stress, motiva
 ## Prerequisites
 
 - [`uv`](https://github.com/astral-sh/uv) package manager (`pip install uv` if you want to install it via python pip default). Otherwise, [Astral](https://docs.astral.sh/uv/getting-started/installation/) provides comprehensive documentation on how to install it directly on your machine.  
-- `uv` will provision Python 3.13.2 automatically for this challenge, as defined in `.python-version` so no separate interpreter installation is required. You can change your python version up to pyhon 3.14.x. At this time, Vercel supports 3.12 | 3.13 | 3.14. `pyproject.toml` defines the accepted python version range for this project.
+- `uv` will provision Python 3.13 automatically for this challenge, as defined in `.python-version` so no separate interpreter installation is required. You can change your python version up to pyhon 3.14.x. At this time, Vercel supports 3.12 | 3.13 | 3.14. `pyproject.toml` defines the accepted python version range for this project.
 - This challenge supports either OpenAI / Anthropic as LLM providers. More on how to set up your provider bellow:
   - To set this up:
     - ```bash

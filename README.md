@@ -1,4 +1,4 @@
-<p align = "center" draggable=”false” ><img src="https://github.com/AI-Maker-Space/LLM-Dev-101/assets/37101144/d1343317-fa2f-41e1-8af1-1dbb18399719" 
+<p align = "center" draggable="false" ><img src="https://github.com/AI-Maker-Space/LLM-Dev-101/assets/37101144/d1343317-fa2f-41e1-8af1-1dbb18399719" 
      width="200px"
      height="auto" alt=""/>
 </p>
@@ -42,7 +42,7 @@ Got everything in place? Let's move on!
      git clone git@github.com:<YOUR GITHUB USERNAME>/The-AI-Engineer-Challenge.git
      ```
 
-     > Note: This command uses SSH. If you haven't set up SSH with GitHub, the command will fail. In that case, use HTTPS by replacing `git@github.com:` with `https://github.com/` - you'll then be prompted for your GitHub username and personal access token.
+     > Note: This command uses SSH. If you haven't set up SSH with GitHub, the command will fail. In that case, use HTTPS by replacing `git@github.com:` with `https://github.com/`. GitHub no longer accepts account passwords for Git over HTTPS, so use a GitHub Personal Access Token when prompted for a password, or authenticate with GitHub CLI / Git Credential Manager.
 
 3. Verify your git setup:
 
@@ -72,7 +72,7 @@ Got everything in place? Let's move on!
 <details>
   <summary>⚙️ Backend Setup with uv</summary>
 
-1. Install the [`uv`](https://github.com/astral-sh/uv) package manager (`pip install uv`). `uv` will download and manage the Python version configured for this project. This repo currently pins Python `3.13.2` in `.python-version`, while `pyproject.toml` accepts Python `>=3.12,<3.15`.
+1. Install the [`uv`](https://github.com/astral-sh/uv) package manager. `uv` will download and manage the Python version configured for this project. This repo currently pins Python `3.13` in `.python-version`, while `pyproject.toml` accepts Python `>=3.12,<3.15`.
 2. From the project root, install dependencies with `uv sync`. This creates `.venv/` and fetches the configured Python version automatically if needed.
 3. Copy the example environment file and choose your LLM provider:
 
@@ -159,27 +159,68 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 
 1. Ensure you have signed in to [Vercel](https://vercel.com/) with your GitHub account.
 
-2. Ensure you have `npm` (this may have been installed if you followed the instructions from setting up your IDE from LLM development linked at the beginning of this step-by-step guide.) - if you need help with that, ask your favorite coding assistant!
+2. Ensure you have `npm` available on your machine.
 
-3. Run the command:
+3. Deploy the full application from the repository root. This deploys both:
 
-     ```bash
-     npm install -g vercel
-     ```
+   - the frontend app in `frontend/`
+   - the FastAPI backend in `api/`
 
-4. Run the command:
+   You do not need to install the Vercel CLI globally. Use `npx`:
 
-     ```bash
-     vercel
-     ```
+   ```bash
+   npx vercel
+   ```
 
-5. Follow the in-terminal instructions. (Below is an example of what you will see!)
+   For a production deployment:
 
-     ![image](https://i.imgur.com/D1iKGCq.png)
+   ```bash
+   npx vercel --prod
+   ```
 
-6. Once the build is completed – head to the provided link and try out your app!
+   If you want to accept the default prompts automatically:
 
-> NOTE: Remember, if you run into any errors, ask your AI coding assistant to help you fix them!
+   ```bash
+   npx vercel --prod --yes --name the-ai-engineer-challenge
+   ```
+
+4. Follow the in-terminal instructions.
+
+5. Add your backend provider environment variables in the Vercel dashboard.
+
+   For OpenAI:
+
+   ```text
+   LLM_PROVIDER=openai
+   OPENAI_API_KEY=your-openai-key
+   OPENAI_MODEL=gpt-4o-mini
+   ```
+
+   For Anthropic:
+
+   ```text
+   LLM_PROVIDER=anthropic
+   ANTHROPIC_API_KEY=your-anthropic-key
+   ANTHROPIC_MODEL=claude-sonnet-4-5
+   ```
+
+6. If the frontend and backend are deployed together on the same Vercel project, you usually do not need to set `NEXT_PUBLIC_API_URL`. The frontend can call the backend through the same domain using:
+
+   ```text
+   /api/chat
+   ```
+
+7. For local development only, set `NEXT_PUBLIC_API_URL` if your frontend runs on `localhost:3000` and your backend runs on `localhost:8000`:
+
+   ```bash
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   ```
+
+8. Once the deployment completes, open the provided Vercel URL and test your app.
+
+> NOTE: Do not deploy with `npx vercel --cwd frontend` if you want the backend included. That command deploys only the frontend directory.
+
+> NOTE: Test the public deployment link in an Incognito browser tab to confirm it works for users who are not signed in.
 
 ### Vercel Link to Share
 
@@ -187,8 +228,6 @@ You'll want to make sure you share your *domain* hyperlink to ensure people can 
 
 ![image](https://i.imgur.com/mpXIgIz.png)
 
-> NOTE: Test this is the public link by trying to open your newly deployed site in an Incognito browser tab!
----
 
 ## 📦 Submission Instructions
 
